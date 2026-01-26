@@ -1,7 +1,7 @@
 {templateType App\Core\Permission\Datagrid\Paginator\PaginatorTemplate}
 {var $page = $paginator->getPage()}
 {var $pageCount = $paginator->getPageCount()}
-{var $window = 2} {* počet stránek vlevo a vpravo od aktuální *}
+{var $window = 2}
 
 {define pageLink, int $targetPage, string $label, bool $active = false, bool $disabled = false}
     <li n:class="page-item, $active ? active, $disabled ? disabled" n:attr="aria-current => $active ? 'page' : null">
