@@ -7,38 +7,66 @@ namespace App\Core\Permission\Datagrid\Filter;
 use App\Core\Permission\Datagrid\Options;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
-use Tracy\Debugger;
 
 final class PageSizeControl extends Control
 {
 	/** @var callable|null Callback invoked on page change */
 	private $onPageChanged = null;
 
+	/** Celkový počet položek v DataGrid */
+	private int $totalItems = 0;
+
+	/** Aktuální počet položek na stránku */
+	private int $currentPageSize = Options::DefaultItemsPerPage;
 
 	/**
-	 * Register a callback to be called when the page changes.
+	 * Registrace callbacku při změně počtu položek na stránku
 	 */
 	public function onPageChanged(callable $callback): void
 	{
 		$this->onPageChanged = $callback;
 	}
 
+	/**
+	 * Nastavení celkového počtu položek (DataGrid)
+	 */
+	public function setTotalItems(int $totalItems): void
+	{
+		$this->totalItems = $totalItems;
+	}
 
+	/**
+	 * Nastavení aktuálního počtu položek na stránku
+	 */
+	public function setCurrentPageSize(int $size): void
+	{
+		$this->currentPageSize = $size;
+	}
+
+	/**
+	 * Vytvoření formuláře pro výběr počtu položek
+	 */
 	protected function createComponentForm(): Form
 	{
 		$form = new Form;
-		$form->addSelect('pageSize', '', [
+
+		$form->addSelect('pageSize', 'Items per page', items: [
 			20 => '20',
 			50 => '50',
 			100 => '100',
-			0 => 'All',
+			0  => 'All',
 		])
-			->setDefaultValue(Options::DefaultItemsPerPage)
+			->setDefaultValue($this->currentPageSize)
 			->setHtmlAttribute('data-items-page');
 
 		$form->onSuccess[] = function (Form $form, \stdClass $values): void {
+			$size = (int) $values->pageSize;
+			if ($size === 0) {
+				$size = $this->totalItems;
+			}
+
 			if ($this->onPageChanged) {
-				($this->onPageChanged)(Options::DefaultPage, $values->pageSize);
+				($this->onPageChanged)(Options::DefaultPage, $size);
 			}
 		};
 

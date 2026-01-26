@@ -1,10 +1,5 @@
 <?php
 
-/**
- * Drago Extension
- * Package built on Nette Framework
- */
-
 declare(strict_types=1);
 
 namespace App\Core\Permission\Datagrid;
@@ -12,6 +7,7 @@ namespace App\Core\Permission\Datagrid;
 use App\Core\Permission\Datagrid\Column\Column;
 use App\Core\Permission\Datagrid\Column\ColumnDate;
 use App\Core\Permission\Datagrid\Column\ColumnText;
+use App\Core\Permission\Datagrid\Filter\PageSizeControl;
 use App\Core\Permission\Datagrid\Paginator\PaginatorControl;
 use Closure;
 use Dibi\Fluent;
@@ -20,7 +16,6 @@ use Nette\Application\Attributes\Parameter;
 use Nette\Application\Attributes\Requires;
 use Nette\Application\UI\Control;
 use Nette\Utils\Paginator;
-
 
 /**
  * DataGrid component for displaying tabular data with sorting, pagination, and row actions.
@@ -46,19 +41,14 @@ class DataGrid extends Control
 	#[Parameter]
 	public int $itemsPerPage = Options::DefaultItemsPerPage;
 
+	/** Celkový počet záznamů */
+	private int $totalItems = 0;
 
-	/**
-	 * Constructor initializes paginator.
-	 */
 	public function __construct()
 	{
 		$this->paginator = new Paginator();
 	}
 
-
-	/**
-	 * Creates Paginator component and sets its callbacks for page changes.
-	 */
 	protected function createComponentPaginator(): PaginatorControl
 	{
 		$control = new PaginatorControl();
@@ -73,7 +63,7 @@ class DataGrid extends Control
 			$control->setPaginator(
 				$this->paginator->getPage(),
 				$this->paginator->getItemsPerPage(),
-				$this->paginator->getItemCount(),
+				$this->paginator->getItemCount()
 			);
 			$control->setSorting($this->column, $this->order);
 		}
@@ -81,40 +71,39 @@ class DataGrid extends Control
 		return $control;
 	}
 
+	protected function createComponentPageSize(): PageSizeControl
+	{
+		$control = new PageSizeControl();
+		$control->setTotalItems($this->totalItems);
+		$control->setCurrentPageSize($this->itemsPerPage);
 
-	/**
-	 * Sets the data source (Dibi Fluent object).
-	 */
+		$control->onPageChanged(function(int $page, int $itemsPerPage): void {
+			$this->page = $page;
+			$this->itemsPerPage = $itemsPerPage;
+			$this->redrawControl('dataGrid');
+		});
+
+		return $control;
+	}
+
 	public function setDataSource(Fluent $source): self
 	{
 		$this->source = $source;
 		return $this;
 	}
 
-
-	/**
-	 * Sets the primary key column name (required for actions).
-	 */
 	public function setPrimaryKey(string $primaryKey): self
 	{
 		$this->primaryKey = $primaryKey;
 		return $this;
 	}
 
-
-	/**
-	 * Adds a text column.
-	 */
 	public function addColumnText(string $name, string $label, bool $sortable = true, ?Closure $formatter = null): self
 	{
 		$this->addColumn(new ColumnText($name, $label, $sortable, $formatter));
 		return $this;
 	}
 
-
-	/**
-	 * Adds a date column.
-	 */
 	public function addColumnDate(
 		string $name,
 		string $label,
@@ -127,11 +116,6 @@ class DataGrid extends Control
 		return $this;
 	}
 
-
-	/**
-	 * Adds a column to the grid.
-	 * Throws LogicException if column with same name already exists.
-	 */
 	private function addColumn(Column $column): void
 	{
 		if (isset($this->columns[$column->name])) {
@@ -140,10 +124,6 @@ class DataGrid extends Control
 		$this->columns[$column->name] = $column;
 	}
 
-
-	/**
-	 * Adds an action (button/link) to each row.
-	 */
 	public function addAction(string $label, string $signal, ?string $class = null, ?callable $callback = null): self
 	{
 		$action = new Action($label, $signal, $class);
@@ -154,11 +134,6 @@ class DataGrid extends Control
 		return $this;
 	}
 
-
-	/**
-	 * Handles sorting via AJAX.
-	 * Toggles between ASC/DESC if same column, otherwise starts with ASC.
-	 */
 	#[Requires(ajax: true)]
 	public function handleSort(string $column, int $page): void
 	{
@@ -178,10 +153,6 @@ class DataGrid extends Control
 		$this->redrawControl('dataGrid');
 	}
 
-
-	/**
-	 * Handles row actions via AJAX.
-	 */
 	#[Requires(ajax: true)]
 	public function handleAction(string $signal, int $id): void
 	{
@@ -194,13 +165,6 @@ class DataGrid extends Control
 		}
 	}
 
-
-	/**
-	 * Renders the DataGrid.
-	 * - Sorts data
-	 * - Applies pagination
-	 * - Passes data, columns, actions to template
-	 */
 	public function render(): void
 	{
 		if ($this->source === null) {
@@ -212,6 +176,7 @@ class DataGrid extends Control
 		}
 
 		$data = clone $this->source;
+
 		if ($this->column !== null && isset($this->columns[$this->column])) {
 			$order = $this->order;
 			$column = $this->column;
@@ -221,13 +186,24 @@ class DataGrid extends Control
 		}
 
 		$allRows = $data->fetchAll();
-		$this->paginator->setItemCount(count($allRows));
-		$this->paginator->setItemsPerPage($this->itemsPerPage);
-		$this->paginator->setPage($this->page);
 
-		$offset = $this->paginator->getOffset();
-		$length = $this->paginator->getLength();
-		$pageRows = array_slice($allRows, $offset, $length);
+		$this->totalItems = count($allRows);
+
+		if ($this->itemsPerPage > 0) {
+			$this->paginator->setItemsPerPage($this->itemsPerPage);
+			$this->paginator->setPage($this->page);
+
+			$offset = $this->paginator->getOffset();
+			$length = $this->paginator->getLength();
+			$pageRows = array_slice($allRows, $offset, $length);
+		} else {
+			// zobraz všechny položky
+			$pageRows = $allRows;
+			$this->paginator->setItemsPerPage($this->totalItems);
+			$this->paginator->setPage(1);
+		}
+
+		$this->paginator->setItemCount($this->totalItems);
 
 		if (!empty($pageRows)) {
 			$dbColumns = array_keys((array)$pageRows[0]);
@@ -257,10 +233,18 @@ class DataGrid extends Control
 				$this->paginator->getItemsPerPage(),
 				$this->paginator->getItemCount()
 			);
-			$this['paginator']->setSorting($this->column, $this->order);
+
+			$this['paginator']->setSorting(
+				$this->column,
+				$this->order,
+			);
+		}
+
+		if ($this->getComponent('pageSize', false)) {
+			$this['pageSize']->setTotalItems($this->totalItems);
+			$this['pageSize']->setCurrentPageSize($this->itemsPerPage);
 		}
 
 		$template->render();
 	}
-
 }
