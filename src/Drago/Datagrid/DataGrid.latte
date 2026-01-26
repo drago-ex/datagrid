@@ -54,6 +54,19 @@
         </tbody>
     </table>
 
-    {control paginator}
+    {var $from = ($page - 1) * $itemsPerPage + 1}
+    {var $to = min($from + $itemsPerPage - 1, $totalItems)}
+
+    <div class="d-flex justify-content-between align-items-center">
+        <div class="text-muted small">
+            {if $totalItems > 0}
+                Showing {$from}–{$to} of {$totalItems} items
+            {else}
+                No items
+            {/if}
+        </div>
+
+        {control paginator}
+    </div>
 
 {/snippet}
