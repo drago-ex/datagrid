@@ -1,0 +1,16 @@
+{
+	"name": "drago-ex/project",
+	"type": "project",
+	"description": "The basis for new projects on Drago Extension.",
+	"require": {
+		"php": ">=8.3 <9",
+		"latte/latte": "^3.1",
+		"tracy/tracy": "^2.11",
+	  	"dibi/dibi": "^5.0",
+	  	"nette/application": "^3.2"
+	},
+	"minimum-stability": "stable",
+	"require-dev": {
+		"phpstan/phpstan-nette": "^1.2.9"
+	}
+}

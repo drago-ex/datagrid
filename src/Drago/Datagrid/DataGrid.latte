@@ -1,0 +1,59 @@
+{templateType App\Core\Permission\Datagrid\DataGridTemplate}
+
+{snippet dataGrid}
+    <table class="table table-sm table-striped">
+        <thead>
+        <tr>
+            {foreach $columns as $col}
+                <th>
+                    {if $col->sortable}
+                        {var $isActive = $col->name === $columnName}
+                        <a n:href="sort!, column: $col->name, page: $page, order: $order"
+                                class="ajax text-decoration-none"
+                                data-naja-history="replace">
+                            {$col->label}
+                            {if $isActive}
+                                {if $order === 'ASC'} ↑{else} ↓{/if}
+                            {else}
+                                ↕
+                            {/if}
+                        </a>
+                    {else}
+                        {$col->label}
+                    {/if}
+                </th>
+            {/foreach}
+
+
+            {if $actions !== []}
+                <th>Akce</th>
+            {/if}
+        </tr>
+        </thead>
+
+        <tbody>
+        {foreach $rows as $row}
+            <tr>
+                {foreach $columns as $col}
+                    <td>{$col->renderCell((array) $row)|noescape}</td>
+                {/foreach}
+
+                {if $actions !== []}
+                    <td>
+                        {foreach $actions as $action}
+                            <a n:href="action!, signal: $action->signal, id: $row[$primaryKey]"
+                                    n:class="$action->class"
+                                    data-naja-history="off">
+                                {$action->label}
+                            </a>
+                        {/foreach}
+                    </td>
+                {/if}
+            </tr>
+        {/foreach}
+        </tbody>
+    </table>
+
+    {control paginator}
+
+{/snippet}
