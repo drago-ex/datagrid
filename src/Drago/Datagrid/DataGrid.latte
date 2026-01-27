@@ -4,17 +4,17 @@
 {import 'Action.latte'}
 
 {snippet dataGrid}
-    <table class="table table-sm table-striped">
+    <table class="table table-sm table-striped table-borderless table-hover">
         <thead>
         <tr>
             {foreach $columns as $col}
-                <th>
+                <th class="fw-semibold">
                     {include 'sortable', sortable: $col->sortable, name: $col->name, label: $col->label}
                 </th>
             {/foreach}
 
             {if $actions !== []}
-                <th>Akce</th>
+                <th class="fw-semibold">Akce</th>
             {/if}
         </tr>
         </thead>
