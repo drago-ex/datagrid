@@ -66,7 +66,7 @@
             {/if}
         </div>
 
-        <div class="order-1 order-md-2 mx-md-auto">
+        <div n:class="'order-1 order-md-2 mx-md-auto', $itemsPerPage >= $totalItems ? 'invisible'">
             {control paginator}
         </div>
 
