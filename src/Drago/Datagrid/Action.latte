@@ -1,0 +1,11 @@
+{define action, string $signal, string $label, int $id, ?string $class = null}
+
+    {do $attr = [
+        'data-naja-history' => 'replace',
+        'class' => $class ?? 'ajax text-decoration-none'
+    ]}
+
+    <a n:href="action!, signal: $signal, id: $id" n:attr="$attr">
+        {$label}
+    </a>
+{/define}

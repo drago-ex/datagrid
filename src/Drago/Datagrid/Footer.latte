@@ -1,0 +1,21 @@
+{templateType App\Core\Permission\Datagrid\DataGridTemplate}
+{do $from = ($page - 1) * $itemsPerPage + 1}
+{do $to = min($from + $itemsPerPage - 1, $totalItems)}
+
+<div class="d-flex flex-column flex-md-row align-items-baseline gap-2">
+    <div class="text-muted small text-nowrap order-2 order-md-1">
+        {if $totalItems > 0}
+            Showing {$from}–{$to} of {$totalItems} items
+        {else}
+            No items
+        {/if}
+    </div>
+
+    <div n:class="'order-1 order-md-2 mx-md-auto', $itemsPerPage >= $totalItems ? 'invisible'">
+        {control paginator}
+    </div>
+
+    <div class="order-3 d-flex align-items-center text-nowrap">
+        {control pageSize}
+    </div>
+</div>

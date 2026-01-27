@@ -1,29 +1,17 @@
 {templateType App\Core\Permission\Datagrid\DataGridTemplate}
 
+{import 'Sortable.latte'}
+{import 'Action.latte'}
+
 {snippet dataGrid}
     <table class="table table-sm table-striped">
         <thead>
         <tr>
             {foreach $columns as $col}
                 <th>
-                    {if $col->sortable}
-                        {var $isActive = $col->name === $columnName}
-                        <a n:href="sort!, column: $col->name, page: $page, order: $order"
-                                class="ajax text-decoration-none"
-                                data-naja-history="replace">
-                            {$col->label}
-                            {if $isActive}
-                                {if $order === 'ASC'} ↑{else} ↓{/if}
-                            {else}
-                                ↕
-                            {/if}
-                        </a>
-                    {else}
-                        {$col->label}
-                    {/if}
+                    {include 'sortable', sortable: $col->sortable, name: $col->name, label: $col->label}
                 </th>
             {/foreach}
-
 
             {if $actions !== []}
                 <th>Akce</th>
@@ -40,12 +28,8 @@
 
                 {if $actions !== []}
                     <td>
-                        {foreach $actions as $action}
-                            <a n:href="action!, signal: $action->signal, id: $row[$primaryKey]"
-                                    n:class="$action->class"
-                                    data-naja-history="off">
-                                {$action->label}
-                            </a>
+                        {foreach $actions as $ac}
+                            {include 'action', signal: $ac->signal, label: $ac->label, id: $row[$primaryKey], class: $ac->class}
                         {/foreach}
                     </td>
                 {/if}
@@ -53,26 +37,5 @@
         {/foreach}
         </tbody>
     </table>
-
-    {var $from = ($page - 1) * $itemsPerPage + 1}
-    {var $to = min($from + $itemsPerPage - 1, $totalItems)}
-
-    <div class="d-flex flex-column flex-md-row align-items-baseline gap-2">
-        <div class="text-muted small text-nowrap order-2 order-md-1">
-            {if $totalItems > 0}
-                Showing {$from}–{$to} of {$totalItems} items
-            {else}
-                No items
-            {/if}
-        </div>
-
-        <div n:class="'order-1 order-md-2 mx-md-auto', $itemsPerPage >= $totalItems ? 'invisible'">
-            {control paginator}
-        </div>
-
-        <div class="order-3 d-flex align-items-center text-nowrap">
-            {control pageSize}
-        </div>
-    </div>
-
+    {include 'Footer.latte'}
 {/snippet}
