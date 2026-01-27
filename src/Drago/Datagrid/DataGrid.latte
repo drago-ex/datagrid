@@ -57,10 +57,8 @@
     {var $from = ($page - 1) * $itemsPerPage + 1}
     {var $to = min($from + $itemsPerPage - 1, $totalItems)}
 
-    <div class="d-flex align-items-center justify-content-between">
-
-        <!-- Vlevo: text -->
-        <div class="text-muted small flex-shrink-0">
+    <div class="d-flex flex-column flex-md-row align-items-baseline gap-2">
+        <div class="text-muted small text-nowrap order-2 order-md-1">
             {if $totalItems > 0}
                 Showing {$from}–{$to} of {$totalItems} items
             {else}
@@ -68,18 +66,13 @@
             {/if}
         </div>
 
-        <!-- Uprostřed: paginator -->
-        <div class="d-flex justify-content-center flex-grow-1">
+        <div class="order-1 order-md-2 mx-md-auto">
             {control paginator}
         </div>
 
-        <!-- Vpravo: změna počtu položek -->
-        <div class="d-flex align-items-center flex-shrink-0">
+        <div class="order-3 d-flex align-items-center text-nowrap">
             {control pageSize}
         </div>
-
     </div>
-
-
 
 {/snippet}
