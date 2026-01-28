@@ -1,13 +1,18 @@
 <form n:name="form" class="ajax">
     <div class="row g-3">
+
         {foreach $form->controls as $input}
-            <div class="col-12 col-md-6">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="flex-grow-1">
-                        {$input->getControl()}
-                    </div>
+            {if !$input instanceof Nette\Forms\Controls\SubmitButton}
+                <div class="col-12 col-md-6">
+                    {$input->getControl()}
                 </div>
-            </div>
+            {/if}
         {/foreach}
+
+    </div>
+
+    <div class="d-flex gap-2 mt-3">
+        {$form['submit']->getControl()}
+        {$form['reset']->getControl()}
     </div>
 </form>

@@ -4,19 +4,22 @@ declare(strict_types=1);
 
 namespace App\Core\Permission\Datagrid\Filter;
 
+use App\Core\Permission\Datagrid\Column\Column;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
+
 
 /**
  * DataGrid filter component.
  * Dynamically creates a form for all columns with filters.
+ * @property-read FilterControlTemplate $template
  */
 final class FilterControl extends Control
 {
 	/** @var callable|null Callback při změně filtru */
 	private $onFilterChanged = null;
 
-	/** Pole sloupců s instancí filtru */
+	/** @var Column[] Columns definitions */
 	private array $columns = [];
 
 	/** Aktuální hodnoty filtrů */
@@ -40,7 +43,6 @@ final class FilterControl extends Control
 	protected function createComponentForm(): Form
 	{
 		$form = new Form;
-
 		foreach ($this->columns as $column) {
 			if ($column->filter !== null) {
 				$type = $column->filter->getInputType();
@@ -50,7 +52,6 @@ final class FilterControl extends Control
 					$form->addText($name, $column->label)
 						->setHtmlAttribute('placeholder', $column->label)
 						->setDefaultValue($this->values[$name] ?? '')
-						->setHtmlAttribute('data-items-filter')
 						->setHtmlAttribute('class', 'form-control');
 				}
 
@@ -58,7 +59,19 @@ final class FilterControl extends Control
 			}
 		}
 
+		$form->addSubmit('submit', 'Filter');
+		$form->addSubmit('reset', 'Reset');
 		$form->onSuccess[] = function (Form $form, \stdClass $values): void {
+
+			if ($form['reset']->isSubmittedBy()) {
+				$form->reset();
+
+				if ($this->onFilterChanged) {
+					($this->onFilterChanged)([]);
+				}
+				return;
+			}
+
 			if ($this->onFilterChanged) {
 				($this->onFilterChanged)((array)$values);
 			}
