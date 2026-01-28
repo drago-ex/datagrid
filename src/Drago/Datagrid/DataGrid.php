@@ -7,7 +7,8 @@ namespace App\Core\Permission\Datagrid;
 use App\Core\Permission\Datagrid\Column\Column;
 use App\Core\Permission\Datagrid\Column\ColumnDate;
 use App\Core\Permission\Datagrid\Column\ColumnText;
-use App\Core\Permission\Datagrid\Filter\PageSizeControl;
+use App\Core\Permission\Datagrid\Filter\FilterControl;
+use App\Core\Permission\Datagrid\PageSize\PageSizeControl;
 use App\Core\Permission\Datagrid\Paginator\PaginatorControl;
 use Closure;
 use Dibi\Fluent;
@@ -41,6 +42,9 @@ class DataGrid extends Control
 	#[Parameter]
 	public int $itemsPerPage = Options::DefaultItemsPerPage;
 
+	/** Aktuální hodnoty filtrů */
+	private array $filterValues = [];
+
 	/** Celkový počet záznamů */
 	private int $totalItems = 0;
 
@@ -49,10 +53,28 @@ class DataGrid extends Control
 		$this->paginator = new Paginator();
 	}
 
+
+	protected function createComponentFilters(): FilterControl
+	{
+		$control = new FilterControl;
+		$control->setColumns($this->columns);
+
+		$control->onFilterChanged(function(array $filters): void {
+			$this->page = Options::DefaultPage; // reset na první stránku
+			$this->filterValues = $filters;     // uložíme hodnoty pro další render
+			$this->redrawControl('dataGrid');
+		});
+
+		$control->setValues($this->filterValues ?? []);
+
+		return $control;
+	}
+
+
 	protected function createComponentPaginator(): PaginatorControl
 	{
 		$control = new PaginatorControl();
-		$control->onPageChanged(function(int $page, ?string $column, ?string $order): void {
+		$control->onPageChanged(function (int $page, ?string $column, ?string $order): void {
 			$this->page = $page;
 			if ($column !== null) $this->column = $column;
 			if ($order !== null) $this->order = $order;
@@ -77,7 +99,7 @@ class DataGrid extends Control
 		$control->setTotalItems($this->totalItems);
 		$control->setCurrentPageSize($this->itemsPerPage);
 
-		$control->onPageChanged(function(int $page, int $itemsPerPage): void {
+		$control->onPageChanged(function (int $page, int $itemsPerPage): void {
 			$this->page = $page;
 			$this->itemsPerPage = $itemsPerPage;
 			$this->redrawControl('dataGrid');
@@ -98,17 +120,23 @@ class DataGrid extends Control
 		return $this;
 	}
 
-	public function addColumnText(string $name, string $label, bool $sortable = true, ?Closure $formatter = null): self
+	public function addColumnText(
+		string   $name,
+		string   $label,
+		bool     $sortable = true,
+		?Closure $formatter = null
+	): ColumnText
 	{
-		$this->addColumn(new ColumnText($name, $label, $sortable, $formatter));
-		return $this;
+		$column = new ColumnText($name, $label, $sortable, $formatter);
+		$this->addColumn($column);
+		return $column;
 	}
 
 	public function addColumnDate(
-		string $name,
-		string $label,
-		bool $sortable = true,
-		string $format = Options::DateFormat,
+		string   $name,
+		string   $label,
+		bool     $sortable = true,
+		string   $format = Options::DateFormat,
 		?Closure $formatter = null,
 	): self
 	{
@@ -176,6 +204,15 @@ class DataGrid extends Control
 		}
 
 		$data = clone $this->source;
+
+		// Aplikujeme filtry
+		if (!empty($this->filterValues)) {
+			foreach ($this->columns as $colName => $col) {
+				if ($col->filter !== null && isset($this->filterValues[$colName])) {
+					$col->filter->apply($data, $colName, $this->filterValues[$colName]);
+				}
+			}
+		}
 
 		if ($this->column !== null && isset($this->columns[$this->column])) {
 			$order = $this->order;

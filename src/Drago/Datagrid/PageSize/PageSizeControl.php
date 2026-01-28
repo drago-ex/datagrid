@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Permission\Datagrid\Filter;
+namespace App\Core\Permission\Datagrid\PageSize;
 
 use App\Core\Permission\Datagrid\Options;
 use Nette\Application\UI\Control;

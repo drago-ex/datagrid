@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace App\Core\Permission\Datagrid\Column;
 
+use App\Core\Permission\Datagrid\Filter\Filter;
 use Closure;
 
 
@@ -23,7 +24,15 @@ abstract class Column
 		public readonly string $label,
 		public readonly bool $sortable,
 		public readonly ?Closure $formatter,
+		public ?Filter $filter = null,
 	) {
+	}
+
+
+	public function setFilter(Filter $filter): static
+	{
+		$this->filter = $filter;
+		return $this;
 	}
 
 
