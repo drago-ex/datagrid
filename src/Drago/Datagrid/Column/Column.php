@@ -12,13 +12,18 @@ namespace App\Core\Permission\Datagrid\Column;
 use App\Core\Permission\Datagrid\Filter\Filter;
 use Closure;
 
-
 /**
- * Abstract base class for a DataGrid column.
- * Defines column properties and requires a renderCell() method.
+ * Base DataGrid column definition.
  */
 abstract class Column
 {
+	/**
+	 * @param string $name Column identifier
+	 * @param string $label Column label
+	 * @param bool $sortable Enables sorting
+	 * @param Closure|null $formatter Optional value formatter
+	 * @param Filter|null  $filter   Optional column filter
+	 */
 	public function __construct(
 		public readonly string $name,
 		public readonly string $label,
@@ -29,6 +34,9 @@ abstract class Column
 	}
 
 
+	/**
+	 * Assigns a filter to the column.
+	 */
 	public function setFilter(Filter $filter): static
 	{
 		$this->filter = $filter;
@@ -36,5 +44,8 @@ abstract class Column
 	}
 
 
+	/**
+	 * Renders a cell value for a given row.
+	 */
 	abstract public function renderCell(array $row): string;
 }

@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Drago Extension
+ * Package built on Nette Framework
+ */
+
 declare(strict_types=1);
 
 namespace App\Core\Permission\Datagrid\Filter;
@@ -8,41 +13,56 @@ use App\Core\Permission\Datagrid\Column\Column;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
 
-
 /**
  * DataGrid filter component.
- * Dynamically creates a form for all columns with filters.
- * @property-read FilterControlTemplate $template
+ * @property-read FilterTextTemplate $template
  */
-final class FilterControl extends Control
+final class FilterTextControl extends Control
 {
-	/** @var callable|null Callback při změně filtru */
+	/** @var callable|null Invoked when filter values change */
 	private $onFilterChanged = null;
 
-	/** @var Column[] Columns definitions */
+	/** @var Column[] */
 	private array $columns = [];
 
-	/** Aktuální hodnoty filtrů */
+	/** @var array<string, mixed> Current filter values */
 	private array $values = [];
 
+
+	/**
+	 * Registers filter change callback.
+	 */
 	public function onFilterChanged(callable $callback): void
 	{
 		$this->onFilterChanged = $callback;
 	}
 
+
+	/**
+	 * Sets grid columns.
+	 */
 	public function setColumns(array $columns): void
 	{
 		$this->columns = $columns;
 	}
 
+
+	/**
+	 * Sets current filter values.
+	 */
 	public function setValues(array $values): void
 	{
 		$this->values = $values;
 	}
 
+
+	/**
+	 * Builds filter form from column definitions.
+	 */
 	protected function createComponentForm(): Form
 	{
 		$form = new Form;
+
 		foreach ($this->columns as $column) {
 			if ($column->filter !== null) {
 				$type = $column->filter->getInputType();
@@ -50,36 +70,31 @@ final class FilterControl extends Control
 
 				if ($type === 'text') {
 					$form->addText($name, $column->label)
-						->setHtmlAttribute('placeholder', $column->label)
-						->setDefaultValue($this->values[$name] ?? '')
-						->setHtmlAttribute('class', 'form-control');
+						->setDefaultValue($this->values[$name] ?? '');
 				}
-
-				// Můžeme později přidat i select, date, atd.
 			}
 		}
 
 		$form->addSubmit('submit', 'Filter');
 		$form->addSubmit('reset', 'Reset');
-		$form->onSuccess[] = function (Form $form, \stdClass $values): void {
 
+		$form->onSuccess[] = function (Form $form, \stdClass $values): void {
 			if ($form['reset']->isSubmittedBy()) {
 				$form->reset();
-
-				if ($this->onFilterChanged) {
-					($this->onFilterChanged)([]);
-				}
+				$this->onFilterChanged && ($this->onFilterChanged)([]);
 				return;
 			}
 
-			if ($this->onFilterChanged) {
-				($this->onFilterChanged)((array)$values);
-			}
+			$this->onFilterChanged && ($this->onFilterChanged)((array) $values);
 		};
 
 		return $form;
 	}
 
+
+	/**
+	 * Renders filter component.
+	 */
 	public function render(): void
 	{
 		$this->template->setFile(__DIR__ . '/Filter.latte');

@@ -12,19 +12,17 @@ namespace App\Core\Permission\Datagrid\Column;
 use App\Core\Permission\Datagrid\Options;
 use Closure;
 
-
 /**
- * DataGrid column for displaying date values.
- * Supports custom formatting and optional cell formatting callback.
+ * Date column with configurable format.
  */
 class ColumnDate extends Column
 {
 	/**
-	 * @param string $name Column key
+	 * @param string $name Column identifier
 	 * @param string $label Column label
-	 * @param bool $sortable Whether column is sortable
+	 * @param bool $sortable Enables sorting
 	 * @param string $format Date format
-	 * @param Closure|null $formatter Optional callback to format cell value
+	 * @param Closure|null $formatter Optional cell formatter
 	 */
 	public function __construct(
 		string $name,
@@ -38,8 +36,7 @@ class ColumnDate extends Column
 
 
 	/**
-	 * Renders the cell for this column.
-	 * Returns formatted date or empty string if value is null/invalid.
+	 * Renders formatted date value.
 	 */
 	public function renderCell(array $row): string
 	{
@@ -48,7 +45,7 @@ class ColumnDate extends Column
 			return '';
 		}
 
-		$timestamp = is_numeric($value) ? (int)$value : strtotime((string)$value);
+		$timestamp = is_numeric($value) ? (int) $value : strtotime((string) $value);
 		if (!$timestamp) {
 			return '';
 		}

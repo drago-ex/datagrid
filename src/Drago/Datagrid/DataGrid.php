@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Drago Extension
+ * Package built on Nette Framework
+ */
+
 declare(strict_types=1);
 
 namespace App\Core\Permission\Datagrid;
@@ -7,7 +12,7 @@ namespace App\Core\Permission\Datagrid;
 use App\Core\Permission\Datagrid\Column\Column;
 use App\Core\Permission\Datagrid\Column\ColumnDate;
 use App\Core\Permission\Datagrid\Column\ColumnText;
-use App\Core\Permission\Datagrid\Filter\FilterControl;
+use App\Core\Permission\Datagrid\Filter\FilterTextControl;
 use App\Core\Permission\Datagrid\PageSize\PageSizeControl;
 use App\Core\Permission\Datagrid\Paginator\PaginatorControl;
 use Closure;
@@ -19,7 +24,9 @@ use Nette\Application\UI\Control;
 use Nette\Utils\Paginator;
 
 /**
- * DataGrid component for displaying tabular data with sorting, pagination, and row actions.
+ * DataGrid component for displaying tabular data
+ * with filtering, sorting, pagination, and row actions.
+ *
  * @property-read DataGridTemplate $template
  */
 class DataGrid extends Control
@@ -42,11 +49,12 @@ class DataGrid extends Control
 	#[Parameter]
 	public int $itemsPerPage = Options::DefaultItemsPerPage;
 
-	/** Aktuální hodnoty filtrů */
+	/** Current filter values */
 	private array $filterValues = [];
 
-	/** Celkový počet záznamů */
+	/** Total number of records */
 	private int $totalItems = 0;
+
 
 	public function __construct()
 	{
@@ -54,14 +62,14 @@ class DataGrid extends Control
 	}
 
 
-	protected function createComponentFilters(): FilterControl
+	protected function createComponentFilters(): FilterTextControl
 	{
-		$control = new FilterControl;
+		$control = new FilterTextControl;
 		$control->setColumns($this->columns);
 
-		$control->onFilterChanged(function(array $filters): void {
-			$this->page = Options::DefaultPage; // reset na první stránku
-			$this->filterValues = $filters;     // uložíme hodnoty pro další render
+		$control->onFilterChanged(function (array $filters): void {
+			$this->page = Options::DefaultPage; // reset to first page
+			$this->filterValues = $filters;     // store values for next render
 			$this->redrawControl('dataGrid');
 		});
 
@@ -85,13 +93,14 @@ class DataGrid extends Control
 			$control->setPaginator(
 				$this->paginator->getPage(),
 				$this->paginator->getItemsPerPage(),
-				$this->paginator->getItemCount()
+				$this->paginator->getItemCount(),
 			);
 			$control->setSorting($this->column, $this->order);
 		}
 
 		return $control;
 	}
+
 
 	protected function createComponentPageSize(): PageSizeControl
 	{
@@ -108,42 +117,60 @@ class DataGrid extends Control
 		return $control;
 	}
 
+
+	/**
+	 * Sets the data source for the DataGrid
+	 */
 	public function setDataSource(Fluent $source): self
 	{
 		$this->source = $source;
 		return $this;
 	}
 
+
+	/**
+	 * Sets primary key used for row actions
+	 */
 	public function setPrimaryKey(string $primaryKey): self
 	{
 		$this->primaryKey = $primaryKey;
 		return $this;
 	}
 
+
+	/**
+	 * Adds a text column to the DataGrid
+	 */
 	public function addColumnText(
-		string   $name,
-		string   $label,
-		bool     $sortable = true,
-		?Closure $formatter = null
-	): ColumnText
-	{
+		string $name,
+		string $label,
+		bool $sortable = true,
+		?Closure $formatter = null,
+	): ColumnText {
 		$column = new ColumnText($name, $label, $sortable, $formatter);
 		$this->addColumn($column);
 		return $column;
 	}
 
+
+	/**
+	 * Adds a date column to the DataGrid
+	 */
 	public function addColumnDate(
-		string   $name,
-		string   $label,
-		bool     $sortable = true,
-		string   $format = Options::DateFormat,
+		string $name,
+		string $label,
+		bool $sortable = true,
+		string $format = Options::DateFormat,
 		?Closure $formatter = null,
-	): self
-	{
+	): self {
 		$this->addColumn(new ColumnDate($name, $label, $sortable, $format, $formatter));
 		return $this;
 	}
 
+
+	/**
+	 * Registers a column
+	 */
 	private function addColumn(Column $column): void
 	{
 		if (isset($this->columns[$column->name])) {
@@ -152,6 +179,10 @@ class DataGrid extends Control
 		$this->columns[$column->name] = $column;
 	}
 
+
+	/**
+	 * Adds a row action
+	 */
 	public function addAction(string $label, string $signal, ?string $class = null, ?callable $callback = null): self
 	{
 		$action = new Action($label, $signal, $class);
@@ -161,6 +192,7 @@ class DataGrid extends Control
 		$this->actions[] = $action;
 		return $this;
 	}
+
 
 	#[Requires(ajax: true)]
 	public function handleSort(string $column, int $page): void
@@ -172,7 +204,9 @@ class DataGrid extends Control
 		$this->page = $page;
 
 		if ($this->column === $column) {
-			$this->order = $this->order === Options::OrderAsc ? Options::OrderDesc : Options::OrderAsc;
+			$this->order = $this->order === Options::OrderAsc
+				? Options::OrderDesc
+				: Options::OrderAsc;
 		} else {
 			$this->column = $column;
 			$this->order = Options::OrderAsc;
@@ -180,6 +214,7 @@ class DataGrid extends Control
 
 		$this->redrawControl('dataGrid');
 	}
+
 
 	#[Requires(ajax: true)]
 	public function handleAction(string $signal, int $id): void
@@ -193,19 +228,23 @@ class DataGrid extends Control
 		}
 	}
 
+
+	/**
+	 * Renders the DataGrid
+	 */
 	public function render(): void
 	{
 		if ($this->source === null) {
-			throw new \LogicException('Data source is not set.');
+			throw new LogicException('Data source is not set.');
 		}
 
 		if ($this->actions !== [] && $this->primaryKey === null) {
-			throw new \LogicException('Primary key must be set when using actions.');
+			throw new LogicException('Primary key must be set when using actions.');
 		}
 
 		$data = clone $this->source;
 
-		// Aplikujeme filtry
+		// Apply filters
 		if (!empty($this->filterValues)) {
 			foreach ($this->columns as $colName => $col) {
 				if ($col->filter !== null && isset($this->filterValues[$colName])) {
@@ -218,23 +257,24 @@ class DataGrid extends Control
 			$order = $this->order;
 			$column = $this->column;
 			$data->orderBy(
-				"CAST(REGEXP_SUBSTR($column, '[0-9]+') AS UNSIGNED) $order"
+				"CAST(REGEXP_SUBSTR($column, '[0-9]+') AS UNSIGNED) $order",
 			);
 		}
 
 		$allRows = $data->fetchAll();
-
 		$this->totalItems = count($allRows);
 
 		if ($this->itemsPerPage > 0) {
 			$this->paginator->setItemsPerPage($this->itemsPerPage);
 			$this->paginator->setPage($this->page);
 
-			$offset = $this->paginator->getOffset();
-			$length = $this->paginator->getLength();
-			$pageRows = array_slice($allRows, $offset, $length);
+			$pageRows = array_slice(
+				$allRows,
+				$this->paginator->getOffset(),
+				$this->paginator->getLength(),
+			);
 		} else {
-			// zobraz všechny položky
+			// show all items
 			$pageRows = $allRows;
 			$this->paginator->setItemsPerPage($this->totalItems);
 			$this->paginator->setPage(1);
@@ -243,10 +283,10 @@ class DataGrid extends Control
 		$this->paginator->setItemCount($this->totalItems);
 
 		if (!empty($pageRows)) {
-			$dbColumns = array_keys((array)$pageRows[0]);
+			$dbColumns = array_keys((array) $pageRows[0]);
 			foreach ($this->columns as $colName => $_) {
 				if (!in_array($colName, $dbColumns, true)) {
-					throw new \LogicException("Column '$colName' does not exist in data source.");
+					throw new LogicException("Column '$colName' does not exist in data source.");
 				}
 			}
 		}
@@ -259,7 +299,6 @@ class DataGrid extends Control
 		$template->order = $this->order;
 		$template->actions = $this->actions;
 		$template->primaryKey = $this->primaryKey;
-
 		$template->page = $this->paginator->getPage();
 		$template->itemsPerPage = $this->paginator->getItemsPerPage();
 		$template->totalItems = $this->paginator->getItemCount();
@@ -268,7 +307,7 @@ class DataGrid extends Control
 			$this['paginator']->setPaginator(
 				$this->paginator->getPage(),
 				$this->paginator->getItemsPerPage(),
-				$this->paginator->getItemCount()
+				$this->paginator->getItemCount(),
 			);
 
 			$this['paginator']->setSorting(

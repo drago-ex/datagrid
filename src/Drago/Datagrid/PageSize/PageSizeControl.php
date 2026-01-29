@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Drago Extension
+ * Package built on the Nette Framework
+ */
+
 declare(strict_types=1);
 
 namespace App\Core\Permission\Datagrid\PageSize;
@@ -8,43 +13,51 @@ use App\Core\Permission\Datagrid\Options;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
 
+
+/**
+ * @property-read PageSizeTemplate $template
+ */
 final class PageSizeControl extends Control
 {
-	/** @var callable|null Callback invoked on page change */
+	/** @var callable|null Callback triggered when page size changes */
 	private $onPageChanged = null;
 
-	/** Celkový počet položek v DataGrid */
+	/** Total number of items in the DataGrid */
 	private int $totalItems = 0;
 
-	/** Aktuální počet položek na stránku */
+	/** Current number of items per page */
 	private int $currentPageSize = Options::DefaultItemsPerPage;
 
+
 	/**
-	 * Registrace callbacku při změně počtu položek na stránku
+	 * Registers a callback executed when page size is changed
 	 */
 	public function onPageChanged(callable $callback): void
 	{
 		$this->onPageChanged = $callback;
 	}
 
+
 	/**
-	 * Nastavení celkového počtu položek (DataGrid)
+	 * Sets total number of items in the DataGrid
 	 */
 	public function setTotalItems(int $totalItems): void
 	{
 		$this->totalItems = $totalItems;
 	}
 
+
 	/**
-	 * Nastavení aktuálního počtu položek na stránku
+	 * Sets current page size
 	 */
 	public function setCurrentPageSize(int $size): void
 	{
 		$this->currentPageSize = $size;
 	}
 
+
 	/**
-	 * Vytvoření formuláře pro výběr počtu položek
+	 * Creates form for selecting number of items per page
 	 */
 	protected function createComponentForm(): Form
 	{
@@ -74,6 +87,9 @@ final class PageSizeControl extends Control
 	}
 
 
+	/**
+	 * Renders page size control
+	 */
 	public function render(): void
 	{
 		$this->template->setFile(__DIR__ . '/PageSize.latte');
