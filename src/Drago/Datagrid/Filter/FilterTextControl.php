@@ -12,6 +12,8 @@ namespace App\Core\Permission\Datagrid\Filter;
 use App\Core\Permission\Datagrid\Column\Column;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
+use Nette\Forms\Controls\SubmitButton;
+use stdClass;
 
 /**
  * DataGrid filter component.
@@ -81,24 +83,25 @@ final class FilterTextControl extends Control
 				if ($type === 'text') {
 					$form->addText($name, $column->label)
 						->setDefaultValue($this->values[$name] ?? '')
-						->setHtmlAttribute('data-items-filter');
+						->setHtmlAttribute('data-items-filter')
+						->setHtmlAttribute('placeholder', 'Search...');
 				}
 			}
 		}
 
 		$form->addSubmit('reset', 'Reset');
-
-		$form->onSuccess[] = function (Form $form, \stdClass $values): void {
-			// Reset button clicked
-			if ($form['reset']->isSubmittedBy()) {
-				$form->reset();
-				$this->values = [];
-				$this->hasActiveFilters = false;
-
-				if ($this->onFilterChanged) {
-					($this->onFilterChanged)([]);
+		$form->onSuccess[] = function (Form $form, stdClass $values): void {
+			$resetButton = $form['reset'];
+			if ($resetButton instanceof SubmitButton) {
+				if ($resetButton->isSubmittedBy()) {
+					$form->reset();
+					$this->values = [];
+					$this->hasActiveFilters = false;
+					if ($this->onFilterChanged) {
+						($this->onFilterChanged)([]);
+					}
+					return;
 				}
-				return;
 			}
 
 			// Apply filters

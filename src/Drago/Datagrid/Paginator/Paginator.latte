@@ -17,6 +17,12 @@
     </li>
 {/define}
 
+{define disabledList}
+    <li class="page-item disabled">
+        <span class="page-link">…</span>
+    </li>
+{/define}
+
 <nav aria-label="Page navigation">
     <ul class="pagination pagination-sm">
 
@@ -28,7 +34,7 @@
 
         {* Left ellipsis *}
         {if $page - $window > 2}
-            <li class="page-item disabled"><span class="page-link">…</span></li>
+            {include 'disabledList'}
         {/if}
 
         {* Pages around current *}
@@ -38,7 +44,7 @@
 
         {* Right ellipsis *}
         {if $page + $window < $pageCount - 1}
-            <li class="page-item disabled"><span class="page-link">…</span></li>
+            {include 'disabledList'}
         {/if}
 
         {* Last page always if more than 1 *}

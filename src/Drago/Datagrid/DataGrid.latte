@@ -4,7 +4,17 @@
 {import 'Action.latte'}
 
 {snippet dataGrid}
-    {control filters}
+    <p class="d-inline-flex gap-1">
+        <a class="btn btn-sm btn-primary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+            Link with href
+        </a>
+    </p>
+    <div class="collapse show" id="collapseExample">
+        <div class="card card-body">
+            {control filters}
+        </div>
+    </div>
+
     <table class="table table-sm table-striped table-borderless table-hover">
         <thead>
         <tr>
