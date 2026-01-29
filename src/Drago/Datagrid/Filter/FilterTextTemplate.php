@@ -16,4 +16,5 @@ use Nette\Bridges\ApplicationLatte\Template;
  */
 class FilterTextTemplate extends Template
 {
+	public bool $hasActiveFilters = false;
 }

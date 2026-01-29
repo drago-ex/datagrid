@@ -1,3 +1,4 @@
+{templateType App\Core\Permission\Datagrid\Filter\FilterTextTemplate}
 {varType Nette\Application\UI\Form $form}
 
 <form n:name="form" class="ajax datagrid-filter">
@@ -15,14 +16,10 @@
     </div>
 
     <div class="d-flex gap-1 mt-3">
-        {var $submitButton = $form['submit']}
-        {varType Nette\Forms\Controls\SubmitButton $submitButton}
-        {do $submit =  $submitButton->getControl()}
-        {$submit->class('btn btn-sm btn-primary')}
-
-        {var $resetButton = $form['reset']}
-        {varType Nette\Forms\Controls\SubmitButton $resetButton}
-        {do $reset =  $resetButton->getControl()}
-        {$reset->class('btn btn-sm btn-secondary')}
+        {if $hasActiveFilters}
+            {var $resetButton = $form['reset']}
+            {varType Nette\Forms\Controls\SubmitButton $resetButton}
+            {$resetButton->getControl()}
+        {/if}
     </div>
 </form>

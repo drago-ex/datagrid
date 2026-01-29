@@ -15,6 +15,7 @@ use Nette\Application\UI\Form;
 
 /**
  * DataGrid filter component.
+ *
  * @property-read FilterTextTemplate $template
  */
 final class FilterTextControl extends Control
@@ -28,6 +29,8 @@ final class FilterTextControl extends Control
 	/** @var array<string, mixed> Current filter values */
 	private array $values = [];
 
+	/** Whether any filter is currently active */
+	private bool $hasActiveFilters = false;
 
 	/**
 	 * Registers filter change callback.
@@ -37,24 +40,31 @@ final class FilterTextControl extends Control
 		$this->onFilterChanged = $callback;
 	}
 
-
 	/**
 	 * Sets grid columns.
+	 *
+	 * @param Column[] $columns
 	 */
 	public function setColumns(array $columns): void
 	{
 		$this->columns = $columns;
 	}
 
-
 	/**
-	 * Sets current filter values.
+	 * Sets current filter values and detects active filters.
 	 */
 	public function setValues(array $values): void
 	{
 		$this->values = $values;
-	}
+		$this->hasActiveFilters = false;
 
+		foreach ($values as $value) {
+			if ($value !== null && $value !== '') {
+				$this->hasActiveFilters = true;
+				break;
+			}
+		}
+	}
 
 	/**
 	 * Builds filter form from column definitions.
@@ -70,27 +80,37 @@ final class FilterTextControl extends Control
 
 				if ($type === 'text') {
 					$form->addText($name, $column->label)
-						->setDefaultValue($this->values[$name] ?? '');
+						->setDefaultValue($this->values[$name] ?? '')
+						->setHtmlAttribute('data-items-filter');
 				}
 			}
 		}
 
-		$form->addSubmit('submit', 'Filter');
 		$form->addSubmit('reset', 'Reset');
 
 		$form->onSuccess[] = function (Form $form, \stdClass $values): void {
+			// Reset button clicked
 			if ($form['reset']->isSubmittedBy()) {
 				$form->reset();
-				$this->onFilterChanged && ($this->onFilterChanged)([]);
+				$this->values = [];
+				$this->hasActiveFilters = false;
+
+				if ($this->onFilterChanged) {
+					($this->onFilterChanged)([]);
+				}
 				return;
 			}
 
-			$this->onFilterChanged && ($this->onFilterChanged)((array) $values);
+			// Apply filters
+			$this->setValues((array) $values);
+
+			if ($this->onFilterChanged) {
+				($this->onFilterChanged)((array) $values);
+			}
 		};
 
 		return $form;
 	}
-
 
 	/**
 	 * Renders filter component.
@@ -98,6 +118,7 @@ final class FilterTextControl extends Control
 	public function render(): void
 	{
 		$this->template->setFile(__DIR__ . '/Filter.latte');
+		$this->template->hasActiveFilters = $this->hasActiveFilters;
 		$this->template->render();
 	}
 }
