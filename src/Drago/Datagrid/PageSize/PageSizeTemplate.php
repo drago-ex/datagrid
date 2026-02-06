@@ -7,9 +7,10 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Permission\Datagrid\PageSize;
+namespace Drago\Datagrid\PageSize;
 
 use Nette\Bridges\ApplicationLatte\Template;
+
 
 /**
  * Latte template for PageSizeControl

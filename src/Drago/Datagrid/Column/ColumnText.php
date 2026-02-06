@@ -7,10 +7,10 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Permission\Datagrid\Column;
+namespace Drago\Datagrid\Column;
 
+use Drago\Datagrid\Filter\TextFilter;
 
-use App\Core\Permission\Datagrid\Filter\TextFilter;
 
 /**
  * DataGrid column for displaying text values.
@@ -20,7 +20,7 @@ class ColumnText extends Column
 {
 	public function setFilterText(): self
 	{
-		$this->setFilter(new TextFilter);
+		$this->setFilter(new TextFilter());
 		return $this;
 	}
 

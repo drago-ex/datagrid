@@ -5,10 +5,13 @@
  * Package built on Nette Framework
  */
 
-namespace App\Core\Permission\Datagrid;
+declare(strict_types=1);
 
-use App\Core\Permission\Datagrid\Column\Column;
+namespace Drago\Datagrid;
+
+use Drago\Datagrid\Column\Column;
 use Nette\Bridges\ApplicationLatte\Template;
+
 
 /**
  * Template class for DataGrid.

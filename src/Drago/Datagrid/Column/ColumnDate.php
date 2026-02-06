@@ -7,10 +7,12 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Permission\Datagrid\Column;
+namespace Drago\Datagrid\Column;
 
-use App\Core\Permission\Datagrid\Options;
 use Closure;
+use Drago\Datagrid\Filter\DateFilter;
+use Drago\Datagrid\Options;
+
 
 /**
  * Date column with configurable format.
@@ -32,6 +34,16 @@ class ColumnDate extends Column
 		?Closure $formatter = null,
 	) {
 		parent::__construct($name, $label, $sortable, $formatter);
+	}
+
+
+	/**
+	 * Sets date filter for this column.
+	 */
+	public function setFilterDate(): self
+	{
+		$this->setFilter(new DateFilter());
+		return $this;
 	}
 
 

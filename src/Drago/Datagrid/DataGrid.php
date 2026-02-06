@@ -7,21 +7,24 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Permission\Datagrid;
+namespace Drago\Datagrid;
 
-use App\Core\Permission\Datagrid\Column\Column;
-use App\Core\Permission\Datagrid\Column\ColumnDate;
-use App\Core\Permission\Datagrid\Column\ColumnText;
-use App\Core\Permission\Datagrid\Filter\FilterTextControl;
-use App\Core\Permission\Datagrid\PageSize\PageSizeControl;
-use App\Core\Permission\Datagrid\Paginator\PaginatorControl;
 use Closure;
 use Dibi\Fluent;
-use LogicException;
+use Drago\Datagrid\Column\Column;
+use Drago\Datagrid\Column\ColumnDate;
+use Drago\Datagrid\Column\ColumnText;
+use Drago\Datagrid\Exception\InvalidColumnException;
+use Drago\Datagrid\Exception\InvalidConfigurationException;
+use Drago\Datagrid\Exception\InvalidDataSourceException;
+use Drago\Datagrid\Filter\FilterTextControl;
+use Drago\Datagrid\PageSize\PageSizeControl;
+use Drago\Datagrid\Paginator\PaginatorControl;
 use Nette\Application\Attributes\Parameter;
 use Nette\Application\Attributes\Requires;
 use Nette\Application\UI\Control;
-use Nette\Utils\Paginator;
+use Nette\Utils\Paginator as UtilsPaginator;
+
 
 /**
  * DataGrid component for displaying tabular data
@@ -32,10 +35,20 @@ use Nette\Utils\Paginator;
 class DataGrid extends Control
 {
 	private ?Fluent $source = null;
+
 	private ?string $primaryKey = null;
+
 	private array $columns = [];
+
 	private array $actions = [];
-	private Paginator $paginator;
+
+	private UtilsPaginator $paginator;
+
+	/** Current filter values */
+	private array $filterValues = [];
+
+	/** Total number of records */
+	private int $totalItems = 0;
 
 	#[Parameter]
 	public ?string $column = null;
@@ -49,27 +62,21 @@ class DataGrid extends Control
 	#[Parameter]
 	public int $itemsPerPage = Options::DefaultItemsPerPage;
 
-	/** Current filter values */
-	private array $filterValues = [];
-
-	/** Total number of records */
-	private int $totalItems = 0;
-
 
 	public function __construct()
 	{
-		$this->paginator = new Paginator();
+		$this->paginator = new UtilsPaginator();
 	}
 
 
 	protected function createComponentFilters(): FilterTextControl
 	{
-		$control = new FilterTextControl;
+		$control = new FilterTextControl();
 		$control->setColumns($this->columns);
 
 		$control->onFilterChanged(function (array $filters): void {
 			$this->page = Options::DefaultPage; // reset to first page
-			$this->filterValues = $filters;     // store values for next render
+			$this->filterValues = $filters; // store values for next render
 			$this->redrawControl('dataGrid');
 		});
 
@@ -84,8 +91,12 @@ class DataGrid extends Control
 		$control = new PaginatorControl();
 		$control->onPageChanged(function (int $page, ?string $column, ?string $order): void {
 			$this->page = $page;
-			if ($column !== null) $this->column = $column;
-			if ($order !== null) $this->order = $order;
+			if ($column !== null) {
+				$this->column = $column;
+			}
+			if ($order !== null) {
+				$this->order = $order;
+			}
 			$this->redrawControl('dataGrid');
 		});
 
@@ -119,7 +130,7 @@ class DataGrid extends Control
 
 
 	/**
-	 * Sets the data source for the DataGrid
+	 * Sets the data source for the DataGrid.
 	 */
 	public function setDataSource(Fluent $source): self
 	{
@@ -129,7 +140,7 @@ class DataGrid extends Control
 
 
 	/**
-	 * Sets primary key used for row actions
+	 * Sets primary key used for row actions.
 	 */
 	public function setPrimaryKey(string $primaryKey): self
 	{
@@ -139,7 +150,8 @@ class DataGrid extends Control
 
 
 	/**
-	 * Adds a text column to the DataGrid
+	 * Adds a text column to the DataGrid.
+	 * @throws InvalidColumnException
 	 */
 	public function addColumnText(
 		string $name,
@@ -154,7 +166,8 @@ class DataGrid extends Control
 
 
 	/**
-	 * Adds a date column to the DataGrid
+	 * Adds a date column to the DataGrid.
+	 * @throws InvalidColumnException
 	 */
 	public function addColumnDate(
 		string $name,
@@ -162,29 +175,35 @@ class DataGrid extends Control
 		bool $sortable = true,
 		string $format = Options::DateFormat,
 		?Closure $formatter = null,
-	): self {
-		$this->addColumn(new ColumnDate($name, $label, $sortable, $format, $formatter));
-		return $this;
+	): ColumnDate {
+		$column = new ColumnDate($name, $label, $sortable, $format, $formatter);
+		$this->addColumn($column);
+		return $column;
 	}
 
 
 	/**
-	 * Registers a column
+	 * Registers a column.
+	 * @throws InvalidColumnException
 	 */
 	private function addColumn(Column $column): void
 	{
 		if (isset($this->columns[$column->name])) {
-			throw new LogicException("Column '{$column->name}' already exists.");
+			throw new InvalidColumnException("Column '{$column->name}' already exists.");
 		}
 		$this->columns[$column->name] = $column;
 	}
 
 
 	/**
-	 * Adds a row action
+	 * Adds a row action.
 	 */
-	public function addAction(string $label, string $signal, ?string $class = null, ?callable $callback = null): self
-	{
+	public function addAction(
+		string $label,
+		string $signal,
+		?string $class = null,
+		?callable $callback = null,
+	): self {
 		$action = new Action($label, $signal, $class);
 		if ($callback !== null) {
 			$action->addCallback($callback);
@@ -231,15 +250,18 @@ class DataGrid extends Control
 
 	/**
 	 * Renders the DataGrid
+	 * @throws InvalidColumnException
+	 * @throws InvalidConfigurationException
+	 * @throws InvalidDataSourceException
 	 */
 	public function render(): void
 	{
 		if ($this->source === null) {
-			throw new LogicException('Data source is not set.');
+			throw new InvalidDataSourceException('Data source is not set.');
 		}
 
 		if ($this->actions !== [] && $this->primaryKey === null) {
-			throw new LogicException('Primary key must be set when using actions.');
+			throw new InvalidConfigurationException('Primary key must be set when using actions.');
 		}
 
 		$data = clone $this->source;
@@ -254,10 +276,9 @@ class DataGrid extends Control
 		}
 
 		if ($this->column !== null && isset($this->columns[$this->column])) {
-			$order = $this->order;
-			$column = $this->column;
 			$data->orderBy(
-				"CAST(REGEXP_SUBSTR($column, '[0-9]+') AS UNSIGNED) $order",
+				"CAST(REGEXP_SUBSTR(%n, '[0-9]+') AS UNSIGNED) {$this->order}",
+				$this->column,
 			);
 		}
 
@@ -286,7 +307,7 @@ class DataGrid extends Control
 			$dbColumns = array_keys((array) $pageRows[0]);
 			foreach ($this->columns as $colName => $_) {
 				if (!in_array($colName, $dbColumns, true)) {
-					throw new LogicException("Column '$colName' does not exist in data source.");
+					throw new InvalidColumnException("Column '$colName' does not exist in data source.");
 				}
 			}
 		}

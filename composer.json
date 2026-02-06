@@ -6,9 +6,14 @@
 		"php": ">=8.3 <9",
 		"latte/latte": "^3.1",
 		"tracy/tracy": "^2.11",
-	  	"dibi/dibi": "^5.0",
-	  	"nette/application": "^3.2",
-	  	"nette/forms": "^3.2"
+		"dibi/dibi": "^5.0",
+		"nette/application": "^3.2",
+		"nette/forms": "^3.2"
+	},
+	"autoload": {
+		"psr-4": {
+			"Drago\\Datagrid\\": "src/Drago/Datagrid/"
+		}
 	},
 	"minimum-stability": "stable",
 	"require-dev": {

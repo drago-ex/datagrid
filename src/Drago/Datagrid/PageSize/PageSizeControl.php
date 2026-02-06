@@ -7,9 +7,10 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Permission\Datagrid\PageSize;
+namespace Drago\Datagrid\PageSize;
 
-use App\Core\Permission\Datagrid\Options;
+use Closure;
+use Drago\Datagrid\Options;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
 
@@ -19,8 +20,7 @@ use Nette\Application\UI\Form;
  */
 final class PageSizeControl extends Control
 {
-	/** @var callable|null Callback triggered when page size changes */
-	private $onPageChanged = null;
+	private ?Closure $onPageChanged = null;
 
 	/** Total number of items in the DataGrid */
 	private int $totalItems = 0;
@@ -30,7 +30,7 @@ final class PageSizeControl extends Control
 
 
 	/**
-	 * Registers a callback executed when page size is changed
+	 * Registers a callback executed when page size is changed.
 	 */
 	public function onPageChanged(callable $callback): void
 	{
@@ -39,7 +39,7 @@ final class PageSizeControl extends Control
 
 
 	/**
-	 * Sets total number of items in the DataGrid
+	 * Sets total number of items in the DataGrid.
 	 */
 	public function setTotalItems(int $totalItems): void
 	{
@@ -48,7 +48,7 @@ final class PageSizeControl extends Control
 
 
 	/**
-	 * Sets current page size
+	 * Sets current page size.
 	 */
 	public function setCurrentPageSize(int $size): void
 	{
@@ -57,17 +57,17 @@ final class PageSizeControl extends Control
 
 
 	/**
-	 * Creates form for selecting number of items per page
+	 * Creates form for selecting number of items per page.
 	 */
 	protected function createComponentForm(): Form
 	{
-		$form = new Form;
+		$form = new Form();
 
 		$form->addSelect('pageSize', 'Items per page', items: [
 			20 => '20',
 			50 => '50',
 			100 => '100',
-			0  => 'All',
+			0 => 'All',
 		])
 			->setDefaultValue($this->currentPageSize)
 			->setHtmlAttribute('data-items-page');
@@ -88,7 +88,7 @@ final class PageSizeControl extends Control
 
 
 	/**
-	 * Renders page size control
+	 * Renders page size control.
 	 */
 	public function render(): void
 	{

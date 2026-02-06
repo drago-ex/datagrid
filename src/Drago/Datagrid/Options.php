@@ -7,7 +7,8 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Permission\Datagrid;
+namespace Drago\Datagrid;
+
 
 /**
  * DataGrid configuration options.

@@ -7,10 +7,11 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Permission\Datagrid\Column;
+namespace Drago\Datagrid\Column;
 
-use App\Core\Permission\Datagrid\Filter\Filter;
 use Closure;
+use Drago\Datagrid\Filter\Filter;
+
 
 /**
  * Base DataGrid column definition.
@@ -22,7 +23,7 @@ abstract class Column
 	 * @param string $label Column label
 	 * @param bool $sortable Enables sorting
 	 * @param Closure|null $formatter Optional value formatter
-	 * @param Filter|null  $filter   Optional column filter
+	 * @param Filter|null $filter Optional column filter
 	 */
 	public function __construct(
 		public readonly string $name,

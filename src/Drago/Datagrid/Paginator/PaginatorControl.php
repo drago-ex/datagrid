@@ -7,11 +7,12 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Permission\Datagrid\Paginator;
+namespace Drago\Datagrid\Paginator;
 
-use App\Core\Permission\Datagrid\Options;
+use Closure;
+use Drago\Datagrid\Options;
 use Nette\Application\UI\Control;
-use Nette\Utils\Paginator;
+use Nette\Utils\Paginator as UtilsPaginator;
 
 
 /**
@@ -22,10 +23,9 @@ use Nette\Utils\Paginator;
  */
 final class PaginatorControl extends Control
 {
-	private Paginator $paginator;
+	private UtilsPaginator $paginator;
 
-	/** @var callable|null Callback invoked on page change */
-	private $onPageChanged = null;
+	private ?Closure $onPageChanged = null;
 
 	/** Current sorting column */
 	private ?string $column = null;
@@ -36,7 +36,7 @@ final class PaginatorControl extends Control
 
 	public function __construct()
 	{
-		$this->paginator = new Paginator();
+		$this->paginator = new UtilsPaginator();
 	}
 
 
@@ -71,8 +71,12 @@ final class PaginatorControl extends Control
 	{
 		$this->paginator->setPage($page);
 
-		if ($column !== null) $this->column = $column;
-		if ($order !== null) $this->order = $order;
+		if ($column !== null) {
+			$this->column = $column;
+		}
+		if ($order !== null) {
+			$this->order = $order;
+		}
 
 		if ($this->onPageChanged) {
 			($this->onPageChanged)($page, $this->column, $this->order);

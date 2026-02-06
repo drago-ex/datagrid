@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Permission\Datagrid\Filter;
+namespace Drago\Datagrid\Filter;
 
 use Dibi\Fluent;
 

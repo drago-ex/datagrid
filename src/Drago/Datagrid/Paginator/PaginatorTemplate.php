@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Permission\Datagrid\Paginator;
+namespace Drago\Datagrid\Paginator;
 
 use Nette\Bridges\ApplicationLatte\Template;
 use Nette\Utils\Paginator;

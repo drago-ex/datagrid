@@ -7,13 +7,15 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Permission\Datagrid\Filter;
+namespace Drago\Datagrid\Filter;
 
-use App\Core\Permission\Datagrid\Column\Column;
+use Closure;
+use Drago\Datagrid\Column\Column;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\SubmitButton;
 use stdClass;
+
 
 /**
  * DataGrid filter component.
@@ -22,8 +24,7 @@ use stdClass;
  */
 final class FilterTextControl extends Control
 {
-	/** @var callable|null Invoked when filter values change */
-	private $onFilterChanged = null;
+	private ?Closure $onFilterChanged = null;
 
 	/** @var Column[] */
 	private array $columns = [];
@@ -34,6 +35,7 @@ final class FilterTextControl extends Control
 	/** Whether any filter is currently active */
 	private bool $hasActiveFilters = false;
 
+
 	/**
 	 * Registers filter change callback.
 	 */
@@ -41,6 +43,7 @@ final class FilterTextControl extends Control
 	{
 		$this->onFilterChanged = $callback;
 	}
+
 
 	/**
 	 * Sets grid columns.
@@ -51,6 +54,7 @@ final class FilterTextControl extends Control
 	{
 		$this->columns = $columns;
 	}
+
 
 	/**
 	 * Sets current filter values and detects active filters.
@@ -68,12 +72,13 @@ final class FilterTextControl extends Control
 		}
 	}
 
+
 	/**
 	 * Builds filter form from column definitions.
 	 */
 	protected function createComponentForm(): Form
 	{
-		$form = new Form;
+		$form = new Form();
 
 		foreach ($this->columns as $column) {
 			if ($column->filter !== null) {
@@ -85,6 +90,11 @@ final class FilterTextControl extends Control
 						->setDefaultValue($this->values[$name] ?? '')
 						->setHtmlAttribute('data-items-filter')
 						->setHtmlAttribute('placeholder', 'Search...');
+				} elseif ($type === 'date') {
+					$form->addText($name, $column->label)
+						->setHtmlType('date')
+						->setDefaultValue($this->values[$name] ?? '')
+						->setHtmlAttribute('data-items-filter');
 				}
 			}
 		}
@@ -114,6 +124,7 @@ final class FilterTextControl extends Control
 
 		return $form;
 	}
+
 
 	/**
 	 * Renders filter component.
