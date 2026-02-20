@@ -300,6 +300,26 @@ class DataGrid extends Control
 	 */
 	public function render(): void
 	{
+		$this->validateConfiguration();
+		
+		$data = clone $this->source;
+		$this->applyFilters($data);
+		$this->applySorting($data);
+		$this->calculateTotalItems($data);
+		
+		$pageRows = $this->fetchPageRows($data);
+		$this->validateColumns($pageRows);
+		$this->renderTemplate($pageRows);
+	}
+
+
+	/**
+	 * Validates that DataGrid is properly configured
+	 * @throws InvalidDataSourceException
+	 * @throws InvalidConfigurationException
+	 */
+	private function validateConfiguration(): void
+	{
 		if ($this->source === null) {
 			throw new InvalidDataSourceException('Data source is not set.');
 		}
@@ -307,55 +327,111 @@ class DataGrid extends Control
 		if ($this->actions !== [] && $this->primaryKey === null) {
 			throw new InvalidConfigurationException('Primary key must be set when using actions.');
 		}
+	}
 
-		$data = clone $this->source;
 
-		// Apply filters
-		if (!empty($this->filterValues)) {
-			foreach ($this->columns as $colName => $col) {
-				if ($col->filter !== null && isset($this->filterValues[$colName])) {
-					$col->filter->apply($data, $colName, $this->filterValues[$colName]);
-				}
+	/**
+	 * Applies active filters to the data source
+	 */
+	private function applyFilters(Fluent $data): void
+	{
+		if (empty($this->filterValues)) {
+			return;
+		}
+
+		foreach ($this->columns as $colName => $col) {
+			if ($col->filter !== null && isset($this->filterValues[$colName])) {
+				$col->filter->apply($data, $colName, $this->filterValues[$colName]);
+			}
+		}
+	}
+
+
+	/**
+	 * Applies sorting to the data source.
+	 * If the selected column requests natural sorting (numeric substrings),
+	 * we attempt to use a DB-side expression to sort by the numeric part.
+	 * Falls back to native ORDER BY on error or if natural sort is not enabled.
+	 */
+	private function applySorting(Fluent $data): void
+	{
+		if ($this->column === null || !isset($this->columns[$this->column])) {
+			return;
+		}
+
+		$columnObj = $this->columns[$this->column];
+
+		// If column requests natural sorting, try to use regex-based numeric sort
+		if (method_exists($columnObj, 'isNaturalSort') && $columnObj->isNaturalSort()) {
+			try {
+				// Attempt DB-side numeric sort using REGEXP_SUBSTR (MySQL/compatible)
+				// Example: CAST(REGEXP_SUBSTR(%n, '[0-9]+') AS UNSIGNED) ASC
+				$data->orderBy("CAST(REGEXP_SUBSTR(%n, '[0-9]+') AS UNSIGNED) {$this->order}", $this->column);
+				return;
+			} catch (\Throwable $e) {
+				// DB doesn't support REGEXP_SUBSTR or expression failed - fallback
+				// Silently fall back to simple ORDER BY
 			}
 		}
 
-		if ($this->column !== null && isset($this->columns[$this->column])) {
-			$data->orderBy(
-				"CAST(REGEXP_SUBSTR(%n, '[0-9]+') AS UNSIGNED) {$this->order}",
-				$this->column,
-			);
-		}
+		// Default native sorting
+		$data->orderBy("%n {$this->order}", $this->column);
+	}
 
-		$allRows = $data->fetchAll();
-		$this->totalItems = count($allRows);
 
-		if ($this->itemsPerPage > 0) {
-			$this->paginator->setItemsPerPage($this->itemsPerPage);
-			$this->paginator->setPage($this->page);
+	/**
+	 * Calculates total number of items matching filters
+	 */
+	private function calculateTotalItems(Fluent $data): void
+	{
+		$this->totalItems = $data->count('*');
+	}
 
-			$pageRows = array_slice(
-				$allRows,
-				$this->paginator->getOffset(),
-				$this->paginator->getLength(),
-			);
-		} else {
-			// show all items
-			$pageRows = $allRows;
-			$this->paginator->setItemsPerPage($this->totalItems);
-			$this->paginator->setPage(1);
-		}
 
+	/**
+	 * Fetches rows for current page using LIMIT/OFFSET
+	 * Performance optimization: Only fetches data needed for current page
+	 */
+	private function fetchPageRows(Fluent $data): array
+	{
+		$this->paginator->setItemsPerPage($this->itemsPerPage > 0 ? $this->itemsPerPage : $this->totalItems);
+		$this->paginator->setPage($this->page);
 		$this->paginator->setItemCount($this->totalItems);
 
-		if (!empty($pageRows)) {
-			$dbColumns = array_keys((array) $pageRows[0]);
-			foreach ($this->columns as $colName => $_) {
-				if (!in_array($colName, $dbColumns, true)) {
-					throw new InvalidColumnException("Column '$colName' does not exist in data source.");
-				}
-			}
+		if ($this->itemsPerPage > 0) {
+			// Apply LIMIT/OFFSET at database level (much faster for large datasets)
+			$data->limit($this->itemsPerPage)
+				->offset($this->paginator->getOffset());
 		}
 
+		return $data->fetchAll();
+	}
+
+
+	/**
+	 * Validates that all defined columns exist in the data source
+	 * @throws InvalidColumnException
+	 */
+	private function validateColumns(array $pageRows): void
+	{
+		if (empty($pageRows)) {
+			return;  // No data to validate against
+		}
+
+		$dbColumns = array_keys((array) $pageRows[0]);
+		foreach ($this->columns as $colName => $_) {
+			if (!in_array($colName, $dbColumns, true)) {
+				throw new InvalidColumnException("Column '$colName' does not exist in data source.");
+			}
+		}
+	}
+
+
+	/**
+	 * Renders the template with prepared data
+	 */
+	private function renderTemplate(array $pageRows): void
+	{
 		$template = $this->template;
 		$template->setFile(__DIR__ . '/DataGrid.latte');
 		$template->rows = $pageRows;

@@ -24,6 +24,14 @@ class ColumnText extends Column
 		return $this;
 	}
 
+	/**
+	 * Enable or disable natural numeric sorting for this column.
+	 */
+	public function setNaturalSort(bool $enable = true): static
+	{
+		parent::setNaturalSort($enable);
+		return $this;
+	}
 
 	/**
 	 * Renders the cell for this column.
