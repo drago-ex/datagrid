@@ -34,6 +34,18 @@ use Nette\Utils\Paginator as UtilsPaginator;
  */
 class DataGrid extends Control
 {
+	#[Parameter]
+	public ?string $column = null;
+
+	#[Parameter]
+	public string $order = Options::OrderAsc;
+
+	#[Parameter]
+	public int $page = Options::DefaultPage;
+
+	#[Parameter]
+	public int $itemsPerPage = Options::DefaultItemsPerPage;
+
 	private ?Fluent $source = null;
 
 	private ?string $primaryKey = null;
@@ -50,24 +62,10 @@ class DataGrid extends Control
 	/** Total number of records */
 	private int $totalItems = 0;
 
-	#[Parameter]
-	public ?string $column = null;
-
-	#[Parameter]
-	public string $order = Options::OrderAsc;
-
-	#[Parameter]
-	public int $page = Options::DefaultPage;
-
-	#[Parameter]
-	public int $itemsPerPage = Options::DefaultItemsPerPage;
-
-
 	public function __construct()
 	{
 		$this->paginator = new UtilsPaginator;
 	}
-
 
 	/**
 	 * Sets the data source for the DataGrid.
@@ -78,7 +76,6 @@ class DataGrid extends Control
 		return $this;
 	}
 
-
 	/**
 	 * Sets primary key used for row actions.
 	 */
@@ -87,7 +84,6 @@ class DataGrid extends Control
 		$this->primaryKey = $primaryKey;
 		return $this;
 	}
-
 
 	/**
 	 * Adds a text column to the DataGrid.
@@ -104,7 +100,6 @@ class DataGrid extends Control
 		$this->addColumn($column);
 		return $column;
 	}
-
 
 	/**
 	 * Adds a date column to the DataGrid.
@@ -123,7 +118,6 @@ class DataGrid extends Control
 		return $column;
 	}
 
-
 	/**
 	 * Adds a row action.
 	 */
@@ -141,7 +135,6 @@ class DataGrid extends Control
 		$this->actions[] = $action;
 		return $this;
 	}
-
 
 	#[Requires(ajax: true)]
 	public function handleSort(string $column, int $page): void
@@ -169,7 +162,6 @@ class DataGrid extends Control
 
 		$this->redrawControl('dataGrid');
 	}
-
 
 	#[Requires(ajax: true)]
 	public function handleAction(
@@ -220,7 +212,6 @@ class DataGrid extends Control
 		}
 	}
 
-
 	/**
 	 * Returns current filter values.
 	 */
@@ -228,7 +219,6 @@ class DataGrid extends Control
 	{
 		return $this->filterValues;
 	}
-
 
 	/**
 	 * Renders the DataGrid
@@ -250,7 +240,6 @@ class DataGrid extends Control
 		$this->renderTemplate($pageRows);
 	}
 
-
 	protected function createComponentFilters(): FilterTextControl
 	{
 		$control = new FilterTextControl;
@@ -266,7 +255,6 @@ class DataGrid extends Control
 
 		return $control;
 	}
-
 
 	protected function createComponentPaginator(): PaginatorControl
 	{
@@ -294,7 +282,6 @@ class DataGrid extends Control
 		return $control;
 	}
 
-
 	protected function createComponentPageSize(): PageSizeControl
 	{
 		$control = new PageSizeControl;
@@ -310,11 +297,6 @@ class DataGrid extends Control
 		return $control;
 	}
 
-
-	/**
-	 * Registers a column.
-	 * @throws InvalidColumnException
-	 */
 	private function addColumn(Column $column): void
 	{
 		if (isset($this->columns[$column->name])) {
@@ -323,12 +305,6 @@ class DataGrid extends Control
 		$this->columns[$column->name] = $column;
 	}
 
-
-	/**
-	 * Validates that DataGrid is properly configured
-	 * @throws InvalidDataSourceException
-	 * @throws InvalidConfigurationException
-	 */
 	private function validateConfiguration(): void
 	{
 		if ($this->source === null) {
@@ -340,10 +316,6 @@ class DataGrid extends Control
 		}
 	}
 
-
-	/**
-	 * Applies active filters to the data source
-	 */
 	private function applyFilters(Fluent $data): void
 	{
 		if (empty($this->filterValues)) {
@@ -357,13 +329,6 @@ class DataGrid extends Control
 		}
 	}
 
-
-	/**
-	 * Applies sorting to the data source.
-	 * If the selected column requests natural sorting (numeric substrings),
-	 * we attempt to use a DB-side expression to sort by the numeric part.
-	 * Falls back to native ORDER BY on error or if natural sort is not enabled.
-	 */
 	private function applySorting(Fluent $data): void
 	{
 		if ($this->column === null || !isset($this->columns[$this->column])) {
@@ -372,36 +337,22 @@ class DataGrid extends Control
 
 		$columnObj = $this->columns[$this->column];
 
-		// If column requests natural sorting, try to use regex-based numeric sort
 		if (method_exists($columnObj, 'isNaturalSort') && $columnObj->isNaturalSort()) {
 			try {
-				// Attempt DB-side numeric sort using REGEXP_SUBSTR (MySQL/compatible)
-				// Example: CAST(REGEXP_SUBSTR(%n, '[0-9]+') AS UNSIGNED) ASC
 				$data->orderBy("CAST(REGEXP_SUBSTR(%n, '[0-9]+') AS UNSIGNED) {$this->order}", $this->column);
 				return;
 			} catch (\Throwable $e) {
-				// DB doesn't support REGEXP_SUBSTR or expression failed - fallback
 			}
 		}
 
-		// Default native sorting
 		$data->orderBy("%n {$this->order}", $this->column);
 	}
 
-
-	/**
-	 * Calculates total number of items matching filters
-	 */
 	private function calculateTotalItems(Fluent $data): void
 	{
 		$this->totalItems = $data->count('*');
 	}
 
-
-	/**
-	 * Fetches rows for current page using LIMIT/OFFSET
-	 * Performance optimization: Only fetches data needed for current page
-	 */
 	private function fetchPageRows(Fluent $data): array
 	{
 		$this->paginator->setItemsPerPage($this->itemsPerPage > 0 ? $this->itemsPerPage : $this->totalItems);
@@ -409,7 +360,6 @@ class DataGrid extends Control
 		$this->paginator->setItemCount($this->totalItems);
 
 		if ($this->itemsPerPage > 0) {
-			// Apply LIMIT/OFFSET at database level (much faster for large datasets)
 			$data->limit($this->itemsPerPage)
 				->offset($this->paginator->getOffset());
 		}
@@ -417,15 +367,10 @@ class DataGrid extends Control
 		return $data->fetchAll();
 	}
 
-
-	/**
-	 * Validates that all defined columns exist in the data source
-	 * @throws InvalidColumnException
-	 */
 	private function validateColumns(array $pageRows): void
 	{
 		if (empty($pageRows)) {
-			return;  // No data to validate against
+			return;
 		}
 
 		$dbColumns = array_keys((array) $pageRows[0]);
@@ -436,10 +381,6 @@ class DataGrid extends Control
 		}
 	}
 
-
-	/**
-	 * Renders the template with prepared data
-	 */
 	private function renderTemplate(array $pageRows): void
 	{
 		$template = $this->template;
