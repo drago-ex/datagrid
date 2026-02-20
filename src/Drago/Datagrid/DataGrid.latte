@@ -40,7 +40,7 @@
                 {if $actions !== []}
                     <td>
                         {foreach $actions as $ac}
-                            {include 'action', signal: $ac->signal, label: $ac->label, id: $row[$primaryKey], class: $ac->class}
+                            {include 'action', signal: $ac->signal, label: $ac->label, id: $row[$primaryKey], class: $ac->class, filters: $filters, page: $page, itemsPerPage: $itemsPerPage, column: $columnName, order: $order}
                         {/foreach}
                     </td>
                 {/if}

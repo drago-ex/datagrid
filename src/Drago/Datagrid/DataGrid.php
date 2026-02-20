@@ -236,8 +236,21 @@ class DataGrid extends Control
 
 
 	#[Requires(ajax: true)]
-	public function handleAction(string $signal, int $id): void
+	public function handleAction(string $signal, int $id, array $filters = [], int $page = Options::DefaultPage, int $itemsPerPage = Options::DefaultItemsPerPage, ?string $column = null, ?string $order = null): void
 	{
+		// Zachovat filter hodnoty, stránkování a řazení z parametrů
+		if (!empty($filters)) {
+			$this->filterValues = $filters;
+		}
+		$this->page = $page;
+		$this->itemsPerPage = $itemsPerPage;
+		if ($column !== null) {
+			$this->column = $column;
+		}
+		if ($order !== null) {
+			$this->order = $order;
+		}
+
 		foreach ($this->actions as $action) {
 			if ($action->signal === $signal) {
 				$action->execute($id);
@@ -245,6 +258,15 @@ class DataGrid extends Control
 				return;
 			}
 		}
+	}
+
+
+	/**
+	 * Returns current filter values.
+	 */
+	public function getFilterValues(): array
+	{
+		return $this->filterValues;
 	}
 
 
@@ -323,6 +345,7 @@ class DataGrid extends Control
 		$template->page = $this->paginator->getPage();
 		$template->itemsPerPage = $this->paginator->getItemsPerPage();
 		$template->totalItems = $this->paginator->getItemCount();
+		$template->filters = $this->filterValues;
 
 		if ($this->getComponent('paginator', false)) {
 			$this['paginator']->setPaginator(

@@ -45,4 +45,7 @@ class DataGridTemplate extends Template
 
 	/** Total number of items in the data source */
 	public int $totalItems = 0;
+
+	/** Current filter values */
+	public array $filters = [];
 }
