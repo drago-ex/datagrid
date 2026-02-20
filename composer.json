@@ -1,5 +1,5 @@
 {
-	"name": "drago-ex/project",
+	"name": "drago-ex/datagrid",
 	"type": "library",
 	"description": "A simple datagrid for sorting and filtering data.",
 	"license": ["MIT"],
