@@ -25,7 +25,6 @@ use Nette\Application\Attributes\Requires;
 use Nette\Application\UI\Control;
 use Nette\Utils\Paginator as UtilsPaginator;
 
-
 /**
  * DataGrid component for displaying tabular data
  * with filtering, sorting, pagination, and row actions.
@@ -69,66 +68,6 @@ class DataGrid extends Control
 	}
 
 
-	protected function createComponentFilters(): FilterTextControl
-	{
-		$control = new FilterTextControl;
-		$control->setColumns($this->columns);
-
-		$control->onFilterChanged(function (array $filters): void {
-			$this->page = Options::DefaultPage; // reset to first page
-			$this->filterValues = $filters; // store values for next render
-			$this->redrawControl('dataGrid');
-		});
-
-		$control->setValues($this->filterValues ?? []);
-
-		return $control;
-	}
-
-
-	protected function createComponentPaginator(): PaginatorControl
-	{
-		$control = new PaginatorControl;
-		$control->onPageChanged(function (int $page, ?string $column, ?string $order): void {
-			$this->page = $page;
-			if ($column !== null) {
-				$this->column = $column;
-			}
-			if ($order !== null) {
-				$this->order = $order;
-			}
-			$this->redrawControl('dataGrid');
-		});
-
-		if ($this->paginator->getItemCount() > 0) {
-			$control->setPaginator(
-				$this->paginator->getPage(),
-				$this->paginator->getItemsPerPage(),
-				$this->paginator->getItemCount(),
-			);
-			$control->setSorting($this->column, $this->order);
-		}
-
-		return $control;
-	}
-
-
-	protected function createComponentPageSize(): PageSizeControl
-	{
-		$control = new PageSizeControl;
-		$control->setTotalItems($this->totalItems);
-		$control->setCurrentPageSize($this->itemsPerPage);
-
-		$control->onPageChanged(function (int $page, int $itemsPerPage): void {
-			$this->page = $page;
-			$this->itemsPerPage = $itemsPerPage;
-			$this->redrawControl('dataGrid');
-		});
-
-		return $control;
-	}
-
-
 	/**
 	 * Sets the data source for the DataGrid.
 	 */
@@ -158,7 +97,8 @@ class DataGrid extends Control
 		string $label,
 		bool $sortable = true,
 		?Closure $formatter = null,
-	): ColumnText {
+	): ColumnText
+	{
 		$column = new ColumnText($name, $label, $sortable, $formatter);
 		$this->addColumn($column);
 		return $column;
@@ -175,23 +115,11 @@ class DataGrid extends Control
 		bool $sortable = true,
 		string $format = Options::DateFormat,
 		?Closure $formatter = null,
-	): ColumnDate {
+	): ColumnDate
+	{
 		$column = new ColumnDate($name, $label, $sortable, $format, $formatter);
 		$this->addColumn($column);
 		return $column;
-	}
-
-
-	/**
-	 * Registers a column.
-	 * @throws InvalidColumnException
-	 */
-	private function addColumn(Column $column): void
-	{
-		if (isset($this->columns[$column->name])) {
-			throw new InvalidColumnException("Column '{$column->name}' already exists.");
-		}
-		$this->columns[$column->name] = $column;
 	}
 
 
@@ -203,7 +131,8 @@ class DataGrid extends Control
 		string $signal,
 		?string $class = null,
 		?callable $callback = null,
-	): self {
+	): self
+	{
 		$action = new Action($label, $signal, $class);
 		if ($callback !== null) {
 			$action->addCallback($callback);
@@ -321,6 +250,79 @@ class DataGrid extends Control
 	}
 
 
+	protected function createComponentFilters(): FilterTextControl
+	{
+		$control = new FilterTextControl;
+		$control->setColumns($this->columns);
+
+		$control->onFilterChanged(function (array $filters): void {
+			$this->page = Options::DefaultPage; // reset to first page
+			$this->filterValues = $filters; // store values for next render
+			$this->redrawControl('dataGrid');
+		});
+
+		$control->setValues($this->filterValues ?? []);
+
+		return $control;
+	}
+
+
+	protected function createComponentPaginator(): PaginatorControl
+	{
+		$control = new PaginatorControl;
+		$control->onPageChanged(function (int $page, ?string $column, ?string $order): void {
+			$this->page = $page;
+			if ($column !== null) {
+				$this->column = $column;
+			}
+			if ($order !== null) {
+				$this->order = $order;
+			}
+			$this->redrawControl('dataGrid');
+		});
+
+		if ($this->paginator->getItemCount() > 0) {
+			$control->setPaginator(
+				$this->paginator->getPage(),
+				$this->paginator->getItemsPerPage(),
+				$this->paginator->getItemCount(),
+			);
+			$control->setSorting($this->column, $this->order);
+		}
+
+		return $control;
+	}
+
+
+	protected function createComponentPageSize(): PageSizeControl
+	{
+		$control = new PageSizeControl;
+		$control->setTotalItems($this->totalItems);
+		$control->setCurrentPageSize($this->itemsPerPage);
+
+		$control->onPageChanged(function (int $page, int $itemsPerPage): void {
+			$this->page = $page;
+			$this->itemsPerPage = $itemsPerPage;
+			$this->redrawControl('dataGrid');
+		});
+
+		return $control;
+	}
+
+
+	/**
+	 * Registers a column.
+	 * @throws InvalidColumnException
+	 */
+	private function addColumn(Column $column): void
+	{
+		if (isset($this->columns[$column->name])) {
+			throw new InvalidColumnException("Column '{$column->name}' already exists.");
+		}
+		$this->columns[$column->name] = $column;
+	}
+
+
 	/**
 	 * Validates that DataGrid is properly configured
 	 * @throws InvalidDataSourceException
@@ -378,7 +380,6 @@ class DataGrid extends Control
 				return;
 			} catch (\Throwable $e) {
 				// DB doesn't support REGEXP_SUBSTR or expression failed - fallback
-				// Silently fall back to simple ORDER BY
 			}
 		}
 

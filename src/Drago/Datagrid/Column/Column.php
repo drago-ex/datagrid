@@ -18,6 +18,10 @@ use Drago\Datagrid\Filter\Filter;
  */
 abstract class Column
 {
+	/** Whether to use natural (numeric) sorting when values contain numbers */
+	private bool $naturalSort = false;
+
+
 	/**
 	 * @param string $name Column identifier
 	 * @param string $label Column label
@@ -33,10 +37,6 @@ abstract class Column
 		public ?Filter $filter = null,
 	) {
 	}
-
-
-	/** Whether to use natural (numeric) sorting when values contain numbers */
-	private bool $naturalSort = false;
 
 
 	/**

@@ -29,7 +29,8 @@ class Action
 		public readonly string $label,
 		public readonly string $signal,
 		public readonly ?string $class = null,
-	) {}
+	) {
+	}
 
 
 	/**
