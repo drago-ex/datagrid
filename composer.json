@@ -1,7 +1,14 @@
 {
 	"name": "drago-ex/project",
-	"type": "project",
-	"description": "The basis for new projects on Drago Extension.",
+	"type": "library",
+	"description": "A simple datagrid for sorting and filtering data.",
+	"license": ["MIT"],
+	"authors": [
+		{
+			"name": "Zdeněk Papučík",
+			"homepage": "https://github.com/accgit"
+		}
+	],
 	"require": {
 		"php": ">=8.3 <9",
 		"latte/latte": "^3.1",
