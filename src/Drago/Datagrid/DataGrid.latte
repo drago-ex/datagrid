@@ -4,13 +4,8 @@
 {import 'Action.latte'}
 
 {snippet dataGrid}
-    <p class="d-inline-flex gap-1">
-        <a class="btn btn-sm btn-primary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-            Link with href
-        </a>
-    </p>
     <div class="collapse show" id="collapseExample">
-        <div class="card card-body">
+        <div class="card card-body bg-light mt-3 mb-3 border-0">
             {control filters}
         </div>
     </div>
