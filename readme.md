@@ -9,7 +9,7 @@ It provides high-performance filtering, sorting, pagination, and row actions wit
 
 ## Requirements
 - PHP >= 8.3
-- Nette Framework 3.2+
+- Nette Framework
 - Dibi
 - Latte
 - Bootstrap 5
