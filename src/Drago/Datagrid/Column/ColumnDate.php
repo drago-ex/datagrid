@@ -42,7 +42,7 @@ class ColumnDate extends Column
 	 */
 	public function setFilterDate(): self
 	{
-		$this->setFilter(new DateFilter());
+		$this->setFilter(new DateFilter);
 		return $this;
 	}
 

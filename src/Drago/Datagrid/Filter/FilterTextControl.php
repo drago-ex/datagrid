@@ -78,7 +78,7 @@ final class FilterTextControl extends Control
 	 */
 	protected function createComponentForm(): Form
 	{
-		$form = new Form();
+		$form = new Form;
 
 		foreach ($this->columns as $column) {
 			if ($column->filter !== null) {

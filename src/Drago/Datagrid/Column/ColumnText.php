@@ -20,7 +20,7 @@ class ColumnText extends Column
 {
 	public function setFilterText(): self
 	{
-		$this->setFilter(new TextFilter());
+		$this->setFilter(new TextFilter);
 		return $this;
 	}
 

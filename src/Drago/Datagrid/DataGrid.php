@@ -65,13 +65,13 @@ class DataGrid extends Control
 
 	public function __construct()
 	{
-		$this->paginator = new UtilsPaginator();
+		$this->paginator = new UtilsPaginator;
 	}
 
 
 	protected function createComponentFilters(): FilterTextControl
 	{
-		$control = new FilterTextControl();
+		$control = new FilterTextControl;
 		$control->setColumns($this->columns);
 
 		$control->onFilterChanged(function (array $filters): void {
@@ -88,7 +88,7 @@ class DataGrid extends Control
 
 	protected function createComponentPaginator(): PaginatorControl
 	{
-		$control = new PaginatorControl();
+		$control = new PaginatorControl;
 		$control->onPageChanged(function (int $page, ?string $column, ?string $order): void {
 			$this->page = $page;
 			if ($column !== null) {
@@ -115,7 +115,7 @@ class DataGrid extends Control
 
 	protected function createComponentPageSize(): PageSizeControl
 	{
-		$control = new PageSizeControl();
+		$control = new PageSizeControl;
 		$control->setTotalItems($this->totalItems);
 		$control->setCurrentPageSize($this->itemsPerPage);
 

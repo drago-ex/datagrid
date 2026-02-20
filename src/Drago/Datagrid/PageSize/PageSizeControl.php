@@ -61,7 +61,7 @@ final class PageSizeControl extends Control
 	 */
 	protected function createComponentForm(): Form
 	{
-		$form = new Form();
+		$form = new Form;
 
 		$form->addSelect('pageSize', 'Items per page', items: [
 			20 => '20',

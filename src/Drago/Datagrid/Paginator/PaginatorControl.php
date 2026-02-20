@@ -36,7 +36,7 @@ final class PaginatorControl extends Control
 
 	public function __construct()
 	{
-		$this->paginator = new UtilsPaginator();
+		$this->paginator = new UtilsPaginator;
 	}
 
 
