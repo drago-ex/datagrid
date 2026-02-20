@@ -16,7 +16,7 @@ It provides high-performance filtering, sorting, pagination, and row actions wit
 - Naja
 - Composer
 
-## ⚡ Features
+## Features
 - **Text & Date Filtering** – LIKE operator with SQL injection protection
 - **Column Sorting** – Click headers to sort, toggle ASC/DESC
 - **Smart Pagination** – LIMIT/OFFSET at DB level (5.8x faster for 1M rows)
