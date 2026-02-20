@@ -62,10 +62,12 @@ class DataGrid extends Control
 	/** Total number of records */
 	private int $totalItems = 0;
 
+
 	public function __construct()
 	{
 		$this->paginator = new UtilsPaginator;
 	}
+
 
 	/**
 	 * Sets the data source for the DataGrid.
@@ -76,6 +78,7 @@ class DataGrid extends Control
 		return $this;
 	}
 
+
 	/**
 	 * Sets primary key used for row actions.
 	 */
@@ -84,6 +87,7 @@ class DataGrid extends Control
 		$this->primaryKey = $primaryKey;
 		return $this;
 	}
+
 
 	/**
 	 * Adds a text column to the DataGrid.
@@ -100,6 +104,7 @@ class DataGrid extends Control
 		$this->addColumn($column);
 		return $column;
 	}
+
 
 	/**
 	 * Adds a date column to the DataGrid.
@@ -118,6 +123,7 @@ class DataGrid extends Control
 		return $column;
 	}
 
+
 	/**
 	 * Adds a row action.
 	 */
@@ -135,6 +141,7 @@ class DataGrid extends Control
 		$this->actions[] = $action;
 		return $this;
 	}
+
 
 	#[Requires(ajax: true)]
 	public function handleSort(string $column, int $page): void
@@ -162,6 +169,7 @@ class DataGrid extends Control
 
 		$this->redrawControl('dataGrid');
 	}
+
 
 	#[Requires(ajax: true)]
 	public function handleAction(
@@ -212,6 +220,7 @@ class DataGrid extends Control
 		}
 	}
 
+
 	/**
 	 * Returns current filter values.
 	 */
@@ -219,6 +228,7 @@ class DataGrid extends Control
 	{
 		return $this->filterValues;
 	}
+
 
 	/**
 	 * Renders the DataGrid
@@ -240,6 +250,7 @@ class DataGrid extends Control
 		$this->renderTemplate($pageRows);
 	}
 
+
 	protected function createComponentFilters(): FilterTextControl
 	{
 		$control = new FilterTextControl;
@@ -255,6 +266,7 @@ class DataGrid extends Control
 
 		return $control;
 	}
+
 
 	protected function createComponentPaginator(): PaginatorControl
 	{
@@ -282,6 +294,7 @@ class DataGrid extends Control
 		return $control;
 	}
 
+
 	protected function createComponentPageSize(): PageSizeControl
 	{
 		$control = new PageSizeControl;
@@ -297,6 +310,7 @@ class DataGrid extends Control
 		return $control;
 	}
 
+
 	private function addColumn(Column $column): void
 	{
 		if (isset($this->columns[$column->name])) {
@@ -304,6 +318,7 @@ class DataGrid extends Control
 		}
 		$this->columns[$column->name] = $column;
 	}
+
 
 	private function validateConfiguration(): void
 	{
@@ -315,6 +330,7 @@ class DataGrid extends Control
 			throw new InvalidConfigurationException('Primary key must be set when using actions.');
 		}
 	}
+
 
 	private function applyFilters(Fluent $data): void
 	{
@@ -328,6 +344,7 @@ class DataGrid extends Control
 			}
 		}
 	}
+
 
 	private function applySorting(Fluent $data): void
 	{
@@ -348,10 +365,12 @@ class DataGrid extends Control
 		$data->orderBy("%n {$this->order}", $this->column);
 	}
 
+
 	private function calculateTotalItems(Fluent $data): void
 	{
 		$this->totalItems = $data->count('*');
 	}
+
 
 	private function fetchPageRows(Fluent $data): array
 	{
@@ -367,6 +386,7 @@ class DataGrid extends Control
 		return $data->fetchAll();
 	}
 
+
 	private function validateColumns(array $pageRows): void
 	{
 		if (empty($pageRows)) {
@@ -380,6 +400,7 @@ class DataGrid extends Control
 			}
 		}
 	}
+
 
 	private function renderTemplate(array $pageRows): void
 	{
