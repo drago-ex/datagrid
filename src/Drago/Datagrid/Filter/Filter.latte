@@ -1,7 +1,7 @@
 {templateType Drago\Datagrid\Filter\FilterTextTemplate}
 {varType Nette\Application\UI\Form $form}
 
-<form n:name="form" class="ajax">
+<form n:name="form" class="ajax" data-bs-theme="light">
     <div class="row g-3">
 
         {foreach $form->getControls() as $input}
@@ -9,17 +9,10 @@
 
             {if !$input instanceof Nette\Forms\Controls\SubmitButton}
                 <div class="col-md-6">
-                    <div class="row align-items-center">
-                        <div class="col-4 text-end">
-                            <label class="form-label mb-0 small">
-                                {$input->getLabel() ?? null}
-                            </label>
-                        </div>
-
-                        <div class="col-8">
-                            {$input->getControl()->class('form-control form-control-sm')}
-                        </div>
-                    </div>
+                    <label class="form-label small">
+                        {$input->getLabel() ?? null}
+                    </label>
+                    {$input->getControl()->class('form-control form-control-sm')}
                 </div>
             {else}
                 <div class="col-md-6 d-flex align-items-end justify-content-end">
