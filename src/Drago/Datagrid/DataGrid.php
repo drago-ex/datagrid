@@ -25,6 +25,7 @@ use Nette\Application\Attributes\Requires;
 use Nette\Application\UI\Control;
 use Nette\Utils\Paginator as UtilsPaginator;
 
+
 /**
  * DataGrid component for displaying tabular data
  * with filtering, sorting, pagination, and row actions.
