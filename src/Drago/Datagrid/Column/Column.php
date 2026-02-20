@@ -34,8 +34,10 @@ abstract class Column
 	) {
 	}
 
+
 	/** Whether to use natural (numeric) sorting when values contain numbers */
 	private bool $naturalSort = false;
+
 
 	/**
 	 * Assigns a filter to the column.
@@ -46,6 +48,7 @@ abstract class Column
 		return $this;
 	}
 
+
 	/**
 	 * Enable or disable natural numeric sorting for this column.
 	 */
@@ -54,6 +57,7 @@ abstract class Column
 		$this->naturalSort = $enable;
 		return $this;
 	}
+
 
 	/**
 	 * Returns whether natural sorting is enabled for this column.

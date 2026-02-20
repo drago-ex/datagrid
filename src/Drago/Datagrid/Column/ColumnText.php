@@ -24,6 +24,7 @@ class ColumnText extends Column
 		return $this;
 	}
 
+
 	/**
 	 * Enable or disable natural numeric sorting for this column.
 	 */
@@ -32,6 +33,7 @@ class ColumnText extends Column
 		parent::setNaturalSort($enable);
 		return $this;
 	}
+
 
 	/**
 	 * Renders the cell for this column.

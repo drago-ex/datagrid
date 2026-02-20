@@ -242,7 +242,15 @@ class DataGrid extends Control
 
 
 	#[Requires(ajax: true)]
-	public function handleAction(string $signal, int $id, array $filters = [], int $page = Options::DefaultPage, int $itemsPerPage = Options::DefaultItemsPerPage, ?string $column = null, ?string $order = null): void
+	public function handleAction(
+		string $signal,
+		int $id,
+		array $filters = [],
+		int $page = Options::DefaultPage,
+		int $itemsPerPage = Options::DefaultItemsPerPage,
+		?string $column = null,
+		?string $order = null,
+	): void
 	{
 		// Validate ID
 		if ($id <= 0) {
@@ -301,12 +309,12 @@ class DataGrid extends Control
 	public function render(): void
 	{
 		$this->validateConfiguration();
-		
+
 		$data = clone $this->source;
 		$this->applyFilters($data);
 		$this->applySorting($data);
 		$this->calculateTotalItems($data);
-		
+
 		$pageRows = $this->fetchPageRows($data);
 		$this->validateColumns($pageRows);
 		$this->renderTemplate($pageRows);
