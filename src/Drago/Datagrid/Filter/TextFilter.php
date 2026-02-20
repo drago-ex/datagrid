@@ -18,7 +18,8 @@ use Dibi\Fluent;
 class TextFilter implements Filter
 {
 	/**
-	 * Applies text filter condition.
+	 * Applies text filter condition with proper escaping.
+	 * Prevents SQL injection by properly escaping special LIKE characters.
 	 */
 	public function apply(Fluent $fluent, string $column, mixed $value): void
 	{
@@ -26,7 +27,9 @@ class TextFilter implements Filter
 			return;
 		}
 
-		$fluent->where('%n LIKE %~like~', $column, $value);
+		// Escape special LIKE characters: %, _
+		$escapedValue = str_replace(['%', '_'], ['\%', '\_'], (string) $value);
+		$fluent->where('%n LIKE %s ESCAPE %s', $column, '%' . $escapedValue . '%', '\\');
 	}
 
 

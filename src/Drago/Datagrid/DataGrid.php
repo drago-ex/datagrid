@@ -216,7 +216,13 @@ class DataGrid extends Control
 	#[Requires(ajax: true)]
 	public function handleSort(string $column, int $page): void
 	{
+		// Validate column exists and is sortable
 		if (!isset($this->columns[$column]) || !$this->columns[$column]->sortable) {
+			return;
+		}
+
+		// Validate page number
+		if ($page < 1) {
 			return;
 		}
 
@@ -238,19 +244,35 @@ class DataGrid extends Control
 	#[Requires(ajax: true)]
 	public function handleAction(string $signal, int $id, array $filters = [], int $page = Options::DefaultPage, int $itemsPerPage = Options::DefaultItemsPerPage, ?string $column = null, ?string $order = null): void
 	{
-		// Zachovat filter hodnoty, stránkování a řazení z parametrů
+		// Validate ID
+		if ($id <= 0) {
+			return;
+		}
+
+		// Validate page and itemsPerPage
+		if ($page < 1 || $itemsPerPage < 1) {
+			return;
+		}
+
+		// Validate order if provided
+		if ($order !== null && !in_array($order, [Options::OrderAsc, Options::OrderDesc], true)) {
+			return;
+		}
+
+		// Restore filter values, pagination and sorting from parameters
 		if (!empty($filters)) {
 			$this->filterValues = $filters;
 		}
 		$this->page = $page;
 		$this->itemsPerPage = $itemsPerPage;
-		if ($column !== null) {
+		if ($column !== null && isset($this->columns[$column])) {
 			$this->column = $column;
 		}
 		if ($order !== null) {
 			$this->order = $order;
 		}
 
+		// Execute action
 		foreach ($this->actions as $action) {
 			if ($action->signal === $signal) {
 				$action->execute($id);
