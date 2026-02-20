@@ -1,0 +1,14 @@
+{
+  "name": "drago-datagrid",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+	".": "./src/Drago/assets/index.js",
+	"./naja.datagrid": "./src/Drago/assets/naja.datagrid.js",
+	"./styles": "./src/Drago/assets/datagrid.scss"
+  },
+  "devDependencies": {
+	"bootstrap": "^5.3.3",
+	"naja": "^3.2.1"
+  }
+}
