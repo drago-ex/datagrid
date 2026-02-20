@@ -10,6 +10,7 @@ export default class DataGridPage {
 				}
 			}
 		}
+
 		dataGridPage(document);
 		naja.snippetHandler.addEventListener('afterUpdate', (e) => dataGridPage(e.detail.snippet));
 	}

@@ -13,6 +13,7 @@ export default class DataGridFilter {
 				});
 			}
 		};
+
 		applyFilters(document);
 		naja.snippetHandler.addEventListener('afterUpdate', (e) => applyFilters(e.detail.snippet));
 	}

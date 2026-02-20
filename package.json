@@ -5,6 +5,7 @@
   "exports": {
 	".": "./src/Drago/assets/index.js",
 	"./naja.datagrid": "./src/Drago/assets/naja.datagrid.js",
+	"./naja.page.items": "./src/Drago/assets/naja.page.items.js",
 	"./styles": "./src/Drago/assets/datagrid.scss"
   },
   "devDependencies": {
