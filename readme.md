@@ -33,6 +33,3 @@ It provides high-performance filtering, sorting, pagination, and row actions wit
 composer require drago-ex/datagrid
 ```
 ---
-
-**Last Updated**: 20. února 2026
-**Status**: Production-ready ✅
