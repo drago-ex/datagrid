@@ -62,6 +62,8 @@ class DataGrid extends Control
 	/** Total number of records */
 	private int $totalItems = 0;
 
+	private string $dataGridSnippet = 'dataGrid';
+
 
 	public function __construct()
 	{
@@ -167,7 +169,7 @@ class DataGrid extends Control
 			$this->order = Options::OrderAsc;
 		}
 
-		$this->redrawControl('dataGrid');
+		$this->redrawControl($this->dataGridSnippet);
 	}
 
 
@@ -214,7 +216,7 @@ class DataGrid extends Control
 		foreach ($this->actions as $action) {
 			if ($action->signal === $signal) {
 				$action->execute($id);
-				$this->redrawControl('dataGrid');
+				$this->redrawControl($this->dataGridSnippet);
 				return;
 			}
 		}
@@ -259,7 +261,7 @@ class DataGrid extends Control
 		$control->onFilterChanged(function (array $filters): void {
 			$this->page = Options::DefaultPage; // reset to first page
 			$this->filterValues = $filters; // store values for next render
-			$this->redrawControl('dataGrid');
+			$this->redrawControl($this->dataGridSnippet);
 		});
 
 		$control->setValues($this->filterValues ?? []);
@@ -279,7 +281,7 @@ class DataGrid extends Control
 			if ($order !== null) {
 				$this->order = $order;
 			}
-			$this->redrawControl('dataGrid');
+			$this->redrawControl($this->dataGridSnippet);
 		});
 
 		if ($this->paginator->getItemCount() > 0) {
@@ -304,7 +306,7 @@ class DataGrid extends Control
 		$control->onPageChanged(function (int $page, int $itemsPerPage): void {
 			$this->page = $page;
 			$this->itemsPerPage = $itemsPerPage;
-			$this->redrawControl('dataGrid');
+			$this->redrawControl($this->dataGridSnippet);
 		});
 
 		return $control;
@@ -436,5 +438,11 @@ class DataGrid extends Control
 		}
 
 		$template->render();
+	}
+
+
+	public function redrawDataGrid(): void
+	{
+		$this->redrawControl($this->dataGridSnippet);
 	}
 }
