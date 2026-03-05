@@ -89,12 +89,15 @@ final class FilterTextControl extends Control
 					$form->addText($name, $column->label)
 						->setDefaultValue($this->values[$name] ?? '')
 						->setHtmlAttribute('data-items-filter')
-						->setHtmlAttribute('placeholder', 'Search...');
+						->setHtmlAttribute('placeholder', 'Search...')
+						->setHtmlAttribute('autocomplete', 'off');
+
 				} elseif ($type === 'date') {
 					$form->addText($name, $column->label)
 						->setHtmlType('date')
 						->setDefaultValue($this->values[$name] ?? '')
-						->setHtmlAttribute('data-items-filter');
+						->setHtmlAttribute('data-items-filter')
+						->setHtmlAttribute('autocomplete', 'off');
 				}
 			}
 		}
