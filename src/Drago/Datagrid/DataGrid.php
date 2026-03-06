@@ -279,10 +279,8 @@ class DataGrid extends Control
 			$this->redrawDataGrid();
 		});
 
-		if ($this->paginator->getItemCount() > 0) {
-			$control->setPaginator($this->paginator->getPage(), $this->paginator->getItemsPerPage(), $this->paginator->getItemCount());
-			$control->setSorting($this->column, $this->order);
-		}
+		$control->setPaginator($this->paginator->getPage(), $this->paginator->getItemsPerPage(), $this->paginator->getItemCount());
+		$control->setSorting($this->column, $this->order);
 
 		return $control;
 	}
