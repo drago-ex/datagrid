@@ -258,13 +258,6 @@ class DataGrid extends Control
 			$this->redrawDataGrid();
 		});
 
-		$control->setCurrentPage($this->page);
-		$control->onFilterReset(function (int $page): void {
-			$this->page = $page;
-			$this->filterValues = [];
-			$this->redrawDataGrid();
-		});
-
 		$control->setValues($this->filterValues ?? []);
 
 		return $control;

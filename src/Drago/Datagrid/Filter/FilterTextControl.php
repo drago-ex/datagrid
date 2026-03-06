@@ -14,6 +14,7 @@ use Drago\Datagrid\Column\Column;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\SubmitButton;
+use Tracy\Debugger;
 use stdClass;
 
 
@@ -25,7 +26,6 @@ use stdClass;
 final class FilterTextControl extends Control
 {
 	private ?Closure $onFilterChanged = null;
-	private ?Closure $onFilterReset = null;
 
 	/** @var Column[] */
 	private array $columns = [];
@@ -36,14 +36,6 @@ final class FilterTextControl extends Control
 	/** Whether any filter is currently active */
 	private bool $hasActiveFilters = false;
 
-	private int $currentPage = 1;
-
-
-	public function setCurrentPage(int $page): void
-	{
-		$this->currentPage = $page;
-	}
-
 
 	/**
 	 * Registers filter change callback.
@@ -51,12 +43,6 @@ final class FilterTextControl extends Control
 	public function onFilterChanged(callable $callback): void
 	{
 		$this->onFilterChanged = $callback;
-	}
-
-
-	public function onFilterReset(callable $callback): void
-	{
-		$this->onFilterReset = $callback;
 	}
 
 
@@ -123,9 +109,6 @@ final class FilterTextControl extends Control
 					$form->reset();
 					$this->values = [];
 					$this->hasActiveFilters = false;
-					if ($this->onFilterReset) {
-						($this->onFilterReset)($this->currentPage);
-					}
 					return;
 				}
 			}
