@@ -25,7 +25,6 @@ use Nette\Application\Attributes\Requires;
 use Nette\Application\UI\Control;
 use Nette\Utils\Paginator as UtilsPaginator;
 
-
 /**
  * DataGrid component for displaying tabular data
  * with filtering, sorting, pagination, and row actions.
@@ -159,7 +158,7 @@ class DataGrid extends Control
 			$this->order = Options::OrderAsc;
 		}
 
-		$this->redrawControl('dataGrid');
+		$this->redrawDataGrid();
 	}
 
 
@@ -199,7 +198,7 @@ class DataGrid extends Control
 		foreach ($this->actions as $action) {
 			if ($action->signal === $signal) {
 				$action->execute($id);
-				$this->redrawControl('dataGrid');
+				$this->redrawDataGrid();
 				return;
 			}
 		}
@@ -251,7 +250,7 @@ class DataGrid extends Control
 		$control->onFilterChanged(function (array $filters): void {
 			$this->page = Options::DefaultPage;
 			$this->filterValues = $filters;
-			$this->redrawControl('dataGrid');
+			$this->redrawDataGrid();
 		});
 
 		$control->setValues($this->filterValues ?? []);
@@ -273,7 +272,7 @@ class DataGrid extends Control
 			if ($order !== null) {
 				$this->order = $order;
 			}
-			$this->redrawControl('dataGrid');
+			$this->redrawDataGrid();
 		});
 
 		if ($this->paginator->getItemCount() > 0) {
@@ -297,7 +296,7 @@ class DataGrid extends Control
 		$control->onPageChanged(function (int $page, int $itemsPerPage): void {
 			$this->page = $page;
 			$this->itemsPerPage = $itemsPerPage;
-			$this->redrawControl('dataGrid');
+			$this->redrawDataGrid();
 		});
 
 		return $control;
@@ -306,6 +305,7 @@ class DataGrid extends Control
 
 	/**
 	 * Adds a column internally and validates uniqueness.
+	 * @throws InvalidColumnException
 	 */
 	private function addColumn(Column $column): void
 	{
@@ -434,7 +434,11 @@ class DataGrid extends Control
 		$template->filters = $this->filterValues;
 
 		if ($this->getComponent('paginator', false)) {
-			$this['paginator']->setPaginator($this->paginator->getPage(), $this->paginator->getItemsPerPage(), $this->paginator->getItemCount());
+			$this['paginator']->setPaginator(
+				$this->paginator->getPage(),
+				$this->paginator->getItemsPerPage(),
+				$this->paginator->getItemCount(),
+			);
 			$this['paginator']->setSorting($this->column, $this->order);
 		}
 
@@ -448,12 +452,21 @@ class DataGrid extends Control
 
 
 	/**
-	 * Redraws the DataGrid component in AJAX requests.
+	 * Redraws the DataGrid component and its subcomponents in AJAX requests
+	 * while preserving filters, sorting, and pagination.
 	 */
 	public function redrawDataGrid(): void
 	{
-		if ($this->getPresenter()->isAjax()) {
-			$this->redrawControl('dataGrid');
+		if (!$this->getPresenter()->isAjax()) {
+			return;
+		}
+
+		$this->redrawControl('dataGrid');
+		foreach (['paginator', 'filters', 'pageSize'] as $component) {
+			$comp = $this->getComponent($component, false);
+			if ($comp instanceof Control) {
+				$comp->redrawControl();
+			}
 		}
 	}
 }
