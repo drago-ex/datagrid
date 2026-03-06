@@ -21,7 +21,6 @@ use Drago\Datagrid\Filter\FilterTextControl;
 use Drago\Datagrid\PageSize\PageSizeControl;
 use Drago\Datagrid\Paginator\PaginatorControl;
 use Nette\Application\Attributes\Parameter;
-use Nette\Application\Attributes\Requires;
 use Nette\Application\UI\Control;
 use Nette\Utils\Paginator as UtilsPaginator;
 
