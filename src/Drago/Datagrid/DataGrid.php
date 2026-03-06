@@ -145,7 +145,6 @@ class DataGrid extends Control
 	}
 
 
-	#[Requires(ajax: true)]
 	public function handleSort(string $column, int $page): void
 	{
 		// Validate column exists and is sortable
@@ -173,7 +172,6 @@ class DataGrid extends Control
 	}
 
 
-	#[Requires(ajax: true)]
 	public function handleAction(
 		string $signal,
 		int $id,
