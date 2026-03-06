@@ -21,9 +21,9 @@ use Drago\Datagrid\Filter\FilterTextControl;
 use Drago\Datagrid\PageSize\PageSizeControl;
 use Drago\Datagrid\Paginator\PaginatorControl;
 use Nette\Application\Attributes\Persistent;
-use Nette\Application\Attributes\Requires;
 use Nette\Application\UI\Control;
 use Nette\Utils\Paginator as UtilsPaginator;
+
 
 /**
  * DataGrid component for displaying tabular data
@@ -139,7 +139,6 @@ class DataGrid extends Control
 	/**
 	 * Handles sorting when a column header is clicked.
 	 */
-	#[Requires(ajax: true)]
 	public function handleSort(string $column, int $page): void
 	{
 		if (!isset($this->columns[$column]) || !$this->columns[$column]->sortable) {
@@ -165,7 +164,6 @@ class DataGrid extends Control
 	/**
 	 * Handles execution of row actions while preserving current grid state.
 	 */
-	#[Requires(ajax: true)]
 	public function handleAction(
 		string $signal,
 		int $id,
