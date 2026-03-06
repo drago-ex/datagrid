@@ -1,7 +1,7 @@
 {define action, string $signal, string $label, int $id, ?string $class = null, array $filters = [], int $page = 1, int $itemsPerPage = 20, ?string $column = null, ?string $order = null}
 
     {do $attr = [
-        'data-naja-history' => 'replace',
+        'data-naja-history' => 'off',
         'class' => $class ?? 'ajax text-decoration-none'
     ]}
 
