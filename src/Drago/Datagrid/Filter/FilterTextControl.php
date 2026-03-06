@@ -25,6 +25,7 @@ use stdClass;
 final class FilterTextControl extends Control
 {
 	private ?Closure $onFilterChanged = null;
+	private ?Closure $onFilterReset = null;
 
 	/** @var Column[] */
 	private array $columns = [];
@@ -42,6 +43,12 @@ final class FilterTextControl extends Control
 	public function onFilterChanged(callable $callback): void
 	{
 		$this->onFilterChanged = $callback;
+	}
+
+
+	public function onFilterReset(callable $callback): void
+	{
+		$this->onFilterReset = $callback;
 	}
 
 
@@ -108,8 +115,8 @@ final class FilterTextControl extends Control
 					$form->reset();
 					$this->values = [];
 					$this->hasActiveFilters = false;
-					if ($this->onFilterChanged) {
-						($this->onFilterChanged)([]);
+					if ($this->onFilterReset) {
+						($this->onFilterReset)();
 					}
 					return;
 				}

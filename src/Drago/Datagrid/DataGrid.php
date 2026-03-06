@@ -258,6 +258,11 @@ class DataGrid extends Control
 			$this->redrawDataGrid();
 		});
 
+		$control->onFilterReset(function (): void {
+			$this->filterValues = [];
+			$this->redrawDataGrid();
+		});
+
 		$control->setValues($this->filterValues ?? []);
 
 		return $control;
