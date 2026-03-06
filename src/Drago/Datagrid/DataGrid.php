@@ -23,6 +23,8 @@ use Drago\Datagrid\Paginator\PaginatorControl;
 use Nette\Application\Attributes\Persistent;
 use Nette\Application\UI\Control;
 use Nette\Utils\Paginator as UtilsPaginator;
+use Tracy\Debugger;
+use Tracy\ILogger;
 
 
 /**
@@ -365,7 +367,7 @@ class DataGrid extends Control
 				$data->orderBy("CAST(REGEXP_SUBSTR(%n, '[0-9]+') AS UNSIGNED) {$this->order}", $this->column);
 				return;
 			} catch (\Throwable $e) {
-				\Tracy\Debugger::log($e, \Tracy\ILogger::WARNING);
+				Debugger::log($e, ILogger::WARNING);
 			}
 		}
 
