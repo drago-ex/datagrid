@@ -104,14 +104,12 @@ final class FilterTextControl extends Control
 		$form->onSuccess[] = function (Form $form, stdClass $values): void {
 			$resetButton = $form['reset'];
 			if ($resetButton instanceof SubmitButton && $resetButton->isSubmittedBy()) {
-				$currentPage = $this->getPresenter()->getParameter('page') ?? 1;
-
 				$form->reset();
 				$this->values = [];
 				$this->hasActiveFilters = false;
 
 				if ($this->onFilterChanged) {
-					($this->onFilterChanged)([], $currentPage);
+					($this->onFilterChanged)([], true);
 				}
 				return;
 			}
