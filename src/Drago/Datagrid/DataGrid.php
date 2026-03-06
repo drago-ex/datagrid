@@ -245,8 +245,8 @@ class DataGrid extends Control
 		$control = new FilterTextControl;
 		$control->setColumns($this->columns);
 
-		$control->onFilterChanged(function (array $filters): void {
-			$this->page = Options::DefaultPage;
+		$control->onFilterChanged(function (array $filters, int $page = 1): void {
+			$this->page = $page;
 			$this->filterValues = $filters;
 			$this->redrawDataGrid();
 		});
