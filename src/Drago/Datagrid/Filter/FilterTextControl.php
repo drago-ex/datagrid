@@ -36,6 +36,14 @@ final class FilterTextControl extends Control
 	/** Whether any filter is currently active */
 	private bool $hasActiveFilters = false;
 
+	private int $currentPage = 1;
+
+
+	public function setCurrentPage(int $page): void
+	{
+		$this->currentPage = $page;
+	}
+
 
 	/**
 	 * Registers filter change callback.
@@ -116,7 +124,7 @@ final class FilterTextControl extends Control
 					$this->values = [];
 					$this->hasActiveFilters = false;
 					if ($this->onFilterReset) {
-						($this->onFilterReset)();
+						($this->onFilterReset)($this->currentPage);
 					}
 					return;
 				}
