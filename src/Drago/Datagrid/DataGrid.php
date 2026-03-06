@@ -21,6 +21,7 @@ use Drago\Datagrid\Filter\FilterTextControl;
 use Drago\Datagrid\PageSize\PageSizeControl;
 use Drago\Datagrid\Paginator\PaginatorControl;
 use Nette\Application\Attributes\Parameter;
+use Nette\Application\Attributes\Requires;
 use Nette\Application\UI\Control;
 use Nette\Utils\Paginator as UtilsPaginator;
 
@@ -144,6 +145,7 @@ class DataGrid extends Control
 	}
 
 
+	#[Requires(ajax: false)]
 	public function handleSort(string $column, int $page): void
 	{
 		// Validate column exists and is sortable
@@ -171,6 +173,7 @@ class DataGrid extends Control
 	}
 
 
+	#[Requires(ajax: true)]
 	public function handleAction(
 		string $signal,
 		int $id,
@@ -310,6 +313,9 @@ class DataGrid extends Control
 	}
 
 
+	/**
+	 * @throws InvalidColumnException
+	 */
 	private function addColumn(Column $column): void
 	{
 		if (isset($this->columns[$column->name])) {
@@ -319,6 +325,10 @@ class DataGrid extends Control
 	}
 
 
+	/**
+	 * @throws InvalidConfigurationException
+	 * @throws InvalidDataSourceException
+	 */
 	private function validateConfiguration(): void
 	{
 		if ($this->source === null) {
@@ -386,6 +396,9 @@ class DataGrid extends Control
 	}
 
 
+	/**
+	 * @throws InvalidColumnException
+	 */
 	private function validateColumns(array $pageRows): void
 	{
 		if (empty($pageRows)) {
