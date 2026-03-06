@@ -181,6 +181,11 @@ class DataGrid extends Control
 			return;
 		}
 
+		$validSignals = array_map(fn(Action $a) => $a->signal, $this->actions);
+		if (!in_array($signal, $validSignals, true)) {
+			return;
+		}
+
 		if (!empty($filters)) {
 			$this->filterValues = $filters;
 		}
@@ -362,6 +367,7 @@ class DataGrid extends Control
 				$data->orderBy("CAST(REGEXP_SUBSTR(%n, '[0-9]+') AS UNSIGNED) {$this->order}", $this->column);
 				return;
 			} catch (\Throwable $e) {
+				\Tracy\Debugger::log($e, \Tracy\ILogger::WARNING);
 			}
 		}
 
