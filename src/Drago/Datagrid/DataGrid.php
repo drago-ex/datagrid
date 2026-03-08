@@ -249,18 +249,22 @@ class DataGrid extends Control
 	 */
 	protected function createComponentFilters(): FilterTextControl
 	{
-		$control = new FilterTextControl;
-		$control->setColumns($this->columns);
-
-		$control->onFilterChanged(function (array $filters): void {
-			$this->page = Options::DefaultPage;
-			$this->filterValues = $filters;
+		$filter = new FilterTextControl;
+		$filter->setColumns($this->columns);
+		$filter->setValues($this->filterValues);
+		$filter->onFilterChanged(function (array $values): void {
+			$this->filterValues = $values;
+			$this->page = 1;
 			$this->redrawDataGrid();
 		});
 
-		$control->setValues($this->filterValues ?? []);
+		$filter->onReset(function (): void {
+			$this->filterValues = [];
+			$this->page = 1;
+			$this->redrawDataGrid();
+		});
 
-		return $control;
+		return $filter;
 	}
 
 
