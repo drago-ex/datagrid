@@ -1,27 +1,28 @@
 {templateType Drago\Datagrid\Filter\FilterTextTemplate}
 {varType Nette\Application\UI\Form $form}
 
-<form n:name="form" class="ajax" data-bs-theme="light">
+<form n:name="form" class="ajax" data-bs-theme="light" data-naja-history="replace">
     <div class="row g-3">
 
         {foreach $form->getControls() as $input}
             {varType Nette\Forms\Controls\BaseControl $input}
 
-            {if !$input instanceof Nette\Forms\Controls\SubmitButton}
-                <div class="col-md-6">
-                    <label class="form-label small">
-                        {$input->getLabel() ?? null}
-                    </label>
-                    {$input->getControl()->class('form-control form-control-sm')}
-                </div>
-            {else}
-                <div class="col-md-12 d-flex align-items-end justify-content-end">
-                    {if $hasActiveFilters}
-                        {$input->getControl()->class('btn btn-secondary btn-sm')}
-                    {/if}
-                </div>
-            {/if}
+            <div class="col-md-6">
+                <label class="form-label small">
+                    {$input->getLabel() ?? null}
+                </label>
+                {$input->getControl()->class('form-control form-control-sm')}
+            </div>
+
         {/foreach}
+
+        {if $hasActiveFilters}
+            <div class="col-md-12 d-flex align-items-end justify-content-end">
+                <a n:href="resetFilters!" class="btn btn-secondary btn-sm ajax" data-naja-history="off">
+                    Reset
+                </a>
+            </div>
+        {/if}
 
     </div>
 </form>
