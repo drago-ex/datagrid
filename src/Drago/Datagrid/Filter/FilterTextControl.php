@@ -1,10 +1,5 @@
 <?php
 
-/**
- * Drago Extension
- * Package built on Nette Framework
- */
-
 declare(strict_types=1);
 
 namespace Drago\Datagrid\Filter;
@@ -13,9 +8,7 @@ use Closure;
 use Drago\Datagrid\Column\Column;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
-use Nette\Forms\Controls\SubmitButton;
 use stdClass;
-
 
 /**
  * DataGrid filter component.
@@ -25,29 +18,41 @@ use stdClass;
 final class FilterTextControl extends Control
 {
 	private ?Closure $onFilterChanged = null;
+	private ?Closure $onReset = null;
 
 	/** @var Column[] */
 	private array $columns = [];
 
-	/** @var array<string, mixed> Current filter values */
+	/** @var array<string, mixed> */
 	private array $values = [];
 
-	/** Whether any filter is currently active */
 	private bool $hasActiveFilters = false;
 
 
-	/**
-	 * Registers filter change callback.
-	 */
 	public function onFilterChanged(callable $callback): void
 	{
 		$this->onFilterChanged = $callback;
 	}
 
 
+	public function onReset(callable $callback): void
+	{
+		$this->onReset = $callback;
+	}
+
+
+	public function handleResetFilters(): void
+	{
+		$this->values = [];
+		$this->hasActiveFilters = false;
+
+		if ($this->onReset) {
+			($this->onReset)();
+		}
+	}
+
+
 	/**
-	 * Sets grid columns.
-	 *
 	 * @param Column[] $columns
 	 */
 	public function setColumns(array $columns): void
@@ -56,9 +61,6 @@ final class FilterTextControl extends Control
 	}
 
 
-	/**
-	 * Sets current filter values and detects active filters.
-	 */
 	public function setValues(array $values): void
 	{
 		$this->values = $values;
@@ -73,15 +75,14 @@ final class FilterTextControl extends Control
 	}
 
 
-	/**
-	 * Builds filter form from column definitions.
-	 */
 	protected function createComponentForm(): Form
 	{
 		$form = new Form;
+		$form->setMethod(Form::GET);
 
 		foreach ($this->columns as $column) {
 			if ($column->filter !== null) {
+
 				$type = $column->filter->getInputType();
 				$name = $column->name;
 
@@ -91,6 +92,7 @@ final class FilterTextControl extends Control
 						->setHtmlAttribute('data-items-filter')
 						->setHtmlAttribute('placeholder', 'Search...')
 						->setHtmlAttribute('autocomplete', 'off');
+
 				} elseif ($type === 'date') {
 					$form->addText($name, $column->label)
 						->setHtmlType('date')
@@ -100,23 +102,14 @@ final class FilterTextControl extends Control
 			}
 		}
 
-		$form->addSubmit('reset', 'Reset');
 		$form->onSuccess[] = function (Form $form, stdClass $values): void {
-			$resetButton = $form['reset'];
-			if ($resetButton instanceof SubmitButton) {
-				if ($resetButton->isSubmittedBy()) {
-					$form->reset();
-					$this->values = [];
-					$this->hasActiveFilters = false;
-					return;
-				}
-			}
 
-			// Apply filters
-			$this->setValues((array) $values);
+			$valuesArray = (array) $values;
+
+			$this->setValues($valuesArray);
 
 			if ($this->onFilterChanged) {
-				($this->onFilterChanged)((array) $values);
+				($this->onFilterChanged)($valuesArray);
 			}
 		};
 
@@ -124,9 +117,6 @@ final class FilterTextControl extends Control
 	}
 
 
-	/**
-	 * Renders filter component.
-	 */
 	public function render(): void
 	{
 		$this->template->setFile(__DIR__ . '/Filter.latte');
