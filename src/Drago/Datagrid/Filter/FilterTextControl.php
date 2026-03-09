@@ -103,7 +103,6 @@ final class FilterTextControl extends Control
 		}
 
 		$form->onSuccess[] = function (Form $form, stdClass $values): void {
-
 			$valuesArray = (array) $values;
 
 			$this->setValues($valuesArray);
