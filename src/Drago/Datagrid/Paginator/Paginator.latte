@@ -6,7 +6,7 @@
 {define pageLink, int $targetPage, string $label, bool $active = false, bool $disabled = false}
     <li n:class="page-item, $active ? active, $disabled ? disabled" n:attr="aria-current => $active ? 'page' : null">
         {if !$disabled}
-            <a n:href="page!, page: $targetPage, column: $column, order: $order" class="page-link ajax">
+            <a n:href="page!, page: $targetPage, column: $column, order: $order" class="page-link ajax" data-naja-history="replace">
                 {$label}
             </a>
         {else}
