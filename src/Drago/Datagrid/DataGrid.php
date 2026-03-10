@@ -356,8 +356,8 @@ class DataGrid extends Control
 		$firstRow = (array) $pageRows[0];
 		if (!array_key_exists($this->primaryKey, $firstRow)) {
 			throw new InvalidColumnException(
-				"Primary key '$this->primaryKey' not found in data source. "
-				. "Ensure the column is selected in your query and the name is correct.",
+				'Primary key \'' . $this->primaryKey . '\' not found in data source. '
+				. 'Ensure the column is selected in your query and the name is correct.',
 			);
 		}
 	}
