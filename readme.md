@@ -183,7 +183,7 @@ $grid->addColumnText('author_name', 'Author', formatter: function($value, $row) 
 
 ```php
 // Date column with formatter
-$grid->addColumnDate('created_at', 'Created', format: 'Y-m-d', 
+$grid->addColumnDate('created_at', 'Created', format: 'Y-m-d',
 	formatter: function($value, $row) {
 		// $value is already formatted (Y-m-d), add time info
 		return $value . ' (' . date('H:i', strtotime($row['created_at'])) . ')';
