@@ -49,6 +49,7 @@ class ColumnDate extends Column
 
 	/**
 	 * Renders formatted date value.
+	 * Formatter output is automatically escaped to prevent XSS.
 	 */
 	public function renderCell(array $row): string
 	{
@@ -65,9 +66,9 @@ class ColumnDate extends Column
 		$formatted = date($this->format, $timestamp);
 
 		if ($this->formatter !== null) {
-			$formatted = ($this->formatter)($formatted, $row);
+			$formatted = (string) ($this->formatter)($formatted, $row);
 		}
 
-		return $formatted;
+		return htmlspecialchars($formatted, ENT_QUOTES, 'UTF-8');
 	}
 }

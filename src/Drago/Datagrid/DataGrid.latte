@@ -29,7 +29,7 @@
         {foreach $rows as $row}
             <tr>
                 {foreach $columns as $col}
-                    <td>{$col->renderCell((array) $row)|noescape}</td>
+                    <td>{$col->renderCell((array) $row)}</td>
                 {/foreach}
 
                 {if $actions !== []}

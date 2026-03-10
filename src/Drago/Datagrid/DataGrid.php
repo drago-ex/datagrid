@@ -239,6 +239,7 @@ class DataGrid extends Control
 		$this->calculateTotalItems($data);
 
 		$pageRows = $this->fetchPageRows($data);
+		$this->validatePrimaryKeyExists($pageRows);
 		$this->validateColumns($pageRows);
 		$this->renderTemplate($pageRows);
 	}
@@ -338,6 +339,26 @@ class DataGrid extends Control
 		}
 		if ($this->actions !== [] && $this->primaryKey === null) {
 			throw new InvalidConfigurationException('Primary key must be set when using actions.');
+		}
+	}
+
+
+	/**
+	 * Validates that primary key exists in fetched rows.
+	 * @throws InvalidColumnException
+	 */
+	private function validatePrimaryKeyExists(array $pageRows): void
+	{
+		if (!$this->primaryKey || empty($pageRows)) {
+			return;
+		}
+
+		$firstRow = (array) $pageRows[0];
+		if (!array_key_exists($this->primaryKey, $firstRow)) {
+			throw new InvalidColumnException(
+				"Primary key '$this->primaryKey' not found in data source. "
+				. "Ensure the column is selected in your query and the name is correct.",
+			);
 		}
 	}
 

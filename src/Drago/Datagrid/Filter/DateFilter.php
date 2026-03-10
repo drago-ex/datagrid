@@ -37,15 +37,34 @@ class DateFilter implements Filter
 			$toDate = trim($toDate);
 
 			if ($fromDate !== '' && $toDate !== '') {
+				$this->validateDateFormat($fromDate);
+				$this->validateDateFormat($toDate);
 				$fluent->where('%n BETWEEN %s AND %s', $column, $fromDate, $toDate);
 			} elseif ($fromDate !== '') {
+				$this->validateDateFormat($fromDate);
 				$fluent->where('%n >= %s', $column, $fromDate);
 			} elseif ($toDate !== '') {
+				$this->validateDateFormat($toDate);
 				$fluent->where('%n <= %s', $column, $toDate);
 			}
 		} else {
 			// Single date
+			$this->validateDateFormat($value);
 			$fluent->where('DATE(%n) = %s', $column, $value);
+		}
+	}
+
+
+	/**
+	 * Validates that date string is in YYYY-MM-DD format.
+	 * @throws \InvalidArgumentException
+	 */
+	private function validateDateFormat(string $date): void
+	{
+		if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+			throw new \InvalidArgumentException(
+				"Date filter expects YYYY-MM-DD format, got: '{$date}'",
+			);
 		}
 	}
 

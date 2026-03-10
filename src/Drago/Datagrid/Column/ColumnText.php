@@ -38,15 +38,18 @@ class ColumnText extends Column
 	/**
 	 * Renders the cell for this column.
 	 * Applies optional formatter and escapes HTML characters.
+	 * Formatter output is automatically escaped to prevent XSS.
 	 */
 	public function renderCell(array $row): string
 	{
 		$value = $row[$this->name] ?? '';
 
 		if ($this->formatter) {
-			return (string) ($this->formatter)($value, $row);
+			$output = (string) ($this->formatter)($value, $row);
+		} else {
+			$output = (string) $value;
 		}
 
-		return htmlspecialchars((string) $value);
+		return htmlspecialchars($output, ENT_QUOTES, 'UTF-8');
 	}
 }
