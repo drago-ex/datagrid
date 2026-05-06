@@ -12,7 +12,7 @@ It provides high-performance filtering, sorting, pagination, and row actions wit
 - Nette Framework
 - Dibi
 - Latte
-- Bootstrap (install it in your application yourself; the bundled Latte templates target Bootstrap 5)
+- Bootstrap
 - Naja
 - Composer
 
