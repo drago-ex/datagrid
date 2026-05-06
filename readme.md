@@ -31,6 +31,34 @@ It provides high-performance filtering, sorting, pagination, and row actions wit
 composer require drago-ex/datagrid
 ```
 
+For frontend assets, install the npm package and its peer dependencies:
+
+```bash
+npm install drago-datagrid bootstrap naja
+```
+
+### Frontend Assets
+
+JavaScript and styles are exported separately, so import the behavior you need and load CSS on its own:
+
+```js
+import naja from 'naja';
+import { DataGridFilter, DataGridPage } from 'drago-datagrid';
+import 'drago-datagrid/styles/datagrid';
+
+naja.initialize();
+
+new DataGridFilter().initialize(naja);
+new DataGridPage().initialize(naja);
+```
+
+If you want only one feature, use the dedicated entrypoints:
+
+```js
+import DataGridFilter from 'drago-datagrid/datagrid';
+import DataGridPage from 'drago-datagrid/page-items';
+```
+
 ## Quick Start
 
 ### 1. Create Component in Presenter
