@@ -8,12 +8,13 @@
 	"./page-items": "./src/Drago/assets/page-items.js",
 	"./styles/datagrid": "./src/Drago/assets/datagrid.scss"
   },
+  "sideEffects": [
+	"**/*.scss"
+  ],
   "peerDependencies": {
-	"bootstrap": ">=5.0.0",
 	"naja": ">=3.0.0"
   },
   "devDependencies": {
-	"bootstrap": "^5.3.3",
 	"naja": "^3.2.1"
   }
 }

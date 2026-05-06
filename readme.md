@@ -9,11 +9,11 @@ It provides high-performance filtering, sorting, pagination, and row actions wit
 
 ## Requirements
 - PHP >= 8.3
-- Nette Framework 3.2+
-- Dibi 5.0+
-- Latte 3.1+
-- Bootstrap 5.3+
-- Naja 3.2+
+- Nette Framework
+- Dibi
+- Latte
+- Bootstrap (install it in your application yourself; the bundled Latte templates target Bootstrap 5)
+- Naja
 - Composer
 
 ## Features
@@ -39,9 +39,7 @@ Since the package is installed via Composer, add the following to your `package.
 {
   "type": "module",
   "dependencies": {
-    "drago-datagrid": "file:vendor/drago-ex/datagrid",
-    "bootstrap": "^5.3.3",
-    "naja": "^3.2.1"
+    "drago-datagrid": "file:vendor/drago-ex/datagrid"
   }
 }
 ```
@@ -56,20 +54,21 @@ After that, you can import the assets directly from the Composer-installed packa
 
 ```js
 import naja from 'naja';
-import { DataGridFilter, DataGridPage } from 'drago-datagrid';
-import 'drago-datagrid/styles/datagrid';
+import DataGrid from 'drago-datagrid';
 
 naja.initialize();
 
-new DataGridFilter().initialize(naja);
-new DataGridPage().initialize(naja);
+new DataGrid().initialize(naja);
 ```
 
-If you want only one feature, use the dedicated entrypoints:
+The main package entrypoint loads both required JS handlers and the shared SCSS for you. Bootstrap is still required in your app because the Latte templates are built on Bootstrap 5, but its installation stays under your control.
+
+If you explicitly want only one feature, use the dedicated entrypoints:
 
 ```js
 import DataGridFilter from 'drago-datagrid/datagrid';
 import DataGridPage from 'drago-datagrid/page-items';
+import 'drago-datagrid/styles/datagrid';
 ```
 
 ## Quick Start
