@@ -31,15 +31,28 @@ It provides high-performance filtering, sorting, pagination, and row actions wit
 composer require drago-ex/datagrid
 ```
 
-For frontend assets, install the npm package and its peer dependencies:
-
-```bash
-npm install drago-datagrid bootstrap naja
-```
-
 ### Frontend Assets
 
-JavaScript and styles are exported separately, so import the behavior you need and load CSS on its own:
+Since the package is installed via Composer, add the following to your `package.json` to make the `drago-datagrid` alias available in your bundler:
+
+```json
+{
+  "type": "module",
+  "dependencies": {
+    "drago-datagrid": "file:vendor/drago-ex/datagrid",
+    "bootstrap": "^5.3.3",
+    "naja": "^3.2.1"
+  }
+}
+```
+
+Then run:
+
+```bash
+npm install
+```
+
+After that, you can import the assets directly from the Composer-installed package:
 
 ```js
 import naja from 'naja';
