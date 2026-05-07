@@ -464,6 +464,7 @@ class DataGrid extends Control
 		$template->itemsPerPage = $this->paginator->getItemsPerPage();
 		$template->totalItems = $this->paginator->getItemCount();
 		$template->filters = $this->filterValues;
+		$template->hasFilters = array_any($this->columns, fn($col) => $col->filter !== null);
 
 		if ($this->getComponent('paginator', false)) {
 			$this['paginator']->setPaginator(

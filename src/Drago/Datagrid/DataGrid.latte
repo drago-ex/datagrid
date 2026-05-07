@@ -4,11 +4,13 @@
 {import 'Action.latte'}
 
 {snippet dataGrid}
+    {if $hasFilters}
     <div class="collapse show" id="collapseExample">
         <div class="card card-body bg-light mt-3 mb-3 border-0 pb-0">
             {control filters}
         </div>
     </div>
+    {/if}
 
     <table class="table table-sm table-striped table-borderless table-hover">
         <thead>

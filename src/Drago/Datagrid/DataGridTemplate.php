@@ -48,4 +48,7 @@ class DataGridTemplate extends Template
 
 	/** Current filter values */
 	public array $filters = [];
+
+	/** Whether any column has a filter configured */
+	public bool $hasFilters = false;
 }
