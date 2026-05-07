@@ -51,4 +51,6 @@ class DataGridTemplate extends Template
 
 	/** Whether any column has a filter configured */
 	public bool $hasFilters = false;
+	public string $filterMode = Options::FilterModeTop;
+	public string $filterFormId = '';
 }

@@ -6,6 +6,7 @@ namespace Drago\Datagrid\Filter;
 
 use Closure;
 use Drago\Datagrid\Column\Column;
+use Drago\Datagrid\Options;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
 use stdClass;
@@ -19,6 +20,7 @@ final class FilterTextControl extends Control
 {
 	private ?Closure $onFilterChanged = null;
 	private ?Closure $onReset = null;
+	private string $filterMode = Options::FilterModeTop;
 
 	/** @var Column[] */
 	private array $columns = [];
@@ -32,6 +34,19 @@ final class FilterTextControl extends Control
 	public function onFilterChanged(callable $callback): void
 	{
 		$this->onFilterChanged = $callback;
+	}
+
+
+	public function setFilterMode(string $mode): void
+	{
+		$this->filterMode = $mode;
+	}
+
+
+	public function getFormId(): string
+	{
+		$path = $this->lookupPath('Nette\Application\UI\Presenter') ?? 'filter';
+		return 'dg-filter-' . str_replace(['-', ':'], '_', $path);
 	}
 
 
@@ -118,7 +133,14 @@ final class FilterTextControl extends Control
 
 	public function render(): void
 	{
-		$this->template->setFile(__DIR__ . '/Filter.latte');
+		if ($this->filterMode === Options::FilterModeInline) {
+			$this['form']->getElementPrototype()->id = $this->getFormId();
+		}
+
+		$templateFile = $this->filterMode === Options::FilterModeInline
+			? __DIR__ . '/FilterInline.latte'
+			: __DIR__ . '/Filter.latte';
+		$this->template->setFile($templateFile);
 		$this->template->hasActiveFilters = $this->hasActiveFilters;
 		$this->template->render();
 	}

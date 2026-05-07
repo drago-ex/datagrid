@@ -54,6 +54,7 @@ class DataGrid extends Control
 	private ?string $primaryKey = null;
 	private array $columns = [];
 	private array $actions = [];
+	private string $filterMode = Options::FilterModeTop;
 	private UtilsPaginator $paginator;
 	private int $totalItems = 0;
 
@@ -61,6 +62,16 @@ class DataGrid extends Control
 	public function __construct()
 	{
 		$this->paginator = new UtilsPaginator;
+	}
+
+
+	/**
+	 * Sets the filter display mode ('top' or 'inline').
+	 */
+	public function setFilterMode(string $mode): self
+	{
+		$this->filterMode = $mode;
+		return $this;
 	}
 
 
@@ -253,6 +264,7 @@ class DataGrid extends Control
 		$filter = new FilterTextControl;
 		$filter->setColumns($this->columns);
 		$filter->setValues($this->filterValues);
+		$filter->setFilterMode($this->filterMode);
 		$filter->onFilterChanged(function (array $values): void {
 			$this->filterValues = $values;
 			$this->page = 1;
@@ -464,7 +476,12 @@ class DataGrid extends Control
 		$template->itemsPerPage = $this->paginator->getItemsPerPage();
 		$template->totalItems = $this->paginator->getItemCount();
 		$template->filters = $this->filterValues;
-		$template->hasFilters = array_any($this->columns, fn($col) => $col->filter !== null);
+		$hasFilters = array_any($this->columns, fn($col) => $col->filter !== null);
+		$template->hasFilters = $hasFilters;
+		$template->filterMode = $this->filterMode;
+		$template->filterFormId = ($hasFilters && $this->filterMode === Options::FilterModeInline)
+			? $this['filters']->getFormId()
+			: '';
 
 		if ($this->getComponent('paginator', false)) {
 			$this['paginator']->setPaginator(

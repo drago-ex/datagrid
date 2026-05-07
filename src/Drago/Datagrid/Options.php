@@ -26,4 +26,8 @@ class Options
 	/** Default paginator settings */
 	public const int DefaultPage = 1;
 	public const int DefaultItemsPerPage = 20;
+
+	/** Filter display modes */
+	public const string FilterModeTop = 'top';
+	public const string FilterModeInline = 'inline';
 }

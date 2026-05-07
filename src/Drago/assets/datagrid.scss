@@ -11,6 +11,15 @@ th a {
   --bs-btn-border-radius: 0.2rem;
 }
 
+.datagrid-filter-row th {
+  background-color: var(--bs-table-bg);
+  vertical-align: middle;
+}
+
+.datagrid-filter-row .form-control-sm {
+  font-size: 0.8rem;
+}
+
 .datagrid-filters .form-floating.form-floating-sm > .form-control,
 .datagrid-filters .form-floating.form-floating-sm > .form-control-plaintext {
   padding: inherit;
