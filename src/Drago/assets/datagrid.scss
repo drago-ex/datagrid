@@ -10,3 +10,49 @@ th a {
   --bs-btn-font-size: 0.75rem;
   --bs-btn-border-radius: 0.2rem;
 }
+
+.datagrid-filters .form-floating.form-floating-sm > .form-control,
+.datagrid-filters .form-floating.form-floating-sm > .form-control-plaintext {
+  padding: inherit;
+}
+
+.datagrid-filters .form-floating.form-floating-sm > .form-control,
+.datagrid-filters .form-floating.form-floating-sm > .form-control-plaintext,
+.datagrid-filters .form-floating.form-floating-sm > .form-select {
+  padding: 0.32rem 0.75rem;
+  min-height: auto;
+  height: inherit;
+  line-height: inherit;
+}
+
+.datagrid-filters .form-floating.form-floating-sm > .form-control-plaintext ~ label,
+.datagrid-filters .form-floating.form-floating-sm > .form-control:focus ~ label,
+.datagrid-filters .form-floating.form-floating-sm > .form-control:not(:placeholder-shown) ~ label,
+.datagrid-filters .form-floating.form-floating-sm > .form-select ~ label {
+  color: rgba(var(--bs-body-color-rgb), .65);
+  transform: scale(.9) translateY(-0.9rem) translateX(0.1rem);
+  background-color: var(--bs-light);
+  padding-left: 0.1rem;
+  padding-right: 0.1rem;
+  line-height: 1;
+}
+
+.datagrid-filters .form-floating.form-floating-sm > label {
+  position: absolute;
+  top: 0;
+  left: 0.75rem;
+  margin-bottom: 0;
+  z-index: 2;
+  padding: 0;
+  height: auto;
+  font-size: 14px;
+  padding-top: 0.37rem;
+  overflow: hidden;
+  text-align: start;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+  border: var(--bs-border-width) solid transparent;
+  transform-origin: 0 0;
+  transition: opacity .1s ease-in-out, transform .1s ease-in-out;
+}
