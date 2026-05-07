@@ -7,11 +7,7 @@
     {var $hasActiveFilters = array_filter($filters, fn($v) => $v !== null && $v !== '') !== []}
 
     {if $hasFilters && $filterMode === 'top'}
-    <div class="collapse show" id="collapseExample">
-        <div class="card card-body bg-light mt-3 mb-3 border-0 pb-0">
-            {control filters}
-        </div>
-    </div>
+        {control filters}
     {/if}
 
     {if $hasFilters && $filterMode === 'inline'}

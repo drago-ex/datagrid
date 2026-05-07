@@ -142,6 +142,7 @@ final class FilterTextControl extends Control
 			: __DIR__ . '/Filter.latte';
 		$this->template->setFile($templateFile);
 		$this->template->hasActiveFilters = $this->hasActiveFilters;
+		$this->template->filterValues = $this->values;
 		$this->template->render();
 	}
 }

@@ -20,6 +20,17 @@ th a {
   font-size: 0.8rem;
 }
 
+// Toolbar layout
+.datagrid-toolbar {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--bs-border-color);
+  margin-bottom: 0.75rem;
+}
+
+.datagrid-filters .form-floating.form-floating-sm {
+  isolation: isolate;
+}
+
 .datagrid-filters .form-floating.form-floating-sm > .form-control,
 .datagrid-filters .form-floating.form-floating-sm > .form-control-plaintext {
   padding: inherit;
@@ -40,7 +51,7 @@ th a {
 .datagrid-filters .form-floating.form-floating-sm > .form-select ~ label {
   color: rgba(var(--bs-body-color-rgb), .65);
   transform: scale(.9) translateY(-0.9rem) translateX(0.1rem);
-  background-color: var(--bs-light);
+  background-color: var(--bs-body-bg);
   padding-left: 0.1rem;
   padding-right: 0.1rem;
   line-height: 1;
@@ -51,7 +62,7 @@ th a {
   top: 0;
   left: 0.75rem;
   margin-bottom: 0;
-  z-index: 2;
+  z-index: 1;
   padding: 0;
   height: auto;
   font-size: 14px;
