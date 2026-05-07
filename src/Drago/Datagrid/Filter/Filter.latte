@@ -1,17 +1,15 @@
 {templateType Drago\Datagrid\Filter\FilterTextTemplate}
 {varType Nette\Application\UI\Form $form}
 
-<form n:name="form" class="ajax" data-bs-theme="light" data-naja-history="replace">
+<form n:name="form" class="ajax datagrid-filters" data-bs-theme="light" data-naja-history="replace">
     <div class="d-flex flex-wrap align-items-end gap-3 py-2">
 
         {foreach $form->getControls() as $input}
             {varType Nette\Forms\Controls\BaseControl $input}
 
-            <div class="flex-fill" style="min-width: 200px">
-                <label class="form-label small mb-1">
-                    {$input->getLabel() ?? null}
-                </label>
-                {$input->getControl()->class('form-control form-control-sm')}
+            <div class="form-floating form-floating-sm flex-fill" style="min-width: 200px">
+                {$input->getControl()->class('form-control datagrid-control')->placeholder($input->getLabel() ?? ' ')}
+                <label>{$input->getLabel() ?? null}</label>
             </div>
 
         {/foreach}
