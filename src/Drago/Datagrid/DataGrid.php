@@ -241,9 +241,7 @@ class DataGrid extends Control
 		$this->validateConfiguration();
 		$data = clone $this->source;
 
-		if ($this->getComponent('filters', false)) {
-			$this['filters']->setValues($this->filterValues);
-		}
+		$this['filters']->setValues($this->filterValues);
 
 		$this->applyFilters($data);
 		$this->applySorting($data);
@@ -419,7 +417,7 @@ class DataGrid extends Control
 	 */
 	private function calculateTotalItems(Fluent $data): void
 	{
-		$this->totalItems = $data->count('*');
+		$this->totalItems = $data->count();
 	}
 
 
@@ -476,26 +474,28 @@ class DataGrid extends Control
 		$template->itemsPerPage = $this->paginator->getItemsPerPage();
 		$template->totalItems = $this->paginator->getItemCount();
 		$template->filters = $this->filterValues;
-		$hasFilters = array_any($this->columns, fn($col) => $col->filter !== null);
+		$hasFilters = false;
+		foreach ($this->columns as $column) {
+			if ($column->filter !== null) {
+				$hasFilters = true;
+				break;
+			}
+		}
 		$template->hasFilters = $hasFilters;
 		$template->filterMode = $this->filterMode;
 		$template->filterFormId = ($hasFilters && $this->filterMode === Options::FilterModeInline)
 			? $this['filters']->getFormId()
 			: '';
 
-		if ($this->getComponent('paginator', false)) {
-			$this['paginator']->setPaginator(
-				$this->paginator->getPage(),
-				$this->paginator->getItemsPerPage(),
-				$this->paginator->getItemCount(),
-			);
-			$this['paginator']->setSorting($this->column, $this->order);
-		}
+		$this['paginator']->setPaginator(
+			$this->paginator->getPage(),
+			$this->paginator->getItemsPerPage(),
+			$this->paginator->getItemCount(),
+		);
+		$this['paginator']->setSorting($this->column, $this->order);
 
-		if ($this->getComponent('pageSize', false)) {
-			$this['pageSize']->setTotalItems($this->totalItems);
-			$this['pageSize']->setCurrentPageSize($this->itemsPerPage);
-		}
+		$this['pageSize']->setTotalItems($this->totalItems);
+		$this['pageSize']->setCurrentPageSize($this->itemsPerPage);
 
 		$template->render();
 	}

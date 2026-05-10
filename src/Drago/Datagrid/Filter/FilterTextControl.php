@@ -45,7 +45,7 @@ final class FilterTextControl extends Control
 
 	public function getFormId(): string
 	{
-		$path = $this->lookupPath('Nette\Application\UI\Presenter') ?? 'filter';
+		$path = $this->lookupPath('Nette\Application\UI\Presenter');
 		return 'dg-filter-' . str_replace(['-', ':'], '_', $path);
 	}
 

@@ -1,4 +1,4 @@
-## Drago DataGrid
+# Drago DataGrid
 
 Drago DataGrid is a powerful and extendable tabular data component built on top of the Nette Framework.
 It provides high-performance filtering, sorting, pagination, and row actions with flexible Latte templates for rendering Bootstrap 5 styled tables.
@@ -15,16 +15,6 @@ It provides high-performance filtering, sorting, pagination, and row actions wit
 - Bootstrap
 - Naja
 - Composer
-
-## Features
-- **Text & Date Filtering** – LIKE operator with SQL injection protection
-- **Column Sorting** – Click headers to sort, toggle ASC/DESC
-- **Smart Pagination** – LIMIT/OFFSET at DB level (5.8x faster for large datasets)
-- **Row Actions** – Edit, Delete, or custom actions with callbacks
-- **Custom Formatting** – Format cell values with auto-escaping
-- **Built-in Security** – SQL injection & XSS protection by default
-- **AJAX Integration** – Seamless Naja support, no page reload
-- **Bootstrap 5** – Beautiful responsive styling
 
 ## Installation
 ```bash
@@ -70,6 +60,16 @@ import DataGridFilter from 'drago-datagrid/datagrid';
 import DataGridPage from 'drago-datagrid/page-items';
 import 'drago-datagrid/styles/datagrid';
 ```
+
+## Features
+- **Text & Date Filtering** - LIKE operator with SQL injection protection
+- **Column Sorting** - Click headers to sort, toggle ASC/DESC
+- **Smart Pagination** - LIMIT/OFFSET at DB level (5.8x faster for large datasets)
+- **Row Actions** - Edit, Delete, or custom actions with callbacks
+- **Custom Formatting** - Format cell values with auto-escaping
+- **Built-in Security** - SQL injection & XSS protection by default
+- **AJAX Integration** - Seamless Naja support, no page reload
+- **Bootstrap 5** - Beautiful responsive styling
 
 ## Quick Start
 
@@ -198,8 +198,8 @@ Format cell output (automatically escaped):
 ```php
 $grid->addColumnText('status', 'Status', formatter: function($value, $row) {
 	return match($value) {
-		'active' => '✓ Active',
-		'inactive' => '✗ Inactive',
+		'active' => 'âś“ Active',
+		'inactive' => 'âś— Inactive',
 		default => 'Unknown'
 	};
 });
@@ -262,7 +262,7 @@ class UserPresenter extends Presenter
 
 		// Custom formatting
 		$grid->addColumnText('status', 'Status', formatter: function($value, $row) {
-			return $value === 'active' ? '✓ Active' : '✗ Inactive';
+			return $value === 'active' ? 'âś“ Active' : 'âś— Inactive';
 		});
 
 		// Actions (requires primary key)
