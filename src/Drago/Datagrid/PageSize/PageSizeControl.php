@@ -73,13 +73,8 @@ final class PageSizeControl extends Control
 			->setHtmlAttribute('data-items-page');
 
 		$form->onSuccess[] = function (Form $form, \stdClass $values): void {
-			$size = (int) $values->pageSize;
-			if ($size === 0) {
-				$size = $this->totalItems;
-			}
-
 			if ($this->onPageChanged) {
-				($this->onPageChanged)(Options::DefaultPage, $size);
+				($this->onPageChanged)(Options::DefaultPage, (int) $values->pageSize);
 			}
 		};
 
