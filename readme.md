@@ -62,11 +62,12 @@ import 'drago-datagrid/styles/datagrid';
 ```
 
 ## Features
-- **Text & Date Filtering** - LIKE operator with SQL injection protection
+- **Text, Date & Select Filtering** - Advanced filtering with SQL injection protection
 - **Column Sorting** - Click headers to sort, toggle ASC/DESC
-- **Smart Pagination** - LIMIT/OFFSET at DB level (5.8x faster for large datasets)
+- **Smart Pagination** - LIMIT/OFFSET at DB level with AJAX history synchronization
 - **Row Actions** - Edit, Delete, or custom actions with callbacks
-- **Custom Formatting** - Format cell values with auto-escaping
+- **Custom Formatting** - Format cell values with auto-escaping or rich HTML support
+- **Localization** - Full support for `Nette\Localization\Translator`
 - **Built-in Security** - SQL injection & XSS protection by default
 - **AJAX Integration** - Seamless Naja support, no page reload
 - **Bootstrap 5** - Beautiful responsive styling
@@ -88,6 +89,9 @@ class UserPresenter extends Presenter
 	{
 		$grid = new DataGrid;
 
+		// Optional: Set translator for localization
+		$grid->setTranslator($this->translator);
+
 		// Set data source (Dibi Fluent query)
 		$grid->setDataSource($this->db->select('*')->from('users'));
 
@@ -106,8 +110,6 @@ class UserPresenter extends Presenter
 ```latte
 {control grid}
 ```
-
-That's it! You have a working data grid with sorting and pagination.
 
 ---
 
@@ -139,9 +141,9 @@ $grid->addColumnDate('updated_at', 'Last Updated', format: 'd.m.Y');
 
 **Column Parameters:**
 - `name` - Database column name
-- `label` - Header label shown to user
+- `label` - Header label (automatically translated if translator is set)
 - `sortable` - Enable click-to-sort (default: true)
-- `formatter` - Optional callback to format cell values (optional)
+- `formatter` - Optional callback to format cell values
 
 ### Step 3: Add Filters (Optional)
 
@@ -149,18 +151,22 @@ Enable filtering on specific columns:
 
 ```php
 $grid->addColumnText('name', 'Product Name')
-	->setFilterText();  // Allows user to search by name
+	->setFilterText();  // Search by name
 
-$grid->addColumnText('category', 'Category')
-	->setFilterText();  // LIKE search
+$grid->addColumnText('status', 'Status')
+	->setFilterSelect([
+		'active' => 'Active',
+		'inactive' => 'Inactive'
+	]); // Dropdown filter
 
 $grid->addColumnDate('created_at', 'Created')
-	->setFilterDate();  // Date range filter (YYYY-MM-DD format)
+	->setFilterDate();  // Date range filter
 ```
 
 **Filter Types:**
-- `setFilterText()` - LIKE search with SQL injection protection
-- `setFilterDate()` - Single date or date range (YYYY-MM-DD or YYYY-MM-DD|YYYY-MM-DD)
+- `setFilterText()` - LIKE search
+- `setFilterSelect(array $items)` - Dropdown with predefined values
+- `setFilterDate()` - Single date or date range (YYYY-MM-DD)
 
 ### Step 4: Add Row Actions (Optional)
 
@@ -181,132 +187,61 @@ $grid->addAction('Delete', 'delete', 'btn btn-sm btn-danger', function($id) {
 });
 ```
 
-**Action Parameters:**
-- `label` - Button text
-- `signal` - Signal name (internal identifier)
-- `class` - CSS classes for styling
-- `callback` - Function executed when clicked, receives row ID
-
 ---
 
 ## Formatting Cell Values
 
-### Simple Formatting
-
-Format cell output (automatically escaped):
+### Simple Formatting (Auto-escaped)
 
 ```php
-$grid->addColumnText('status', 'Status', formatter: function($value, $row) {
-	return match($value) {
-		'active' => '✓ Active',
-		'inactive' => '✗ Inactive',
-		default => 'Unknown'
-	};
-});
-
 $grid->addColumnText('price', 'Price', formatter: function($value, $row) {
 	return number_format((float)$value, 2) . ' CZK';
 });
 ```
 
-### With Full Row Data
+### Rich HTML Formatting
 
-Formatters receive the entire row, so you can use related data:
+If you want to render HTML in a cell (e.g., badges), return a `Nette\Utils\Html` object. These are **not** escaped.
 
 ```php
-$grid->addColumnText('author_name', 'Author', formatter: function($value, $row) {
-	return $row['author_name'] . ' (' . $row['author_email'] . ')';
+use Nette\Utils\Html;
+
+$grid->addColumnText('status', 'Status', formatter: function($value, $row) {
+	$color = $value === 'active' ? 'success' : 'danger';
+	return Html::el('span')
+		->class("badge bg-$color")
+		->setText(ucfirst($value));
 });
-```
-
-### Custom Date Formatting
-
-```php
-// Date column with formatter
-$grid->addColumnDate('created_at', 'Created', format: 'Y-m-d',
-	formatter: function($value, $row) {
-		// $value is already formatted (Y-m-d), add time info
-		return $value . ' (' . date('H:i', strtotime($row['created_at'])) . ')';
-	}
-);
 ```
 
 ---
 
-## Complete Example
+## Localization
+
+DataGrid fully supports `Nette\Localization\Translator`. When set, it automatically translates:
+- Column headers
+- Action labels
+- Filter labels and prompts
+- Pagination info (Showing X–Y of Z items)
+- System buttons (Reset, Previous, Next, etc.)
 
 ```php
-use Drago\Datagrid\DataGrid;
-use Dibi\Connection;
-
-class UserPresenter extends Presenter
-{
-	public function __construct(private Connection $db) {}
-
-	protected function createComponentUserGrid(): DataGrid
-	{
-		$grid = new DataGrid;
-
-		// Data source - Dibi Fluent query
-		$grid->setDataSource($this->db->select('*')->from('users'));
-
-		// Columns with filters
-		$grid->addColumnText('name', 'Name')
-			->setFilterText();
-
-		$grid->addColumnText('email', 'Email')
-			->setFilterText();
-
-		$grid->addColumnDate('created_at', 'Registered', format: 'd.m.Y')
-			->setFilterDate();
-
-		// Custom formatting
-		$grid->addColumnText('status', 'Status', formatter: function($value, $row) {
-			return $value === 'active' ? '✓ Active' : '✗ Inactive';
-		});
-
-		// Actions (requires primary key)
-		$grid->setPrimaryKey('id')
-			->addAction('Edit', 'edit', 'btn btn-sm btn-primary', fn($id) => $this->editUser($id))
-			->addAction('Delete', 'delete', 'btn btn-sm btn-danger', fn($id) => $this->deleteUser($id));
-
-		return $grid;
-	}
-
-	private function editUser($id): void
-	{
-		// Your edit logic...
-	}
-
-	private function deleteUser($id): void
-	{
-		// Your delete logic...
-	}
-}
+$grid->setTranslator($this->translator);
 ```
 
 ---
 
 ## Security
 
-### Auto-Escaping Protection
-**All cell values and formatter output are automatically HTML-escaped** to prevent XSS attacks. This is enabled by default and cannot be disabled for regular columns.
-
-```php
-// Safe - automatically escaped
-$grid->addColumnText('description', 'Description', formatter: function($value) {
-	return strtoupper($value);  // Output will be escaped
-});
-```
+### XSS Protection
+**All cell values are automatically HTML-escaped** unless they are instances of `Nette\Utils\Html`. This provides a perfect balance between security and flexibility.
 
 ### SQL Injection Protection
-- Text and date filters use **parameterized queries** via Dibi
-- Special characters (`%`, `_`) in LIKE searches are properly escaped
-- Date filters validate format before executing query
+- Filters use **parameterized queries** via Dibi
+- Special characters in LIKE searches are properly escaped
+- Input data is validated before execution
 
-### Other Protections
-- **Primary Key Validation** - Primary key existence is checked before rendering actions
-- **CSRF Protection** - Handled automatically by Nette Framework
-- **Input Validation** - Date filter validates YYYY-MM-DD format
+### AJAX & History
+DataGrid uses Naja for seamless AJAX updates. It automatically synchronizes the browser URL and history, ensuring that filters, sorting, and pagination are preserved even after a page refresh or using the back button.
 
 ---

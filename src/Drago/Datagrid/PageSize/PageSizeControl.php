@@ -13,6 +13,7 @@ use Closure;
 use Drago\Datagrid\Options;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
+use Nette\Localization\Translator;
 
 
 /**
@@ -27,6 +28,14 @@ final class PageSizeControl extends Control
 
 	/** Current number of items per page */
 	private int $currentPageSize = Options::DefaultItemsPerPage;
+
+	private ?Translator $translator = null;
+
+
+	public function setTranslator(?Translator $translator): void
+	{
+		$this->translator = $translator;
+	}
 
 
 	/**
@@ -96,7 +105,11 @@ final class PageSizeControl extends Control
 	 */
 	public function render(): void
 	{
-		$this->template->setFile(__DIR__ . '/PageSize.latte');
+		$template = $this->template;
+		if ($this->translator !== null) {
+			$template->setTranslator($this->translator);
+		}
+		$template->setFile(__DIR__ . '/PageSize.latte');
 		$this->template->items = [
 			20 => '20',
 			50 => '50',

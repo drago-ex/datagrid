@@ -7,11 +7,11 @@
 
     {if !empty($filters) || $page !== 1 || $column !== null}
         <a n:href="action!, signal: $signal, id: $id, filters: $filters, page: $page, itemsPerPage: $itemsPerPage, column: $column, order: $order" n:attr="$attr">
-            {$label}
+            {_$label}
         </a>
     {else}
         <a n:href="action!, signal: $signal, id: $id" n:attr="$attr">
-            {$label}
+            {_$label}
         </a>
     {/if}
 {/define}

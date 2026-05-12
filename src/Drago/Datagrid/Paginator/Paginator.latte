@@ -27,7 +27,7 @@
     <ul class="pagination pagination-sm">
 
         {* Previous button *}
-        {include pageLink, $page - 1, 'Previous', false, $page === 1}
+        {include pageLink, $page - 1, ('Previous'|translate), false, $page === 1}
 
         {* First page always *}
         {include pageLink, 1, '1', $page === 1}
@@ -39,7 +39,7 @@
 
         {* Pages around current *}
         {for $i = max(2, $page - $window); $i <= min($pageCount - 1, $page + $window); $i++}
-            {include pageLink, $i, $i, $i === $page}
+            {include pageLink, $i, (string) $i, $i === $page}
         {/for}
 
         {* Right ellipsis *}
@@ -49,11 +49,11 @@
 
         {* Last page always if more than 1 *}
         {if $pageCount > 1}
-            {include pageLink, $pageCount, $pageCount, $page === $pageCount}
+            {include pageLink, $pageCount, (string) $pageCount, $page === $pageCount}
         {/if}
 
         {* Next button *}
-        {include pageLink, $page + 1, 'Next', false, $page === $pageCount}
+        {include pageLink, $page + 1, ('Next'|translate), false, $page === $pageCount}
 
     </ul>
 </nav>

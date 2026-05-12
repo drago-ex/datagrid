@@ -9,7 +9,9 @@ use Drago\Datagrid\Column\Column;
 use Drago\Datagrid\Options;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
+use Nette\Localization\Translator;
 use stdClass;
+
 
 /**
  * DataGrid filter component.
@@ -29,6 +31,13 @@ final class FilterTextControl extends Control
 	private array $values = [];
 
 	private bool $hasActiveFilters = false;
+	private ?Translator $translator = null;
+
+
+	public function setTranslator(?Translator $translator): void
+	{
+		$this->translator = $translator;
+	}
 
 
 	public function onFilterChanged(callable $callback): void
@@ -94,6 +103,7 @@ final class FilterTextControl extends Control
 	{
 		$form = new Form;
 		$form->setMethod(Form::GET);
+		$form->setTranslator($this->translator);
 
 		foreach ($this->columns as $column) {
 			if ($column->filter !== null) {
@@ -107,6 +117,13 @@ final class FilterTextControl extends Control
 						->setHtmlAttribute('data-items-filter')
 						->setHtmlAttribute('placeholder', 'Search...')
 						->setHtmlAttribute('autocomplete', 'off');
+
+				} elseif ($type === 'select') {
+					$items = $column->filter instanceof SelectFilter ? $column->filter->items : [];
+					$form->addSelect($name, $column->label, $items)
+						->setPrompt('All')
+						->setDefaultValue($this->values[$name] ?? '')
+						->setHtmlAttribute('data-items-filter');
 
 				} elseif ($type === 'date') {
 					$form->addText($name, $column->label)
@@ -133,6 +150,11 @@ final class FilterTextControl extends Control
 
 	public function render(): void
 	{
+		$template = $this->template;
+		if ($this->translator !== null) {
+			$template->setTranslator($this->translator);
+		}
+
 		if ($this->filterMode === Options::FilterModeInline) {
 			$this['form']->getElementPrototype()->id = $this->getFormId();
 		}

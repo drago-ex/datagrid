@@ -5,9 +5,9 @@
 <div class="d-flex flex-column flex-md-row align-items-baseline gap-2">
     <div class="text-muted small text-nowrap order-2 order-md-1">
         {if $totalItems > 0}
-            Showing {$from}–{$to} of {$totalItems} items
+            {_Showing} {$from}–{$to} {_of} {$totalItems} {_items}
         {else}
-            No items
+            {_'No items'}
         {/if}
     </div>
 

@@ -22,6 +22,7 @@ use Drago\Datagrid\PageSize\PageSizeControl;
 use Drago\Datagrid\Paginator\PaginatorControl;
 use Nette\Application\Attributes\Persistent;
 use Nette\Application\UI\Control;
+use Nette\Localization\Translator;
 use Nette\Utils\Paginator as UtilsPaginator;
 use Tracy\Debugger;
 use Tracy\ILogger;
@@ -57,11 +58,31 @@ class DataGrid extends Control
 	private string $filterMode = Options::FilterModeTop;
 	private UtilsPaginator $paginator;
 	private int $totalItems = 0;
+	private ?Translator $translator = null;
 
 
 	public function __construct()
 	{
 		$this->paginator = new UtilsPaginator;
+	}
+
+
+	/**
+	 * Sets the translator for the DataGrid and its components.
+	 */
+	public function setTranslator(?Translator $translator): self
+	{
+		$this->translator = $translator;
+		return $this;
+	}
+
+
+	/**
+	 * Returns the translator.
+	 */
+	public function getTranslator(): ?Translator
+	{
+		return $this->translator;
 	}
 
 
@@ -260,6 +281,7 @@ class DataGrid extends Control
 	protected function createComponentFilters(): FilterTextControl
 	{
 		$filter = new FilterTextControl;
+		$filter->setTranslator($this->translator);
 		$filter->setColumns($this->columns);
 		$filter->setValues($this->filterValues);
 		$filter->setFilterMode($this->filterMode);
@@ -285,6 +307,7 @@ class DataGrid extends Control
 	protected function createComponentPaginator(): PaginatorControl
 	{
 		$control = new PaginatorControl;
+		$control->setTranslator($this->translator);
 		$control->onPageChanged(function (int $page, ?string $column, ?string $order): void {
 			$this->page = $page;
 			if ($column !== null) {
@@ -311,6 +334,7 @@ class DataGrid extends Control
 	protected function createComponentPageSize(): PageSizeControl
 	{
 		$control = new PageSizeControl;
+		$control->setTranslator($this->translator);
 		$control->setTotalItems($this->totalItems);
 		$control->setCurrentPageSize($this->itemsPerPage);
 
@@ -462,6 +486,9 @@ class DataGrid extends Control
 	private function renderTemplate(array $pageRows): void
 	{
 		$template = $this->template;
+		if ($this->translator !== null) {
+			$template->setTranslator($this->translator);
+		}
 		$template->setFile(__DIR__ . '/DataGrid.latte');
 
 		$template->rows = $pageRows;

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Drago\Datagrid\Column;
 
+use Drago\Datagrid\Filter\SelectFilter;
 use Drago\Datagrid\Filter\TextFilter;
 
 
@@ -21,6 +22,13 @@ class ColumnText extends Column
 	public function setFilterText(): self
 	{
 		$this->setFilter(new TextFilter);
+		return $this;
+	}
+
+
+	public function setFilterSelect(array $items): self
+	{
+		$this->setFilter(new SelectFilter($items));
 		return $this;
 	}
 
@@ -38,18 +46,22 @@ class ColumnText extends Column
 	/**
 	 * Renders the cell for this column.
 	 * Applies optional formatter and escapes HTML characters.
-	 * Formatter output is automatically escaped to prevent XSS.
+	 * If the formatter returns a Nette\Utils\Html object, it is rendered directly.
 	 */
 	public function renderCell(array $row): string
 	{
 		$value = $row[$this->name] ?? '';
 
 		if ($this->formatter) {
-			$output = (string) ($this->formatter)($value, $row);
+			$output = ($this->formatter)($value, $row);
 		} else {
-			$output = (string) $value;
+			$output = $value;
 		}
 
-		return htmlspecialchars($output, ENT_QUOTES, 'UTF-8');
+		if ($output instanceof \Nette\Utils\Html) {
+			return (string) $output;
+		}
+
+		return htmlspecialchars((string) $output, ENT_QUOTES, 'UTF-8');
 	}
 }

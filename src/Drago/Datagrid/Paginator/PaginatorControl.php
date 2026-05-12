@@ -12,6 +12,7 @@ namespace Drago\Datagrid\Paginator;
 use Closure;
 use Drago\Datagrid\Options;
 use Nette\Application\UI\Control;
+use Nette\Localization\Translator;
 use Nette\Utils\Paginator as UtilsPaginator;
 
 
@@ -33,10 +34,18 @@ final class PaginatorControl extends Control
 	/** Current sorting order */
 	private string $order = Options::OrderAsc;
 
+	private ?Translator $translator = null;
+
 
 	public function __construct()
 	{
 		$this->paginator = new UtilsPaginator;
+	}
+
+
+	public function setTranslator(?Translator $translator): void
+	{
+		$this->translator = $translator;
 	}
 
 
@@ -101,6 +110,9 @@ final class PaginatorControl extends Control
 	public function render(): void
 	{
 		$template = $this->template;
+		if ($this->translator !== null) {
+			$template->setTranslator($this->translator);
+		}
 		$template->setFile(__DIR__ . '/Paginator.latte');
 		$template->paginator = $this->paginator;
 		$template->order = $this->order;
