@@ -1,5 +1,5 @@
 import "./datagrid.scss";
-import DataGridFilter from "./datagrid.js";
+import DataGridFilter from "./datagrid-filter.js";
 import DataGridPage from "./page-items.js";
 
 export { DataGridFilter, DataGridPage };
