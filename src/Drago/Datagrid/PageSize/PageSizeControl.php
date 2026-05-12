@@ -62,6 +62,7 @@ final class PageSizeControl extends Control
 	protected function createComponentForm(): Form
 	{
 		$form = new Form;
+		$form->setMethod(Form::GET);
 
 		$form->addSelect('pageSize', 'Items per page', items: [
 			20 => '20',
@@ -82,12 +83,27 @@ final class PageSizeControl extends Control
 	}
 
 
+	public function handleSetPageSize($size): void
+	{
+		if ($this->onPageChanged) {
+			($this->onPageChanged)(Options::DefaultPage, (int) $size);
+		}
+	}
+
+
 	/**
 	 * Renders page size control.
 	 */
 	public function render(): void
 	{
 		$this->template->setFile(__DIR__ . '/PageSize.latte');
+		$this->template->items = [
+			20 => '20',
+			50 => '50',
+			100 => '100',
+			0 => 'All',
+		];
+		$this->template->currentSize = $this->currentPageSize;
 		$this->template->render();
 	}
 }

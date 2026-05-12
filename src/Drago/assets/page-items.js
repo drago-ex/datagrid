@@ -5,7 +5,12 @@ export default class DataGridPage {
 			if (itemCount) {
 				for(let item of itemCount) {
 					item.addEventListener('change', (e) => {
-						naja.uiHandler.submitForm(e.target.form).then();
+						const select = e.target;
+						const template = select.getAttribute('data-url-template');
+						if (template) {
+							const url = template.replace('__SIZE__', select.value);
+							naja.makeRequest('GET', url, null, {history: 'replace'}).then();
+						}
 					});
 				}
 			}
