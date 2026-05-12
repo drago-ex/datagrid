@@ -56,7 +56,7 @@ The main package entrypoint loads both required JS handlers and the shared SCSS 
 If you explicitly want only one feature, use the dedicated entrypoints:
 
 ```js
-import DataGridFilter from 'drago-datagrid/datagrid';
+import DataGridFilter from 'drago-datagrid/datagrid-filter';
 import DataGridPage from 'drago-datagrid/page-items';
 import 'drago-datagrid/styles/datagrid';
 ```
