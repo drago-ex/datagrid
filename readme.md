@@ -198,8 +198,8 @@ Format cell output (automatically escaped):
 ```php
 $grid->addColumnText('status', 'Status', formatter: function($value, $row) {
 	return match($value) {
-		'active' => 'âś“ Active',
-		'inactive' => 'âś— Inactive',
+		'active' => '✓ Active',
+		'inactive' => '✗ Inactive',
 		default => 'Unknown'
 	};
 });
@@ -262,7 +262,7 @@ class UserPresenter extends Presenter
 
 		// Custom formatting
 		$grid->addColumnText('status', 'Status', formatter: function($value, $row) {
-			return $value === 'active' ? 'âś“ Active' : 'âś— Inactive';
+			return $value === 'active' ? '✓ Active' : '✗ Inactive';
 		});
 
 		// Actions (requires primary key)
