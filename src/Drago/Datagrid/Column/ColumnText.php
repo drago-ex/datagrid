@@ -11,6 +11,7 @@ namespace Drago\Datagrid\Column;
 
 use Drago\Datagrid\Filter\SelectFilter;
 use Drago\Datagrid\Filter\TextFilter;
+use Nette\Utils\Html;
 
 
 /**
@@ -58,7 +59,7 @@ class ColumnText extends Column
 			$output = $value;
 		}
 
-		if ($output instanceof \Nette\Utils\Html) {
+		if ($output instanceof Html) {
 			return (string) $output;
 		}
 
