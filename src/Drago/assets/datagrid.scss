@@ -2,93 +2,109 @@
 // Datagrid styles
 //
 
+th {
+  a {
+	position: relative;
+	cursor: pointer;
+	user-select: none;
+  }
+}
+
+.btn {
+  &.btn-xs {
+	--bs-btn-padding-y: 0.15rem;
+	--bs-btn-padding-x: 0.4rem;
+	--bs-btn-font-size: 0.75rem;
+	--bs-btn-border-radius: 0.2rem;
+  }
+}
+
 .datagrid {
-	th a {
-		position: relative;
-		cursor: pointer;
-		user-select: none;
+  &-filter-row {
+	th {
+	  background-color: var(--bs-table-bg);
+	  vertical-align: middle;
 	}
 
-	// Extra small button definition
-	.btn-xs {
-		--bs-btn-padding-y: 0.15rem;
-		--bs-btn-padding-x: 0.4rem;
-		--bs-btn-font-size: 0.75rem;
-		--bs-btn-border-radius: 0.2rem;
+	.form-control-sm {
+	  font-size: 0.8rem;
 	}
+  }
 
-	.datagrid-filter-row th {
-		background-color: var(--bs-table-bg);
-		vertical-align: middle;
-	}
+  // Toolbar layout
+  &-toolbar {
+	padding: 0.75rem 0;
+	border-bottom: 1px solid var(--bs-border-color);
+	margin-bottom: 0.75rem;
+  }
 
-	.datagrid-filter-row .form-control-sm {
-		font-size: 0.8rem;
-	}
+  &-reset-btn {
+	position: relative;
+	z-index: 10;
+	padding-top: 0.32rem;
+	padding-bottom: 0.32rem;
+	font-size: 1rem;
+	line-height: 1.5;
+  }
 
-	// Toolbar layout
-	.datagrid-toolbar {
-		padding: 0.75rem 0;
-		border-bottom: 1px solid var(--bs-border-color);
-		margin-bottom: 0.75rem;
-	}
-
-	// Floating labels support for small inputs
-	.datagrid-filters .form-floating.form-floating-sm {
+  &-filters {
+	.form-floating {
+	  &.form-floating-sm {
 		isolation: isolate;
 
 		> .form-control,
 		> .form-control-plaintext {
-			padding: inherit;
+		  padding: inherit;
 		}
 
 		> .form-control,
 		> .form-control-plaintext,
 		> .form-select {
-			padding: 0.32rem 0.75rem;
-			min-height: auto;
-			height: inherit;
-			line-height: inherit;
+		  padding: 0.32rem 0.75rem;
+		  min-height: auto;
+		  height: inherit;
+		  line-height: inherit;
 		}
 
-		> .form-control-plaintext ~ label,
-		> .form-control:focus ~ label,
-		> .form-control:not(:placeholder-shown) ~ label,
-		> .form-select ~ label {
-			color: rgba(var(--bs-body-color-rgb), .65);
-			transform: scale(.9) translateY(-0.9rem) translateX(0.1rem);
+		> .form-control-plaintext,
+		> .form-control:focus,
+		> .form-control:not(:placeholder-shown),
+		> .form-select {
+		  ~ label {
+			color: rgba(var(--bs-body-color-rgb), 0.65);
+			transform: scale(0.9) translateY(-0.9rem) translateX(0.1rem);
 			background-color: var(--bs-body-bg);
-			padding-left: 0.1rem;
-			padding-right: 0.1rem;
+			padding-inline: 0.1rem;
 			line-height: 1;
+		  }
 		}
 
 		> label {
-			position: absolute;
-			top: 0;
-			left: 0.75rem;
-			margin-bottom: 0;
-			z-index: 1;
-			height: auto;
-			font-size: 14px;
-			padding: 0.37rem 0 0;
-			overflow: hidden;
-			text-align: start;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-			pointer-events: none;
-			border: var(--bs-border-width) solid transparent;
-			transform-origin: 0 0;
-			transition: opacity .1s ease-in-out, transform .1s ease-in-out;
-		}
-	}
+		  position: absolute;
+		  top: 0;
+		  left: 0.75rem;
+		  z-index: 1;
 
-	.datagrid-reset-btn {
-		position: relative;
-		z-index: 10;
-		padding-top: 0.32rem;
-		padding-bottom: 0.32rem;
-		font-size: 1rem;
-		line-height: 1.5;
+		  height: auto;
+		  margin-bottom: 0;
+		  padding: 0;
+		  padding-top: 0.37rem;
+
+		  overflow: hidden;
+		  text-align: start;
+		  text-overflow: ellipsis;
+		  white-space: nowrap;
+
+		  font-size: 14px;
+		  pointer-events: none;
+
+		  border: var(--bs-border-width) solid transparent;
+		  transform-origin: 0 0;
+		  transition:
+				  opacity 0.1s ease-in-out,
+				  transform 0.1s ease-in-out;
+		}
+	  }
 	}
+  }
 }
