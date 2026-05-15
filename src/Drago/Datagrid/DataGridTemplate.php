@@ -19,6 +19,8 @@ use Nette\Bridges\ApplicationLatte\Template;
  */
 class DataGridTemplate extends Template
 {
+	public DataGrid $control;
+
 	/** Rows for the current page */
 	public array $rows = [];
 
@@ -33,6 +35,9 @@ class DataGridTemplate extends Template
 
 	/** @var Action[] Row actions */
 	public array $actions = [];
+
+	public bool $autoHideActions = false;
+	public ?string $rowClickAction = null;
 
 	/** Primary key column name (required for actions) */
 	public ?string $primaryKey = null;

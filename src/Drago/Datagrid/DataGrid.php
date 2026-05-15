@@ -51,6 +51,8 @@ class DataGrid extends Control
 	/** Persistent current filter values */
 	#[Persistent] public array $filterValues = [];
 
+	private bool $autoHideActions = false;
+	private ?string $rowClickAction = null;
 	private ?Fluent $source = null;
 	private ?string $primaryKey = null;
 	private array $columns = [];
@@ -64,6 +66,26 @@ class DataGrid extends Control
 	public function __construct()
 	{
 		$this->paginator = new UtilsPaginator;
+	}
+
+
+	/**
+	 * Sets whether action buttons should be visible only on row hover.
+	 */
+	public function setAutoHideActions(bool $autoHide = true): self
+	{
+		$this->autoHideActions = $autoHide;
+		return $this;
+	}
+
+
+	/**
+	 * Sets the signal name for row click action.
+	 */
+	public function setRowClickAction(string $signal): self
+	{
+		$this->rowClickAction = $signal;
+		return $this;
 	}
 
 
@@ -486,6 +508,7 @@ class DataGrid extends Control
 	private function renderTemplate(array $pageRows): void
 	{
 		$template = $this->template;
+		$template->control = $this;
 		if ($this->translator !== null) {
 			$template->setTranslator($this->translator);
 		}
@@ -495,7 +518,22 @@ class DataGrid extends Control
 		$template->columns = $this->columns;
 		$template->columnName = $this->column;
 		$template->order = $this->order;
-		$template->actions = $this->actions;
+
+		// Sort actions: special actions first, edit and delete last
+		$actions = $this->actions;
+		usort($actions, function(Action $a, Action $b) {
+			$standard = ['edit!', 'delete!'];
+			$isAStandard = in_array($a->signal, $standard, true);
+			$isBStandard = in_array($b->signal, $standard, true);
+			if ($isAStandard === $isBStandard) {
+				return 0;
+			}
+			return $isAStandard ? 1 : -1;
+		});
+
+		$template->actions = $actions;
+		$template->autoHideActions = $this->autoHideActions;
+		$template->rowClickAction = $this->rowClickAction;
 		$template->primaryKey = $this->primaryKey;
 		$template->page = $this->paginator->getPage();
 		$template->itemsPerPage = $this->paginator->getItemsPerPage();

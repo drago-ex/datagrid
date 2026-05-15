@@ -137,6 +137,12 @@ final class FilterTextControl extends Control
 		$form->onSuccess[] = function (Form $form, stdClass $values): void {
 			$valuesArray = (array) $values;
 
+			// Trim all string values
+			$valuesArray = array_map(fn($v) => is_string($v) ? trim($v) : $v, $valuesArray);
+
+			// Remove empty values to keep persistent parameters and URL clean
+			$valuesArray = array_filter($valuesArray, fn($v) => $v !== null && $v !== '');
+
 			$this->setValues($valuesArray);
 
 			if ($this->onFilterChanged) {

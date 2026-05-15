@@ -36,6 +36,27 @@ th {
 	margin-bottom: 0.75rem;
   }
 
+  &-row-clickable {
+	cursor: pointer;
+  }
+
+  &-actions-autohide {
+	td.text-end {
+	  a {
+		opacity: 0;
+		transition: opacity 0.2s ease-in-out;
+	  }
+	}
+
+	&:hover {
+	  td.text-end {
+		a {
+		  opacity: 1;
+		}
+	  }
+	}
+  }
+
   &-reset-btn {
 	position: relative;
 	z-index: 10;

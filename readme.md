@@ -71,6 +71,10 @@ import 'drago-datagrid/styles/datagrid';
 - **Built-in Security** - SQL injection & XSS protection by default
 - **AJAX Integration** - Seamless Naja support, no page reload
 - **Bootstrap 5** - Beautiful responsive styling
+- **Row-Click Actions** - Trigger edit or custom signals by clicking anywhere on the row
+- **Auto-hide Actions** - Keep your UI clean by showing buttons only on row hover
+- **Action Sorting** - Smart sorting that keeps standard actions (Edit/Delete) at the end
+- **Filter Optimizations** - Automatic trimming and prevention of redundant empty submissions
 
 ## Quick Start
 
@@ -228,6 +232,39 @@ DataGrid fully supports `Nette\Localization\Translator`. When set, it automatica
 ```php
 $grid->setTranslator($this->translator);
 ```
+
+---
+
+## Advanced Layout & UX
+
+### Row-Click Actions
+Instead of having an explicit "Edit" button, you can make the entire row clickable to trigger a signal. This is fully compatible with Naja AJAX.
+
+```php
+$grid->setPrimaryKey('id');
+$grid->setRowClickAction('edit!');
+
+$grid->addAction('Edit', 'edit!', 'ajax btn btn-primary', function($id) {
+	// This will be called on row click
+});
+```
+*Note: If the signal in `addAction` matches the `setRowClickAction`, the button will be automatically hidden from the actions column to save space.*
+
+### Hover-to-Show Actions
+You can keep the actions column clean and show the buttons only when the user hovers over a row.
+
+```php
+$grid->setAutoHideActions(true);
+```
+
+### Action Button Sorting
+DataGrid automatically sorts your action buttons. "Special" actions (like Permissions or View) are always displayed first, while "Standard" actions (`edit!` and `delete!`) are always placed at the end of the list, ensuring a consistent UI.
+
+### Filter Optimizations
+The grid includes built-in optimizations for filtering:
+- **Automatic Trimming**: All input values are trimmed on both client and server sides.
+- **Redundant Request Prevention**: If a user presses Enter in a filter but the value hasn't changed (or contains only whitespace), no AJAX request is sent.
+- **Clean URLs**: Empty filters are automatically removed from persistent parameters, keeping your browser's address bar clean.
 
 ---
 

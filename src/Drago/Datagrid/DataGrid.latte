@@ -24,7 +24,7 @@
             {/foreach}
 
             {if $actions !== []}
-                <th class="fw-semibold">{_'Actions'}</th>
+                <th class="fw-semibold text-end">{_'Actions'}</th>
             {elseif $hasFilters && $filterMode === 'inline'}
                 <th></th>
             {/if}
@@ -57,15 +57,18 @@
 
         <tbody>
         {foreach $rows as $row}
-            <tr>
+            <tr n:class="$rowClickAction ? 'datagrid-row-clickable ajax', $autoHideActions ? 'datagrid-actions-autohide'"
+                n:attr="data-row-click-url => $rowClickAction ? $control->link('action!', ['signal' => $rowClickAction, 'id' => $row[$primaryKey], 'filters' => $filters, 'page' => $page, 'itemsPerPage' => $itemsPerPage, 'column' => $columnName, 'order' => $order]) : null">
                 {foreach $columns as $col}
                     <td>{$col->renderCell((array) $row)}</td>
                 {/foreach}
 
                 {if $actions !== []}
-                    <td>
+                    <td class="text-end">
                         {foreach $actions as $ac}
-                            {include 'action', signal: $ac->signal, label: $ac->label, id: $row[$primaryKey], class: $ac->class, filters: $filters, page: $page, itemsPerPage: $itemsPerPage, column: $columnName, order: $order}
+                            {if $ac->signal !== $rowClickAction}
+                                {include 'action', signal: $ac->signal, label: $ac->label, id: $row[$primaryKey], class: $ac->class, filters: $filters, page: $page, itemsPerPage: $itemsPerPage, column: $columnName, order: $order}
+                            {/if}
                         {/foreach}
                     </td>
                 {/if}
