@@ -521,7 +521,7 @@ class DataGrid extends Control
 
 		// Sort actions: special actions first, edit and delete last
 		$actions = $this->actions;
-		usort($actions, function(Action $a, Action $b) {
+		usort($actions, function (Action $a, Action $b) {
 			$standard = ['edit!', 'delete!'];
 			$isAStandard = in_array($a->signal, $standard, true);
 			$isBStandard = in_array($b->signal, $standard, true);
