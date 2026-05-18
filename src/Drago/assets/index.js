@@ -1,4 +1,3 @@
-import "./datagrid.scss";
 import DataGridFilter from "./datagrid-filter.js";
 import DataGridPage from "./page-items.js";
 import DataGridRowClick from "./row-click.js";
