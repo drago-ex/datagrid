@@ -6,7 +6,7 @@
 	".": "./src/Drago/assets/index.js",
 	"./datagrid-filter": "./src/Drago/assets/datagrid-filter.js",
 	"./page-items": "./src/Drago/assets/page-items.js",
-	"./datagrid.scss": "./src/Drago/assets/datagrid.scss"
+	"./styles/datagrid": "./src/Drago/assets/datagrid.scss"
   },
   "sideEffects": [
 	"**/*.scss"
