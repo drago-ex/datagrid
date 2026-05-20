@@ -16,7 +16,7 @@ namespace Drago\Datagrid;
  */
 class Action
 {
-	/** @var callable[] List of callbacks executed when the action is triggered */
+	/** @var list<callable(int): void> List of callbacks executed when the action is triggered */
 	private array $callbacks = [];
 
 
@@ -35,7 +35,7 @@ class Action
 
 	/**
 	 * Adds a callback to be executed when the action is triggered.
-	 * @param callable $callback Callback function receiving the row ID
+	 * @param callable(int): void $callback Callback function receiving the row ID
 	 * @return $this Fluent interface
 	 */
 	public function addCallback(callable $callback): self

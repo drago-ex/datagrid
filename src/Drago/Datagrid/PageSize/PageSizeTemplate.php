@@ -17,6 +17,10 @@ use Nette\Bridges\ApplicationLatte\Template;
  */
 class PageSizeTemplate extends Template
 {
+	/** @var array<int, string> */
 	public array $items;
+
 	public int $currentSize;
+
+	public int $totalItems;
 }

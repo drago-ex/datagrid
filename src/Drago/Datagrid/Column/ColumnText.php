@@ -48,6 +48,7 @@ class ColumnText extends Column
 	 * Renders the cell for this column.
 	 * Applies optional formatter and escapes HTML characters.
 	 * If the formatter returns a Nette\Utils\Html object, it is rendered directly.
+	 * @param array<string, mixed> $row
 	 */
 	public function renderCell(array $row): string
 	{

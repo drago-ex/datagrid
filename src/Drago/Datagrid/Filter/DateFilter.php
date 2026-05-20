@@ -21,6 +21,7 @@ class DateFilter implements Filter
 	/**
 	 * Applies date filter condition.
 	 * Supports format: YYYY-MM-DD or range: YYYY-MM-DD|YYYY-MM-DD
+	 * @throws \InvalidArgumentException
 	 */
 	public function apply(Fluent $fluent, string $column, mixed $value): void
 	{

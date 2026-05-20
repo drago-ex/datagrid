@@ -70,6 +70,7 @@ abstract class Column
 
 	/**
 	 * Renders a cell value for a given row.
+	 * @param array<string, mixed> $row
 	 */
 	abstract public function renderCell(array $row): string;
 }

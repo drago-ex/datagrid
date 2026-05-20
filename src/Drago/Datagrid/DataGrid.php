@@ -22,6 +22,7 @@ use Drago\Datagrid\PageSize\PageSizeControl;
 use Drago\Datagrid\Paginator\PaginatorControl;
 use Nette\Application\Attributes\Persistent;
 use Nette\Application\UI\Control;
+use Nette\Application\UI\InvalidLinkException;
 use Nette\Localization\Translator;
 use Nette\Utils\Paginator as UtilsPaginator;
 use Tracy\Debugger;
@@ -48,15 +49,20 @@ class DataGrid extends Control
 	/** Persistent items per page */
 	#[Persistent] public int $itemsPerPage = Options::DefaultItemsPerPage;
 
-	/** Persistent current filter values */
+	/** @var array<string, mixed> Persistent current filter values */
 	#[Persistent] public array $filterValues = [];
 
 	private bool $autoHideActions = false;
 	private ?string $rowClickAction = null;
 	private ?Fluent $source = null;
 	private ?string $primaryKey = null;
+
+	/** @var array<string, Column> */
 	private array $columns = [];
+
+	/** @var list<Action> */
 	private array $actions = [];
+
 	private string $filterMode = Options::FilterModeTop;
 	private UtilsPaginator $paginator;
 	private int $totalItems = 0;
@@ -219,6 +225,7 @@ class DataGrid extends Control
 
 	/**
 	 * Handles execution of row actions while preserving current grid state.
+	 * @param array<string, mixed> $filters
 	 */
 	public function handleAction(
 		string $signal,
@@ -266,6 +273,7 @@ class DataGrid extends Control
 
 	/**
 	 * Returns current filter values.
+	 * @return array<string, mixed>
 	 */
 	public function getFilterValues(): array
 	{
@@ -401,6 +409,7 @@ class DataGrid extends Control
 
 	/**
 	 * Validates that primary key exists in fetched rows.
+	 * @param list<array<string, mixed>> $pageRows
 	 * @throws InvalidColumnException
 	 */
 	private function validatePrimaryKeyExists(array $pageRows): void
@@ -409,7 +418,7 @@ class DataGrid extends Control
 			return;
 		}
 
-		$firstRow = (array) $pageRows[0];
+		$firstRow = $pageRows[0];
 		if (!array_key_exists($this->primaryKey, $firstRow)) {
 			throw new InvalidColumnException(
 				'Primary key \'' . $this->primaryKey . '\' not found in data source. '
@@ -445,7 +454,7 @@ class DataGrid extends Control
 		}
 		$columnObj = $this->columns[$this->column];
 
-		if (method_exists($columnObj, 'isNaturalSort') && $columnObj->isNaturalSort()) {
+		if ($columnObj->isNaturalSort()) {
 			try {
 				$data->orderBy("CAST(REGEXP_SUBSTR(%n, '[0-9]+') AS UNSIGNED) {$this->order}", $this->column);
 				return;
@@ -469,6 +478,7 @@ class DataGrid extends Control
 
 	/**
 	 * Fetches current page rows based on paginator.
+	 * @return list<array<string, mixed>>
 	 */
 	private function fetchPageRows(Fluent $data): array
 	{
@@ -480,12 +490,14 @@ class DataGrid extends Control
 			$data->limit($this->itemsPerPage)->offset($this->paginator->getOffset());
 		}
 
+		/** @var list<array<string, mixed>> */
 		return $data->fetchAll();
 	}
 
 
 	/**
 	 * Validates that all defined columns exist in the data source.
+	 * @param list<array<string, mixed>> $pageRows
 	 * @throws InvalidColumnException
 	 */
 	private function validateColumns(array $pageRows): void
@@ -493,7 +505,7 @@ class DataGrid extends Control
 		if (empty($pageRows)) {
 			return;
 		}
-		$dbColumns = array_keys((array) $pageRows[0]);
+		$dbColumns = array_keys($pageRows[0]);
 		foreach ($this->columns as $colName => $_) {
 			if (!in_array($colName, $dbColumns, true)) {
 				throw new InvalidColumnException("Column '$colName' does not exist in data source.");
@@ -504,6 +516,7 @@ class DataGrid extends Control
 
 	/**
 	 * Renders the template with all variables for the DataGrid.
+	 * @param list<array<string, mixed>> $pageRows
 	 */
 	private function renderTemplate(array $pageRows): void
 	{
@@ -521,7 +534,7 @@ class DataGrid extends Control
 
 		// Sort actions: special actions first, edit and delete last
 		$actions = $this->actions;
-		usort($actions, function (Action $a, Action $b) {
+		usort($actions, function (Action $a, Action $b): int {
 			$standard = ['edit!', 'delete!'];
 			$isAStandard = in_array($a->signal, $standard, true);
 			$isBStandard = in_array($b->signal, $standard, true);
@@ -569,6 +582,7 @@ class DataGrid extends Control
 	/**
 	 * Redraws the DataGrid component and its subcomponents in AJAX requests
 	 * while preserving filters, sorting, and pagination.
+	 * @throws InvalidLinkException
 	 */
 	public function redrawDataGrid(): void
 	{
@@ -578,11 +592,10 @@ class DataGrid extends Control
 
 		$this->getPresenter()->payload->url = $this->getPresenter()->link('//this');
 		$this->redrawControl('dataGrid');
-		foreach (['paginator', 'filters', 'pageSize'] as $component) {
-			$comp = $this->getComponent($component, false);
-			if ($comp instanceof Control) {
-				$comp->redrawControl();
-			}
+
+		/** @var array<Control> $components */
+		foreach ([$this['paginator'], $this['filters'], $this['pageSize']] as $comp) {
+			$comp->redrawControl();
 		}
 	}
 }

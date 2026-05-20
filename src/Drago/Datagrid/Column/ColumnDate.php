@@ -50,6 +50,7 @@ class ColumnDate extends Column
 	/**
 	 * Renders formatted date value.
 	 * Formatter output is automatically escaped to prevent XSS.
+	 * @param array<string, mixed> $row
 	 */
 	public function renderCell(array $row): string
 	{

@@ -21,10 +21,10 @@ class DataGridTemplate extends Template
 {
 	public DataGrid $control;
 
-	/** Rows for the current page */
+	/** @var list<array<string, mixed>> Rows for the current page */
 	public array $rows = [];
 
-	/** @var Column[] Columns definitions */
+	/** @var array<string, Column> Columns definitions */
 	public array $columns = [];
 
 	/** Currently sorted column name */
@@ -33,7 +33,7 @@ class DataGridTemplate extends Template
 	/** Sorting direction ('ASC' or 'DESC') */
 	public string $order = 'ASC';
 
-	/** @var Action[] Row actions */
+	/** @var list<Action> Row actions */
 	public array $actions = [];
 
 	public bool $autoHideActions = false;
@@ -51,7 +51,7 @@ class DataGridTemplate extends Template
 	/** Total number of items in the data source */
 	public int $totalItems = 0;
 
-	/** Current filter values */
+	/** @var array<string, mixed> Current filter values */
 	public array $filters = [];
 
 	/** Whether any column has a filter configured */

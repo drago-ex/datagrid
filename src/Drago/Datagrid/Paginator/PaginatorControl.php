@@ -26,6 +26,7 @@ final class PaginatorControl extends Control
 {
 	private UtilsPaginator $paginator;
 
+	/** @var Closure(int, ?string, ?string): void|null */
 	private ?Closure $onPageChanged = null;
 
 	/** Current sorting column */
@@ -66,6 +67,7 @@ final class PaginatorControl extends Control
 
 	/**
 	 * Register a callback to be called when the page changes.
+	 * @param callable(int, ?string, ?string): void $callback
 	 */
 	public function onPageChanged(callable $callback): void
 	{

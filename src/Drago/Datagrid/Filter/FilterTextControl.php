@@ -20,11 +20,15 @@ use stdClass;
  */
 final class FilterTextControl extends Control
 {
+	/** @var Closure(array<string, mixed>): void|null */
 	private ?Closure $onFilterChanged = null;
+
+	/** @var Closure(): void|null */
 	private ?Closure $onReset = null;
+
 	private string $filterMode = Options::FilterModeTop;
 
-	/** @var Column[] */
+	/** @var array<string, Column> */
 	private array $columns = [];
 
 	/** @var array<string, mixed> */
@@ -40,6 +44,9 @@ final class FilterTextControl extends Control
 	}
 
 
+	/**
+	 * @param callable(array<string, mixed>): void $callback
+	 */
 	public function onFilterChanged(callable $callback): void
 	{
 		$this->onFilterChanged = $callback;
@@ -59,6 +66,9 @@ final class FilterTextControl extends Control
 	}
 
 
+	/**
+	 * @param callable(): void $callback
+	 */
 	public function onReset(callable $callback): void
 	{
 		$this->onReset = $callback;
@@ -77,7 +87,7 @@ final class FilterTextControl extends Control
 
 
 	/**
-	 * @param Column[] $columns
+	 * @param array<string, Column> $columns
 	 */
 	public function setColumns(array $columns): void
 	{
@@ -85,6 +95,9 @@ final class FilterTextControl extends Control
 	}
 
 
+	/**
+	 * @param array<string, mixed> $values
+	 */
 	public function setValues(array $values): void
 	{
 		$this->values = $values;
@@ -102,7 +115,7 @@ final class FilterTextControl extends Control
 	protected function createComponentForm(): Form
 	{
 		$form = new Form;
-		$form->setMethod(Form::GET);
+		$form->setMethod($form::Get);
 		$form->setTranslator($this->translator);
 
 		foreach ($this->columns as $column) {
@@ -135,6 +148,7 @@ final class FilterTextControl extends Control
 		}
 
 		$form->onSuccess[] = function (Form $form, stdClass $values): void {
+			/** @var array<string, mixed> $valuesArray */
 			$valuesArray = (array) $values;
 
 			// Trim all string values

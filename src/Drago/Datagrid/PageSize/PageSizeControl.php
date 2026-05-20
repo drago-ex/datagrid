@@ -21,6 +21,7 @@ use Nette\Localization\Translator;
  */
 final class PageSizeControl extends Control
 {
+	/** @var Closure(int, int): void|null */
 	private ?Closure $onPageChanged = null;
 
 	/** Total number of items in the DataGrid */
@@ -40,6 +41,7 @@ final class PageSizeControl extends Control
 
 	/**
 	 * Registers a callback executed when page size is changed.
+	 * @param callable(int, int): void $callback
 	 */
 	public function onPageChanged(callable $callback): void
 	{
@@ -71,7 +73,7 @@ final class PageSizeControl extends Control
 	protected function createComponentForm(): Form
 	{
 		$form = new Form;
-		$form->setMethod(Form::GET);
+		$form->setMethod($form::Get);
 
 		$form->addSelect('pageSize', 'Items per page', items: [
 			20 => '20',
@@ -92,10 +94,10 @@ final class PageSizeControl extends Control
 	}
 
 
-	public function handleSetPageSize($size): void
+	public function handleSetPageSize(int $size): void
 	{
 		if ($this->onPageChanged) {
-			($this->onPageChanged)(Options::DefaultPage, (int) $size);
+			($this->onPageChanged)(Options::DefaultPage, $size);
 		}
 	}
 
@@ -117,6 +119,7 @@ final class PageSizeControl extends Control
 			0 => 'All',
 		];
 		$this->template->currentSize = $this->currentPageSize;
+		$this->template->totalItems = $this->totalItems;
 		$this->template->render();
 	}
 }
