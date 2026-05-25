@@ -33,6 +33,18 @@ final class PageSizeControl extends Control
 	private ?Translator $translator = null;
 
 
+	/** @return array<int, string> */
+	private function getPageSizeItems(): array
+	{
+		return [
+			20 => '20',
+			50 => '50',
+			100 => '100',
+			0 => 'All',
+		];
+	}
+
+
 	public function setTranslator(?Translator $translator): void
 	{
 		$this->translator = $translator;
@@ -75,12 +87,7 @@ final class PageSizeControl extends Control
 		$form = new Form;
 		$form->setMethod($form::Get);
 
-		$form->addSelect('pageSize', 'Items per page', items: [
-			20 => '20',
-			50 => '50',
-			100 => '100',
-			0 => 'All',
-		])
+		$form->addSelect('pageSize', 'Items per page', items: $this->getPageSizeItems())
 			->setDefaultValue($this->currentPageSize)
 			->setHtmlAttribute('data-items-page');
 
@@ -113,12 +120,7 @@ final class PageSizeControl extends Control
 			$template->setTranslator($this->translator);
 		}
 		$template->setFile(__DIR__ . '/PageSize.latte');
-		$this->template->items = [
-			20 => '20',
-			50 => '50',
-			100 => '100',
-			0 => 'All',
-		];
+		$this->template->items = $this->getPageSizeItems();
 		$this->template->currentSize = $this->currentPageSize;
 		$this->template->totalItems = $this->totalItems;
 		$this->template->render();
