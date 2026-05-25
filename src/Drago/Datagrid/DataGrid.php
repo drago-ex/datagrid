@@ -11,6 +11,7 @@ namespace Drago\Datagrid;
 
 use Closure;
 use Dibi\Fluent;
+use Dibi\Row;
 use Drago\Datagrid\Column\Column;
 use Drago\Datagrid\Column\ColumnDate;
 use Drago\Datagrid\Column\ColumnText;
@@ -409,20 +410,22 @@ class DataGrid extends Control
 
 	/**
 	 * Validates that primary key exists in fetched rows.
-	 * @param list<array<string, mixed>> $pageRows
+	 * @param list<array<string, mixed>|Row> $pageRows
 	 * @throws InvalidColumnException
 	 */
 	private function validatePrimaryKeyExists(array $pageRows): void
 	{
-		if (!$this->primaryKey || empty($pageRows)) {
+		if ($this->primaryKey === null || $pageRows === []) {
 			return;
 		}
 
-		$firstRow = $pageRows[0];
+		$firstRow = (array) $pageRows[0];
 		if (!array_key_exists($this->primaryKey, $firstRow)) {
 			throw new InvalidColumnException(
-				'Primary key \'' . $this->primaryKey . '\' not found in data source. '
-				. 'Ensure the column is selected in your query and the name is correct.',
+				sprintf(
+					'Primary key "%s" not found in data source. Ensure the column is selected in your query and the name is correct.',
+					$this->primaryKey,
+				),
 			);
 		}
 	}
