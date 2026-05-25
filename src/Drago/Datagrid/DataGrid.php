@@ -593,9 +593,8 @@ class DataGrid extends Control
 		$this->getPresenter()->payload->url = $this->getPresenter()->link('//this');
 		$this->redrawControl('dataGrid');
 
-		/** @var array<Control> $components */
-		foreach ([$this['paginator'], $this['filters'], $this['pageSize']] as $comp) {
-			$comp->redrawControl();
+		foreach ([$this['paginator'], $this['filters'], $this['pageSize']] as $component) {
+			$component->redrawControl();
 		}
 	}
 }
