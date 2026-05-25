@@ -94,8 +94,9 @@ final class PageSizeControl extends Control
 	}
 
 
-	public function handleSetPageSize(int $size): void
+	public function handleSetPageSize(string|int $size): void
 	{
+		$size = (int) $size;
 		if ($this->onPageChanged) {
 			($this->onPageChanged)(Options::DefaultPage, $size);
 		}

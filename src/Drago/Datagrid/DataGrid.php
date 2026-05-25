@@ -500,15 +500,18 @@ class DataGrid extends Control
 
 	/**
 	 * Validates that all defined columns exist in the data source.
-	 * @param list<array<string, mixed>> $pageRows
+	 * @param list<array<string, mixed>|Row> $pageRows
 	 * @throws InvalidColumnException
 	 */
 	private function validateColumns(array $pageRows): void
 	{
-		if (empty($pageRows)) {
+		if ($pageRows === []) {
 			return;
 		}
-		$dbColumns = array_keys($pageRows[0]);
+
+		$firstRow = (array) $pageRows[0];
+		$dbColumns = array_keys($firstRow);
+
 		foreach ($this->columns as $colName => $_) {
 			if (!in_array($colName, $dbColumns, true)) {
 				throw new InvalidColumnException("Column '$colName' does not exist in data source.");
