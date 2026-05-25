@@ -26,7 +26,7 @@ class ColumnText extends Column
 		return $this;
 	}
 
-
+	/** @param array<string, string> $items */
 	public function setFilterSelect(array $items): self
 	{
 		$this->setFilter(new SelectFilter($items));
