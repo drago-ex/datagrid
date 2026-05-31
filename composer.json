@@ -24,6 +24,9 @@
 		"nette/tester": "^2.3",
 		"phpstan/phpstan-nette": "^2.0"
 	},
+	"suggest": {
+		"drago-ex/translator": "Configures Latte translation support for bundled templates using translation macros."
+	},
 	"scripts": {
 		"phpstan": "phpstan analyse"
 	}
