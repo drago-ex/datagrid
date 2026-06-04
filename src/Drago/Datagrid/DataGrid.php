@@ -461,6 +461,7 @@ class DataGrid extends Control
 			return;
 		}
 		$columnObj = $this->columns[$this->column];
+		$data->removeClause('ORDER BY');
 
 		if ($columnObj->isNaturalSort()) {
 			try {

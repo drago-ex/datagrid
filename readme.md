@@ -54,9 +54,10 @@ new DataGrid().initialize(naja);
 
 ## Features
 - **Text, Date & Select Filtering** - Advanced filtering with SQL injection protection
+- **Filter Display Modes** - Render filters above the table or inline under column headers
 - **Column Sorting** - Click headers to sort, toggle ASC/DESC
 - **Smart Pagination** - LIMIT/OFFSET at DB level with AJAX history synchronization
-- **Row Actions** - Edit, Delete, or custom actions with callbacks
+- **Row Actions** - Edit, Delete, or custom actions with callbacks and per-row conditions
 - **Custom Formatting** - Format cell values with auto-escaping or rich HTML support
 - **Localization** - Full support for `Nette\Localization\Translator`
 - **Built-in Security** - SQL injection & XSS protection by default
@@ -163,7 +164,21 @@ $grid->addColumnDate('created_at', 'Created')
 - `setFilterSelect(array $items)` - Dropdown with predefined values
 - `setFilterDate()` - Single date or date range (YYYY-MM-DD)
 
-### Step 4: Add Row Actions (Optional)
+### Step 4: Choose Filter Mode (Optional)
+
+Filters can be rendered in two modes:
+
+```php
+// Default: filters are displayed in a toolbar above the table
+$grid->setFilterMode('top');
+
+// Inline: filters are displayed in a second header row under column labels
+$grid->setFilterMode('inline');
+```
+
+Use `top` when you want a wider toolbar layout. Use `inline` when each filter should stay directly under its column.
+
+### Step 5: Add Row Actions (Optional)
 
 Add Edit/Delete buttons for each row:
 
@@ -181,6 +196,8 @@ $grid->addAction('Delete', 'delete', 'btn btn-sm btn-danger', function($id) {
 	$this->redirect('this');
 });
 ```
+
+Actions can also be displayed conditionally per row with the `condition` argument.
 
 ---
 
@@ -248,8 +265,36 @@ You can keep the actions column clean and show the buttons only when the user ho
 $grid->setAutoHideActions(true);
 ```
 
+### Conditional Actions
+You can hide or show an action for each row with the `condition` argument:
+
+```php
+$grid->addAction(
+	'Activate',
+	'activate!',
+	'ajax btn btn-sm btn-success',
+	callback: fn(int $id) => $this->activate($id),
+	condition: fn(array $row): bool => !$row['active'],
+);
+```
+
 ### Action Button Sorting
 DataGrid automatically sorts your action buttons. "Special" actions (like Permissions or View) are always displayed first, while "Standard" actions (`edit!` and `delete!`) are always placed at the end of the list, ensuring a consistent UI.
+
+### Filter Display Modes
+The default filter mode is `top`, which renders filters above the table in a toolbar:
+
+```php
+$grid->setFilterMode('top');
+```
+
+Inline mode renders filters directly inside the table header:
+
+```php
+$grid->setFilterMode('inline');
+```
+
+Both modes use the same filter definitions and AJAX behavior.
 
 ### Filter Optimizations
 The grid includes built-in optimizations for filtering:

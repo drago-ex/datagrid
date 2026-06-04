@@ -6,9 +6,9 @@
         <div class="d-inline-flex flex-wrap align-items-end gap-3">
             {foreach $form->getControls() as $input}
                 {varType Nette\Forms\Controls\BaseControl $input}
-                <div class="form-floating form-floating-sm">
-                    {$input->getControl()->class('form-control datagrid-control')->placeholder(($input->control->placeholder|translate) ?? ' ')}
-                    <label>{$input->getLabel() ?? null}</label>
+                <div class="datagrid-filter">
+                    {$input->getLabel()->addClass('form-label small mb-1')}
+                    {$input->getControl()}
                 </div>
             {/foreach}
 

@@ -1,5 +1,30 @@
 export default class DataGridFilter {
 	initialize(naja) {
+		const getFormInputs = (form) => {
+			if (!form) {
+				return [];
+			}
+
+			return Array.from(document.querySelectorAll('[data-items-filter]'))
+				.filter((input) => input.form === form);
+		};
+
+		const submitIfChanged = (form) => {
+			const allInputs = getFormInputs(form);
+			let hasChanged = false;
+
+			for (let input of allInputs) {
+				if (input.value.trim() !== (input.dataset.lastValue || "")) {
+					hasChanged = true;
+					break;
+				}
+			}
+
+			if (hasChanged) {
+				naja.uiHandler.submitForm(form);
+			}
+		};
+
 		const applyFilters = (doc) => {
 			const inputs = doc.querySelectorAll('[data-items-filter]');
 			if (!inputs) return;
@@ -13,21 +38,12 @@ export default class DataGridFilter {
 						e.preventDefault();
 
 						const form = e.target.form;
-						const allInputs = form.querySelectorAll('[data-items-filter]');
-						let hasChanged = false;
-
-						for (let i of allInputs) {
-							if (i.value.trim() !== (i.dataset.lastValue || "")) {
-								hasChanged = true;
-								break;
-							}
-						}
-
-						// Only submit if at least one filter value has actually changed
-						if (hasChanged) {
-							naja.uiHandler.submitForm(form);
-						}
+						submitIfChanged(form);
 					}
+				});
+
+				input.addEventListener('change', (e) => {
+					submitIfChanged(e.target.form);
 				});
 			}
 		};

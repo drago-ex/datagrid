@@ -35,14 +35,29 @@
             {foreach $columns as $col}
                 <th class="p-1">
                     {if $col->filter !== null}
-                        <input
-                            type="{$col->filter->getInputType() === 'date' ? 'date' : 'text'}"
-                            name="{$col->name}"
-                            form="{$filterFormId}"
-                            class="form-control form-control-sm datagrid-control"
-                            data-items-filter
-                            value="{$filters[$col->name] ?? ''}"
-                            autocomplete="off">
+                        {if $col->filter->getInputType() === 'select'}
+                            <select
+                                name="{$col->name}"
+                                form="{$filterFormId}"
+                                class="form-select form-select-sm datagrid-control"
+                                data-items-filter>
+                                <option value="">{_'All'}</option>
+                                {foreach $col->filter->items as $value => $label}
+                                    <option value="{$value}" n:attr="selected => ($filters[$col->name] ?? '') == $value">
+                                        {$label}
+                                    </option>
+                                {/foreach}
+                            </select>
+                        {else}
+                            <input
+                                type="{$col->filter->getInputType() === 'date' ? 'date' : 'text'}"
+                                name="{$col->name}"
+                                form="{$filterFormId}"
+                                class="form-control form-control-sm datagrid-control"
+                                data-items-filter
+                                value="{$filters[$col->name] ?? ''}"
+                                autocomplete="off">
+                        {/if}
                     {/if}
                 </th>
             {/foreach}

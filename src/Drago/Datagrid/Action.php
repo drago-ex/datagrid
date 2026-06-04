@@ -20,7 +20,7 @@ class Action
 	private array $callbacks = [];
 
 	/** @var (callable(array<string, mixed>): bool)|null Optional condition to show/hide this action per row */
-	private $condition = null;
+	private $condition;
 
 
 	/**

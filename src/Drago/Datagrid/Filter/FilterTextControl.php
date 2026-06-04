@@ -127,6 +127,7 @@ final class FilterTextControl extends Control
 				if ($type === 'text') {
 					$form->addText($name, $column->label)
 						->setDefaultValue($this->values[$name] ?? '')
+						->setHtmlAttribute('class', 'form-control form-control-sm datagrid-control')
 						->setHtmlAttribute('data-items-filter')
 						->setHtmlAttribute('placeholder', 'Search...')
 						->setHtmlAttribute('autocomplete', 'off');
@@ -136,12 +137,14 @@ final class FilterTextControl extends Control
 					$form->addSelect($name, $column->label, $items)
 						->setPrompt('All')
 						->setDefaultValue($this->values[$name] ?? '')
+						->setHtmlAttribute('class', 'form-select form-select-sm datagrid-control')
 						->setHtmlAttribute('data-items-filter');
 
 				} elseif ($type === 'date') {
 					$form->addText($name, $column->label)
 						->setHtmlType('date')
 						->setDefaultValue($this->values[$name] ?? '')
+						->setHtmlAttribute('class', 'form-control form-control-sm datagrid-control')
 						->setHtmlAttribute('data-items-filter');
 				}
 			}

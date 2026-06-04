@@ -66,64 +66,7 @@ th {
 	line-height: 1.5;
   }
 
-  &-filters {
-	.form-floating {
-	  &.form-floating-sm {
-		isolation: isolate;
-
-		> .form-control,
-		> .form-control-plaintext {
-		  padding: inherit;
-		}
-
-		> .form-control,
-		> .form-control-plaintext,
-		> .form-select {
-		  padding: 0.32rem 0.75rem;
-		  min-height: auto;
-		  height: inherit;
-		  line-height: inherit;
-		}
-
-		> .form-control-plaintext,
-		> .form-control:focus,
-		> .form-control:not(:placeholder-shown),
-		> .form-select {
-		  ~ label {
-			color: rgba(var(--bs-body-color-rgb), 0.65);
-			transform: scale(0.9) translateY(-0.9rem) translateX(0.1rem);
-			background-color: var(--bs-body-bg);
-			padding-inline: 0.1rem;
-			line-height: 1;
-		  }
-		}
-
-		> label {
-		  position: absolute;
-		  top: 0;
-		  left: 0.75rem;
-		  z-index: 1;
-
-		  height: auto;
-		  margin-bottom: 0;
-		  padding: 0;
-		  padding-top: 0.37rem;
-
-		  overflow: hidden;
-		  text-align: start;
-		  text-overflow: ellipsis;
-		  white-space: nowrap;
-
-		  font-size: 14px;
-		  pointer-events: none;
-
-		  border: var(--bs-border-width) solid transparent;
-		  transform-origin: 0 0;
-		  transition:
-				  opacity 0.1s ease-in-out,
-				  transform 0.1s ease-in-out;
-		}
-	  }
-	}
+  &-filter {
+	min-width: 12rem;
   }
 }
