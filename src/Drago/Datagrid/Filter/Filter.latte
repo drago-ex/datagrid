@@ -6,13 +6,17 @@
         <div class="d-inline-flex flex-wrap align-items-end gap-3">
             {foreach $form->getControls() as $input}
                 {varType Nette\Forms\Controls\BaseControl $input}
-                <div class="datagrid-filter">
-                    {var $label = $input->getLabel()}
-                    {if $label !== null}
-                        {$label->addClass('form-label small mb-1')}
-                    {/if}
+                {if $input instanceof \Nette\Forms\Controls\HiddenField}
                     {$input->getControl()}
-                </div>
+                {else}
+                    <div class="datagrid-filter">
+                        {var $label = $input->getLabel()}
+                        {if $label !== null}
+                            {$label->addClass('form-label small mb-1')}
+                        {/if}
+                        {$input->getControl()}
+                    </div>
+                {/if}
             {/foreach}
 
             {if $hasActiveFilters}
