@@ -18,8 +18,13 @@ use Drago\Datagrid\Filter\Filter;
  */
 abstract class Column
 {
+	public const string AlignLeft = 'start';
+	public const string AlignCenter = 'center';
+	public const string AlignRight = 'end';
+
 	/** Whether to use natural (numeric) sorting when values contain numbers */
 	private bool $naturalSort = false;
+	private string $align = self::AlignLeft;
 
 
 	/**
@@ -65,6 +70,44 @@ abstract class Column
 	public function isNaturalSort(): bool
 	{
 		return $this->naturalSort;
+	}
+
+
+	/**
+	 * Sets Bootstrap text alignment for this column.
+	 */
+	public function setAlign(string $align): static
+	{
+		if (!in_array($align, [self::AlignLeft, self::AlignCenter, self::AlignRight], true)) {
+			throw new \InvalidArgumentException(sprintf('Invalid column alignment "%s".', $align));
+		}
+
+		$this->align = $align;
+		return $this;
+	}
+
+
+	public function alignLeft(): static
+	{
+		return $this->setAlign(self::AlignLeft);
+	}
+
+
+	public function alignCenter(): static
+	{
+		return $this->setAlign(self::AlignCenter);
+	}
+
+
+	public function alignRight(): static
+	{
+		return $this->setAlign(self::AlignRight);
+	}
+
+
+	public function getAlignClass(): string
+	{
+		return 'text-' . $this->align;
 	}
 
 

@@ -121,6 +121,16 @@ Natural numeric sorting can be enabled on text columns:
 $grid->addColumnText('code', 'Code')->setNaturalSort();
 ```
 
+Column text alignment can be changed with Bootstrap alignment helpers:
+
+```php
+$grid->addColumnText('id', 'ID')->alignRight();
+$grid->addColumnText('status', 'Status')->alignCenter();
+$grid->addColumnText('name', 'Name')->alignLeft();
+```
+
+Alignment affects only table rendering. It does not validate or convert the column value.
+
 ## Filters
 
 ```php

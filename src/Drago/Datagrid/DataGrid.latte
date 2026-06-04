@@ -18,7 +18,7 @@
         <thead>
         <tr>
             {foreach $columns as $col}
-                <th class="fw-semibold">
+                <th n:class="'fw-semibold', $col->getAlignClass()">
                     {include 'sortable', sortable: $col->sortable, name: $col->name, label: ($col->label|translate)}
                 </th>
             {/foreach}
@@ -75,7 +75,7 @@
             <tr n:class="$rowClickAction ? 'datagrid-row-clickable ajax', $autoHideActions ? 'datagrid-actions-autohide'"
                 n:attr="data-row-click-url => $rowClickAction ? $control->link('action!', ['signal' => $rowClickAction, 'id' => $row[$primaryKey], 'filters' => $filters, 'page' => $page, 'itemsPerPage' => $itemsPerPage, 'column' => $columnName, 'order' => $order]) : null">
                 {foreach $columns as $col}
-                    <td>{$col->renderCell((array) $row)}</td>
+                    <td n:class="$col->getAlignClass()">{$col->renderCell((array) $row)}</td>
                 {/foreach}
 
                 {if $actions !== []}
