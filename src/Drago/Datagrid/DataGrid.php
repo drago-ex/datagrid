@@ -181,18 +181,23 @@ class DataGrid extends Control
 
 
 	/**
-	 * Adds a row action with optional callback.
+	 * Adds a row action with optional callback and optional visibility condition.
+	 * @param callable(array<string, mixed>): bool|null $condition
 	 */
 	public function addAction(
 		string $label,
 		string $signal,
 		?string $class = null,
 		?callable $callback = null,
+		?callable $condition = null,
 	): self
 	{
 		$action = new Action($label, $signal, $class);
 		if ($callback !== null) {
 			$action->addCallback($callback);
+		}
+		if ($condition !== null) {
+			$action->setCondition($condition);
 		}
 		$this->actions[] = $action;
 		return $this;

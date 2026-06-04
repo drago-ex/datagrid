@@ -19,6 +19,9 @@ class Action
 	/** @var list<callable(int): void> List of callbacks executed when the action is triggered */
 	private array $callbacks = [];
 
+	/** @var (callable(array<string, mixed>): bool)|null Optional condition to show/hide this action per row */
+	private $condition = null;
+
 
 	/**
 	 * @param string $label Action label displayed in the UI
@@ -30,6 +33,31 @@ class Action
 		public readonly string $signal,
 		public readonly ?string $class = null,
 	) {
+	}
+
+
+	/**
+	 * Sets a condition callback that decides whether the action is visible for a given row.
+	 * @param callable(array<string, mixed>): bool $condition
+	 * @return $this
+	 */
+	public function setCondition(callable $condition): self
+	{
+		$this->condition = $condition;
+		return $this;
+	}
+
+
+	/**
+	 * Evaluates whether this action should be visible for the given row.
+	 * @param array<string, mixed> $row
+	 */
+	public function isVisible(array $row): bool
+	{
+		if ($this->condition === null) {
+			return true;
+		}
+		return ($this->condition)($row);
 	}
 
 
