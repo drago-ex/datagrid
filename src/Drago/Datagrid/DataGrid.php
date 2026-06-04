@@ -207,7 +207,7 @@ class DataGrid extends Control
 	/**
 	 * Handles sorting when a column header is clicked.
 	 */
-	public function handleSort(string $column, int $page): void
+	public function handleSort(string $column, int $page, string $sortOrder = Options::OrderAsc): void
 	{
 		if (!isset($this->columns[$column]) || !$this->columns[$column]->sortable) {
 			return;
@@ -215,15 +215,13 @@ class DataGrid extends Control
 		if ($page < 1) {
 			return;
 		}
+		if (!in_array($sortOrder, [Options::OrderAsc, Options::OrderDesc], true)) {
+			return;
+		}
 
 		$this->page = $page;
-
-		if ($this->column === $column) {
-			$this->order = $this->order === Options::OrderAsc ? Options::OrderDesc : Options::OrderAsc;
-		} else {
-			$this->column = $column;
-			$this->order = Options::OrderAsc;
-		}
+		$this->column = $column;
+		$this->order = $sortOrder;
 
 		$this->redrawDataGrid();
 	}

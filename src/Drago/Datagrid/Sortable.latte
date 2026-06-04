@@ -8,12 +8,13 @@
 
     {if $sortable}
         {do $active = $name === $columnName}
-        <a n:href="sort!, column: $name, page: $page, order: $order" n:attr="$attr">
+        {do $nextOrder = $active && $order === 'ASC' ? 'DESC' : 'ASC'}
+        <a n:href="sort!, column: $name, page: $page, sortOrder: $nextOrder" n:attr="$attr">
             {$label}
             {if $active}
-                {if $order === 'ASC'} ↑{else} ↓{/if}
+                {if $order === 'ASC'} &uarr;{else} &darr;{/if}
             {else}
-                ↕
+                &varr;
             {/if}
         </a>
     {else}
