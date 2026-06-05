@@ -24,7 +24,6 @@ use Drago\Datagrid\Paginator\PaginatorControl;
 use Nette\Application\Attributes\Persistent;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\InvalidLinkException;
-use Nette\Http\Url;
 use Nette\Localization\Translator;
 use Nette\Utils\Paginator as UtilsPaginator;
 use Tracy\Debugger;
@@ -69,7 +68,7 @@ class DataGrid extends Control
 	private UtilsPaginator $paginator;
 	private int $totalItems = 0;
 	private ?Translator $translator = null;
-	private bool $cleanFilterUrl = false;
+	private ?string $historyUrl = null;
 
 
 	public function __construct()
@@ -330,7 +329,7 @@ class DataGrid extends Control
 		$filter->onReset(function (): void {
 			$this->filterValues = [];
 			$this->page = 1;
-			$this->cleanFilterUrl = true;
+			$this->historyUrl = $this->link('//this', ['filterValues' => []]);
 			$this->redrawDataGrid();
 		});
 
@@ -603,27 +602,18 @@ class DataGrid extends Control
 			return;
 		}
 
-		$url = $this->getPresenter()->link('//this');
-		if ($this->cleanFilterUrl) {
-			$url = $this->removeFilterParameters($url);
-			$this->cleanFilterUrl = false;
+		if ($this->historyUrl !== null) {
+			$this->getPresenter()->payload->postGet = true;
+			$this->getPresenter()->payload->url = $this->historyUrl;
+			$this->historyUrl = null;
+		} else {
+			$this->getPresenter()->payload->url = $this->getPresenter()->link('//this');
 		}
 
-		$this->getPresenter()->payload->url = $url;
 		$this->redrawControl('dataGrid');
 
 		foreach ([$this['paginator'], $this['filters'], $this['pageSize']] as $component) {
 			$component->redrawControl();
 		}
-	}
-
-
-	private function removeFilterParameters(string $url): string
-	{
-		$url = new Url($url);
-		$query = $url->getQueryParameters();
-		unset($query['do'], $query[$this->getParameterId('filterValues')]);
-
-		return (string) $url->setQuery($query);
 	}
 }
