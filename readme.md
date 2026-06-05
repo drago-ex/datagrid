@@ -264,7 +264,7 @@ Translated values include column labels, action labels, filter labels, reset but
 
 The grid is built for Naja. Filtering, sorting, pagination, page size changes and row actions are handled through AJAX and keep browser history updated.
 
-Text filters are submitted by the browser form submit event and handled by Naja. The DataGrid JavaScript only auto-submits select and date filters on change.
+Text filters are submitted by pressing Enter. Select and date filters are submitted automatically when their value changes.
 
 ## Security
 

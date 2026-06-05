@@ -42,6 +42,15 @@ export default class DataGridFilter {
 				// Store the initial trimmed value to detect changes
 				input.dataset.lastValue = input.value.trim();
 
+				input.addEventListener('keydown', (e) => {
+					if (e.key !== 'Enter') {
+						return;
+					}
+
+					e.preventDefault();
+					submitIfChanged(e.target.form);
+				});
+
 				if (input.tagName === 'SELECT' || input.type === 'date') {
 					input.addEventListener('change', (e) => {
 						submitIfChanged(e.target.form);
