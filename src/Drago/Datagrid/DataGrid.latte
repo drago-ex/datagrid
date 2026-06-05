@@ -36,36 +36,34 @@
                 <th class="p-1">
                     {if $col->filter !== null}
                         {var $isFilterActive = isset($filters[$col->name]) && $filters[$col->name] !== ''}
-                        {if $isFilterActive}
-                            <div class="input-group input-group-sm">
-                        {/if}
-                        {if $col->filter->getInputType() === 'select'}
-                            <select
-                                name="{$col->name}"
-                                form="{$filterFormId}"
-                                class="form-select form-select-sm datagrid-control"
-                                data-items-filter>
-                                <option value="">{_'All'}</option>
-                                {foreach $col->filter->items as $value => $label}
-                                    <option value="{$value}" n:attr="selected => ($filters[$col->name] ?? '') == $value">
-                                        {$label}
-                                    </option>
-                                {/foreach}
-                            </select>
-                        {else}
-                            <input
-                                type="{$col->filter->getInputType() === 'date' ? 'date' : 'text'}"
-                                name="{$col->name}"
-                                form="{$filterFormId}"
-                                class="form-control form-control-sm datagrid-control"
-                                data-items-filter
-                                value="{$filters[$col->name] ?? ''}"
-                                autocomplete="off">
-                        {/if}
-                        {if $isFilterActive}
+                        <div n:class="$isFilterActive ? 'input-group input-group-sm'">
+                            {if $col->filter->getInputType() === 'select'}
+                                <select
+                                    name="{$col->name}"
+                                    form="{$filterFormId}"
+                                    class="form-select form-select-sm datagrid-control"
+                                    data-items-filter>
+                                    <option value="">{_'All'}</option>
+                                    {foreach $col->filter->items as $value => $label}
+                                        <option value="{$value}" n:attr="selected => ($filters[$col->name] ?? '') == $value">
+                                            {$label}
+                                        </option>
+                                    {/foreach}
+                                </select>
+                            {else}
+                                <input
+                                    type="{$col->filter->getInputType() === 'date' ? 'date' : 'text'}"
+                                    name="{$col->name}"
+                                    form="{$filterFormId}"
+                                    class="form-control form-control-sm datagrid-control"
+                                    data-items-filter
+                                    value="{$filters[$col->name] ?? ''}"
+                                    autocomplete="off">
+                            {/if}
+                            {if $isFilterActive}
                                 <a n:href="filters:clearFilter!, name: $col->name" class="btn btn-outline-secondary ajax" data-naja-history="replace" n:attr="aria-label => 'Clear filter'|translate">&times;</a>
-                            </div>
-                        {/if}
+                            {/if}
+                        </div>
                     {/if}
                 </th>
             {/foreach}
