@@ -36,7 +36,6 @@
                 <th class="p-1">
                     {if $col->filter !== null}
                         {var $isFilterActive = isset($filters[$col->name]) && $filters[$col->name] !== ''}
-                        {var $clearFilterLabel = 'Clear filter'|translate}
                         <div n:class="$isFilterActive ? 'input-group input-group-sm'">
                             {if $col->filter->getInputType() === 'select'}
                                 <select
@@ -62,7 +61,7 @@
                                     autocomplete="off">
                             {/if}
                             {if $isFilterActive}
-                                <a n:href="filters:clearFilter!, name: $col->name" class="btn btn-outline-secondary ajax" data-naja-history="replace" n:attr="aria-label => $clearFilterLabel">&times;</a>
+                                <a n:href="filters:clearFilter!, name: $col->name" class="btn btn-outline-secondary ajax" data-naja-history="replace" aria-label="Clear filter">&times;</a>
                             {/if}
                         </div>
                     {/if}
