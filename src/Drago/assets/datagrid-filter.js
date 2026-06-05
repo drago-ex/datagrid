@@ -21,6 +21,10 @@ export default class DataGridFilter {
 			}
 
 			if (hasChanged) {
+				for (let input of allInputs) {
+					input.dataset.lastValue = input.value.trim();
+				}
+
 				naja.uiHandler.submitForm(form);
 			}
 		};
@@ -30,21 +34,19 @@ export default class DataGridFilter {
 			if (!inputs) return;
 
 			for (let input of inputs) {
+				if (input.dataset.datagridFilterInitialized === "true") {
+					continue;
+				}
+
+				input.dataset.datagridFilterInitialized = "true";
 				// Store the initial trimmed value to detect changes
 				input.dataset.lastValue = input.value.trim();
 
-				input.addEventListener('keydown', (e) => {
-					if (e.key === 'Enter') {
-						e.preventDefault();
-
-						const form = e.target.form;
-						submitIfChanged(form);
-					}
-				});
-
-				input.addEventListener('change', (e) => {
-					submitIfChanged(e.target.form);
-				});
+				if (input.tagName === 'SELECT' || input.type === 'date') {
+					input.addEventListener('change', (e) => {
+						submitIfChanged(e.target.form);
+					});
+				}
 			}
 		};
 

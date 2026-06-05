@@ -264,9 +264,10 @@ Translated values include column labels, action labels, filter labels, reset but
 
 The grid is built for Naja. Filtering, sorting, pagination, page size changes and row actions are handled through AJAX and keep browser history updated.
 
+Text filters are submitted by the browser form submit event and handled by Naja. The DataGrid JavaScript only auto-submits select and date filters on change.
+
 ## Security
 
 - Cell values are escaped unless a formatter returns `Nette\Utils\Html`.
 - Filters use parameterized Dibi queries.
 - Empty filter values are removed from persistent parameters.
-- Redundant filter submissions are skipped on the client side.
