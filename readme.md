@@ -151,6 +151,8 @@ Filter types:
 
 Date filters also support range values in the form `YYYY-MM-DD|YYYY-MM-DD`.
 
+Active filters can be cleared individually with the small clear button next to the filter input. The reset button clears all filters at once.
+
 ## Filter Modes
 
 Filters can be rendered in two modes:

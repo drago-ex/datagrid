@@ -26,6 +26,9 @@ final class FilterTextControl extends Control
 	/** @var Closure(): void|null */
 	private ?Closure $onReset = null;
 
+	/** @var Closure(string): void|null */
+	private ?Closure $onClearFilter = null;
+
 	private string $filterMode = Options::FilterModeTop;
 
 	/** @var array<string, Column> */
@@ -75,6 +78,15 @@ final class FilterTextControl extends Control
 	}
 
 
+	/**
+	 * @param callable(string): void $callback
+	 */
+	public function onClearFilter(callable $callback): void
+	{
+		$this->onClearFilter = $callback;
+	}
+
+
 	public function handleResetFilters(): void
 	{
 		$this->values = [];
@@ -82,6 +94,21 @@ final class FilterTextControl extends Control
 
 		if ($this->onReset) {
 			($this->onReset)();
+		}
+	}
+
+
+	public function handleClearFilter(string $name): void
+	{
+		if (!isset($this->columns[$name]) || $this->columns[$name]->filter === null) {
+			return;
+		}
+
+		unset($this->values[$name]);
+		$this->setValues($this->values);
+
+		if ($this->onClearFilter) {
+			($this->onClearFilter)($name);
 		}
 	}
 

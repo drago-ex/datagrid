@@ -10,11 +10,22 @@
                     {$input->getControl()}
                 {else}
                     <div class="datagrid-filter">
+                        {var $inputName = $input->getName()}
+                        {var $isActive = isset($filterValues[$inputName]) && $filterValues[$inputName] !== ''}
                         {var $label = $input->getLabel()}
                         {if $label !== null}
                             {$label->addClass('form-label small mb-1')}
                         {/if}
-                        {$input->getControl()}
+                        {if $isActive}
+                            <div class="input-group input-group-sm">
+                                {$input->getControl()}
+                                <a n:href="clearFilter!, name: $inputName" class="btn btn-outline-secondary ajax" data-naja-history="replace" n:attr="aria-label => 'Clear filter'|translate">
+                                    &times;
+                                </a>
+                            </div>
+                        {else}
+                            {$input->getControl()}
+                        {/if}
                     </div>
                 {/if}
             {/foreach}

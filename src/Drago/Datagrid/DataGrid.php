@@ -333,6 +333,13 @@ class DataGrid extends Control
 			$this->redrawDataGrid();
 		});
 
+		$filter->onClearFilter(function (string $name): void {
+			unset($this->filterValues[$name]);
+			$this->page = 1;
+			$this->historyUrl = $this->link('//this', ['filterValues' => $this->filterValues]);
+			$this->redrawDataGrid();
+		});
+
 		return $filter;
 	}
 
