@@ -24,8 +24,20 @@ th {
 	  vertical-align: middle;
 	}
 
-	.form-control-sm {
-	  font-size: 0.8rem;
+	.datagrid-control,
+	.datagrid-filter-button,
+	.datagrid-filter-clear {
+	  min-height: calc(1.5em + 0.5rem + 2px);
+	  font-size: 0.875rem;
+	  line-height: 1.5;
+	}
+
+	.datagrid-filter-clear {
+	  display: inline-flex;
+	  align-items: center;
+	  justify-content: center;
+	  min-width: calc(1.5em + 0.75rem + 2px);
+	  padding-inline: 0.5rem;
 	}
   }
 
