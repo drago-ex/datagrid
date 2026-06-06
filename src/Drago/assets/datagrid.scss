@@ -18,9 +18,15 @@ th {
 }
 
 .datagrid {
+  &-table {
+	--bs-table-bg: transparent;
+	--bs-table-accent-bg: transparent;
+	--bs-table-hover-bg: rgba(var(--bs-body-color-rgb), 0.05);
+  }
+
   &-filter-row {
 	th {
-	  background-color: var(--bs-body-bg);
+	  background-color: transparent;
 	  vertical-align: middle;
 	}
 
