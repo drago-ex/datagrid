@@ -468,18 +468,22 @@ class DataGrid extends Control
 			return;
 		}
 		$columnObj = $this->columns[$this->column];
+		$order = in_array($this->order, [Options::OrderAsc, Options::OrderDesc], true)
+			? $this->order
+			: Options::OrderAsc;
+
 		$data->removeClause('ORDER BY');
 
 		if ($columnObj->isNaturalSort()) {
 			try {
-				$data->orderBy("CAST(REGEXP_SUBSTR(%n, '[0-9]+') AS UNSIGNED) {$this->order}", $this->column);
+				$data->orderBy("CAST(REGEXP_SUBSTR(%n, '[0-9]+') AS UNSIGNED) {$order}", $this->column);
 				return;
 			} catch (\Throwable $e) {
 				Debugger::log($e, ILogger::WARNING);
 			}
 		}
 
-		$data->orderBy("%n {$this->order}", $this->column);
+		$data->orderBy("%n {$order}", $this->column);
 	}
 
 
