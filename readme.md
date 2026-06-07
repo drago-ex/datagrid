@@ -44,7 +44,7 @@ Import the assets:
 ```js
 import naja from 'naja';
 import DataGrid from 'drago-datagrid';
-import 'drago-datagrid/datagrid.scss';
+import 'drago-datagrid/styles/datagrid';
 
 naja.initialize();
 new DataGrid().initialize(naja);
@@ -272,4 +272,5 @@ Text filters are submitted by pressing Enter. Select and date filters are submit
 
 - Cell values are escaped unless a formatter returns `Nette\Utils\Html`.
 - Filters use parameterized Dibi queries.
+- Sort direction is normalized to `ASC` or `DESC` before it is applied to SQL.
 - Empty filter values are removed from persistent parameters.

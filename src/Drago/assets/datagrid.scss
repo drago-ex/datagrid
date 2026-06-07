@@ -3,84 +3,84 @@
 //
 
 th {
-  a {
+	a {
 	position: relative;
 	cursor: pointer;
 	user-select: none;
-  }
+	}
 }
 
 .btn-xs {
-  --bs-btn-padding-y: 0.15rem;
-  --bs-btn-padding-x: 0.4rem;
-  --bs-btn-font-size: 0.75rem;
-  --bs-btn-border-radius: 0.2rem;
+	--bs-btn-padding-y: 0.15rem;
+	--bs-btn-padding-x: 0.4rem;
+	--bs-btn-font-size: 0.75rem;
+	--bs-btn-border-radius: 0.2rem;
 }
 
 .datagrid {
-  &-table {
+	&-table {
 	--bs-table-bg: transparent;
 	--bs-table-accent-bg: transparent;
 	--bs-table-hover-bg: rgba(var(--bs-body-color-rgb), 0.05);
-  }
+	}
 
-  &-filter-row {
+	&-filter-row {
 	th {
-	  background-color: transparent;
-	  vertical-align: middle;
+		background-color: transparent;
+		vertical-align: middle;
 	}
 
 	.datagrid-control,
 	.datagrid-filter-button,
 	.datagrid-filter-clear {
-	  min-height: calc(1.5em + 0.5rem + 2px);
-	  font-size: 0.875rem;
-	  line-height: 1.5;
+		min-height: calc(1.5em + 0.5rem + 2px);
+		font-size: 0.875rem;
+		line-height: 1.5;
 	}
 
 	.datagrid-filter-clear {
-	  display: inline-flex;
-	  align-items: center;
-	  justify-content: center;
-	  min-width: calc(1.5em + 0.75rem + 2px);
-	  padding-inline: 0.5rem;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: calc(1.5em + 0.75rem + 2px);
+		padding-inline: 0.5rem;
 	}
-  }
+	}
 
-  // Toolbar layout
-  &-toolbar {
+	// Toolbar layout
+	&-toolbar {
 	padding: 0.75rem 0;
 	border-bottom: 1px solid var(--bs-border-color);
 	margin-bottom: 0.75rem;
-  }
+	}
 
-  &-row-clickable {
+	&-row-clickable {
 	cursor: pointer;
-  }
+	}
 
-  &-actions-autohide {
+	&-actions-autohide {
 	td.text-end {
-	  a {
+		a {
 		opacity: 0;
 		transition: opacity 0.2s ease-in-out;
-	  }
+		}
 	}
 
 	&:hover {
-	  td.text-end {
+		td.text-end {
 		a {
-		  opacity: 1;
+			opacity: 1;
 		}
-	  }
+		}
 	}
-  }
+	}
 
-  &-reset-btn {
+	&-reset-btn {
 	position: relative;
 	z-index: 10;
-  }
+	}
 
-  &-filter {
+	&-filter {
 	min-width: 12rem;
-  }
+	}
 }
