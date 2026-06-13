@@ -4,98 +4,98 @@
 {import 'Action.latte'}
 
 {snippet dataGrid}
-    {var $hasActiveFilters = array_filter($filters, fn($v) => $v !== null && $v !== '') !== []}
+	{var $hasActiveFilters = array_filter($filters, fn($v) => $v !== null && $v !== '') !== []}
 
-    {if $hasFilters && $filterMode === 'top'}
-        {control filters}
-    {/if}
+	{if $hasFilters && $filterMode === 'top'}
+		{control filters}
+	{/if}
 
-    {if $hasFilters && $filterMode === 'inline'}
-        {control filters}
-    {/if}
+	{if $hasFilters && $filterMode === 'inline'}
+		{control filters}
+	{/if}
 
-    <table class="table table-sm table-borderless table-hover datagrid-table">
-        <thead>
-        <tr>
-            {foreach $columns as $col}
-                <th n:class="'fw-semibold', $col->getAlignClass()">
-                    {include 'sortable', sortable: $col->sortable, name: $col->name, label: ($col->label|translate)}
-                </th>
-            {/foreach}
+	<table class="table table-sm table-borderless table-hover datagrid-table">
+		<thead>
+		<tr>
+			{foreach $columns as $col}
+				<th n:class="'fw-semibold', $col->getAlignClass()">
+					{include 'sortable', sortable: $col->sortable, name: $col->name, label: ($col->label|translate)}
+				</th>
+			{/foreach}
 
-            {if $actions !== []}
-                <th class="fw-semibold text-end">&nbsp;</th>
-            {elseif $hasFilters && $filterMode === 'inline'}
-                <th></th>
-            {/if}
-        </tr>
+			{if $actions !== []}
+				<th class="fw-semibold text-end">&nbsp;</th>
+			{elseif $hasFilters && $filterMode === 'inline'}
+				<th></th>
+			{/if}
+		</tr>
 
-        {if $hasFilters && $filterMode === 'inline'}
-        <tr class="datagrid-filter-row">
-            {foreach $columns as $col}
-                <th class="p-1">
-                    {if $col->filter !== null}
-                        {var $isFilterActive = isset($filters[$col->name]) && $filters[$col->name] !== ''}
-                        <div n:class="'datagrid-filter-control', $isFilterActive ? 'input-group input-group-sm'">
-                            {if $col->filter->getInputType() === 'select'}
-                                <select
-                                    name="{$col->name}"
-                                    form="{$filterFormId}"
-                                    class="form-select form-select-sm datagrid-control"
-                                    data-items-filter>
-                                    <option value="">{_'All'}</option>
-                                    {foreach $col->filter->items as $value => $label}
-                                        <option value="{$value}" n:attr="selected => ($filters[$col->name] ?? '') == $value">
-                                            {$label}
-                                        </option>
-                                    {/foreach}
-                                </select>
-                            {else}
-                                <input
-                                    type="{$col->filter->getInputType() === 'date' ? 'date' : 'text'}"
-                                    name="{$col->name}"
-                                    form="{$filterFormId}"
-                                    class="form-control form-control-sm datagrid-control"
-                                    data-items-filter
-                                    value="{$filters[$col->name] ?? ''}"
-                                    autocomplete="off">
-                            {/if}
-                            {if $isFilterActive}
-                                <a n:href="filters:clearFilter!, name: $col->name" class="btn btn-secondary btn-sm datagrid-filter-clear ajax" data-naja-history="replace" aria-label="{_'Clear filter'}">&times;</a>
-                            {/if}
-                        </div>
-                    {/if}
-                </th>
-            {/foreach}
-            <th class="p-1">
-                {if $hasActiveFilters}
-                    <a n:href="filters:resetFilters!" class="btn btn-secondary btn-sm datagrid-filter-button ajax" data-naja-history="replace">{_'Reset'}</a>
-                {/if}
-            </th>
-        </tr>
-        {/if}
-        </thead>
+		{if $hasFilters && $filterMode === 'inline'}
+		<tr class="datagrid-filter-row">
+			{foreach $columns as $col}
+				<th class="p-1">
+					{if $col->filter !== null}
+						{var $isFilterActive = isset($filters[$col->name]) && $filters[$col->name] !== ''}
+						<div n:class="'datagrid-filter-control', $isFilterActive ? 'input-group input-group-sm'">
+							{if $col->filter->getInputType() === 'select'}
+								<select
+									name="{$col->name}"
+									form="{$filterFormId}"
+									class="form-select form-select-sm datagrid-control"
+									data-items-filter>
+									<option value="">{_'All'}</option>
+									{foreach $col->filter->items as $value => $label}
+										<option value="{$value}" n:attr="selected => ($filters[$col->name] ?? '') == $value">
+											{$label}
+										</option>
+									{/foreach}
+								</select>
+							{else}
+								<input
+									type="{$col->filter->getInputType() === 'date' ? 'date' : 'text'}"
+									name="{$col->name}"
+									form="{$filterFormId}"
+									class="form-control form-control-sm datagrid-control"
+									data-items-filter
+									value="{$filters[$col->name] ?? ''}"
+									autocomplete="off">
+							{/if}
+							{if $isFilterActive}
+								<a n:href="filters:clearFilter!, name: $col->name" class="btn btn-secondary btn-sm datagrid-filter-clear ajax" data-naja-history="replace" aria-label="{_'Clear filter'}">&times;</a>
+							{/if}
+						</div>
+					{/if}
+				</th>
+			{/foreach}
+			<th class="p-1">
+				{if $hasActiveFilters}
+					<a n:href="filters:resetFilters!" class="btn btn-secondary btn-sm datagrid-filter-button ajax" data-naja-history="replace">{_'Reset'}</a>
+				{/if}
+			</th>
+		</tr>
+		{/if}
+		</thead>
 
-        <tbody>
-        {foreach $rows as $row}
-            <tr n:class="$rowClickAction ? 'datagrid-row-clickable ajax', $autoHideActions ? 'datagrid-actions-autohide'"
-                n:attr="data-row-click-url => $rowClickAction ? $control->link('action!', ['signal' => $rowClickAction, 'id' => $row[$primaryKey], 'filters' => $filters, 'page' => $page, 'itemsPerPage' => $itemsPerPage, 'column' => $columnName, 'order' => $order]) : null">
-                {foreach $columns as $col}
-                    <td n:class="$col->getAlignClass()">{$col->renderCell((array) $row)}</td>
-                {/foreach}
+		<tbody>
+		{foreach $rows as $row}
+			<tr n:class="$rowClickAction ? 'datagrid-row-clickable ajax', $autoHideActions ? 'datagrid-actions-autohide'"
+				n:attr="data-row-click-url => $rowClickAction ? $control->link('action!', ['signal' => $rowClickAction, 'id' => $row[$primaryKey], 'filters' => $filters, 'page' => $page, 'itemsPerPage' => $itemsPerPage, 'column' => $columnName, 'order' => $order]) : null">
+				{foreach $columns as $col}
+					<td n:class="$col->getAlignClass()">{$col->renderCell((array) $row)}</td>
+				{/foreach}
 
-                {if $actions !== []}
-                    <td class="text-end">
-                        {foreach $actions as $ac}
-                            {if $ac->signal !== $rowClickAction && $ac->isVisible((array) $row)}
-                                {include 'action', signal: $ac->signal, label: $ac->label, id: $row[$primaryKey], class: $ac->class, filters: $filters, page: $page, itemsPerPage: $itemsPerPage, column: $columnName, order: $order}
-                            {/if}
-                        {/foreach}
-                    </td>
-                {/if}
-            </tr>
-        {/foreach}
-        </tbody>
-    </table>
-    {include 'Footer.latte'}
+				{if $actions !== []}
+					<td class="text-end">
+						{foreach $actions as $ac}
+							{if $ac->signal !== $rowClickAction && $ac->isVisible((array) $row)}
+								{include 'action', signal: $ac->signal, label: $ac->label, id: $row[$primaryKey], class: $ac->class, filters: $filters, page: $page, itemsPerPage: $itemsPerPage, column: $columnName, order: $order}
+							{/if}
+						{/foreach}
+					</td>
+				{/if}
+			</tr>
+		{/foreach}
+		</tbody>
+	</table>
+	{include 'Footer.latte'}
 {/snippet}
