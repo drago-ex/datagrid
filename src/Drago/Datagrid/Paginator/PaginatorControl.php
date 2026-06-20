@@ -29,10 +29,8 @@ final class PaginatorControl extends Control
 	/** @var Closure(int, ?string, ?string): void|null */
 	private ?Closure $onPageChanged = null;
 
-	/** Current sorting column */
 	private ?string $column = null;
 
-	/** Current sorting order */
 	private string $order = Options::OrderAsc;
 
 	private ?Translator $translator = null;
@@ -50,13 +48,6 @@ final class PaginatorControl extends Control
 	}
 
 
-	/**
-	 * Set paginator state.
-	 *
-	 * @param int $page Current page
-	 * @param int $itemsPerPage Items per page
-	 * @param int $itemCount Total items
-	 */
 	public function setPaginator(int $page, int $itemsPerPage, int $itemCount): void
 	{
 		$this->paginator->setPage($page);
@@ -66,7 +57,7 @@ final class PaginatorControl extends Control
 
 
 	/**
-	 * Register a callback to be called when the page changes.
+	 * Registers a callback invoked when the page changes.
 	 * @param callable(int, ?string, ?string): void $callback
 	 */
 	public function onPageChanged(callable $callback): void
@@ -75,9 +66,6 @@ final class PaginatorControl extends Control
 	}
 
 
-	/**
-	 * Handle page change signal.
-	 */
 	public function handlePage(int $page, ?string $column = null, ?string $order = null): void
 	{
 		$this->paginator->setPage($page);
@@ -96,9 +84,6 @@ final class PaginatorControl extends Control
 	}
 
 
-	/**
-	 * Set current sorting column and order.
-	 */
 	public function setSorting(?string $column, string $order): void
 	{
 		$this->column = $column;
@@ -106,9 +91,6 @@ final class PaginatorControl extends Control
 	}
 
 
-	/**
-	 * Render paginator component.
-	 */
 	public function render(): void
 	{
 		$template = $this->template;

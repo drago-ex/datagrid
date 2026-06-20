@@ -19,13 +19,6 @@ use Drago\Datagrid\Options;
  */
 class ColumnDate extends Column
 {
-	/**
-	 * @param string $name Column identifier
-	 * @param string $label Column label
-	 * @param bool $sortable Enables sorting
-	 * @param string $format Date format
-	 * @param Closure|null $formatter Optional cell formatter
-	 */
 	public function __construct(
 		string $name,
 		string $label,
@@ -37,9 +30,6 @@ class ColumnDate extends Column
 	}
 
 
-	/**
-	 * Sets date filter for this column.
-	 */
 	public function setFilterDate(): self
 	{
 		$this->setFilter(new DateFilter);

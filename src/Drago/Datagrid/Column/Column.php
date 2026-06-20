@@ -22,18 +22,10 @@ abstract class Column
 	public const string AlignCenter = 'center';
 	public const string AlignRight = 'end';
 
-	/** Whether to use natural (numeric) sorting when values contain numbers */
 	private bool $naturalSort = false;
 	private string $align = self::AlignLeft;
 
 
-	/**
-	 * @param string $name Column identifier
-	 * @param string $label Column label
-	 * @param bool $sortable Enables sorting
-	 * @param Closure|null $formatter Optional value formatter
-	 * @param Filter|null $filter Optional column filter
-	 */
 	public function __construct(
 		public readonly string $name,
 		public readonly string $label,
@@ -44,9 +36,6 @@ abstract class Column
 	}
 
 
-	/**
-	 * Assigns a filter to the column.
-	 */
 	public function setFilter(Filter $filter): static
 	{
 		$this->filter = $filter;
@@ -54,9 +43,6 @@ abstract class Column
 	}
 
 
-	/**
-	 * Enable or disable natural numeric sorting for this column.
-	 */
 	public function setNaturalSort(bool $enable = true): static
 	{
 		$this->naturalSort = $enable;
@@ -64,9 +50,6 @@ abstract class Column
 	}
 
 
-	/**
-	 * Returns whether natural sorting is enabled for this column.
-	 */
 	public function isNaturalSort(): bool
 	{
 		return $this->naturalSort;

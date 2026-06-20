@@ -10,16 +10,12 @@ declare(strict_types=1);
 namespace Drago\Datagrid;
 
 
-/**
- * Represents an action in the DataGrid.
- * Can have a label, signal, optional CSS class, and callbacks to execute.
- */
 class Action
 {
-	/** @var list<callable(int): void> List of callbacks executed when the action is triggered */
+	/** @var list<callable(int): void> */
 	private array $callbacks = [];
 
-	/** @var (callable(array<string, mixed>): bool)|null Optional condition to show/hide this action per row */
+	/** @var (callable(array<string, mixed>): bool)|null */
 	private $condition;
 
 

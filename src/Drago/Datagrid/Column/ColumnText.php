@@ -36,16 +36,6 @@ class ColumnText extends Column
 
 
 	/**
-	 * Enable or disable natural numeric sorting for this column.
-	 */
-	public function setNaturalSort(bool $enable = true): static
-	{
-		parent::setNaturalSort($enable);
-		return $this;
-	}
-
-
-	/**
 	 * Renders the cell for this column.
 	 * Applies optional formatter and escapes HTML characters.
 	 * If the formatter returns a Nette\Utils\Html object, it is rendered directly.

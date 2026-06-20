@@ -24,10 +24,8 @@ final class PageSizeControl extends Control
 	/** @var Closure(int, int): void|null */
 	private ?Closure $onPageChanged = null;
 
-	/** Total number of items in the DataGrid */
 	private int $totalItems = 0;
 
-	/** Current number of items per page */
 	private int $currentPageSize = Options::DefaultItemsPerPage;
 
 	private ?Translator $translator = null;
@@ -61,27 +59,18 @@ final class PageSizeControl extends Control
 	}
 
 
-	/**
-	 * Sets total number of items in the DataGrid.
-	 */
 	public function setTotalItems(int $totalItems): void
 	{
 		$this->totalItems = $totalItems;
 	}
 
 
-	/**
-	 * Sets current page size.
-	 */
 	public function setCurrentPageSize(int $size): void
 	{
 		$this->currentPageSize = $size;
 	}
 
 
-	/**
-	 * Creates form for selecting number of items per page.
-	 */
 	protected function createComponentForm(): Form
 	{
 		$form = new Form;
@@ -110,9 +99,6 @@ final class PageSizeControl extends Control
 	}
 
 
-	/**
-	 * Renders page size control.
-	 */
 	public function render(): void
 	{
 		$template = $this->template;

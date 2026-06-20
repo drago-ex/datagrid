@@ -38,16 +38,12 @@ use Tracy\ILogger;
  */
 class DataGrid extends Control
 {
-	/** Persistent sorting column */
 	#[Persistent] public ?string $column = null;
 
-	/** Persistent sorting order (ASC/DESC) */
 	#[Persistent] public string $order = Options::OrderAsc;
 
-	/** Persistent current page */
 	#[Persistent] public int $page = Options::DefaultPage;
 
-	/** Persistent items per page */
 	#[Persistent] public int $itemsPerPage = Options::DefaultItemsPerPage;
 
 	/** @var array<string, mixed> Persistent current filter values */
@@ -77,9 +73,6 @@ class DataGrid extends Control
 	}
 
 
-	/**
-	 * Sets whether action buttons should be visible only on row hover.
-	 */
 	public function setAutoHideActions(bool $autoHide = true): self
 	{
 		$this->autoHideActions = $autoHide;
@@ -87,9 +80,6 @@ class DataGrid extends Control
 	}
 
 
-	/**
-	 * Sets the signal name for row click action.
-	 */
 	public function setRowClickAction(string $signal): self
 	{
 		$this->rowClickAction = $signal;
@@ -97,9 +87,6 @@ class DataGrid extends Control
 	}
 
 
-	/**
-	 * Sets the translator for the DataGrid and its components.
-	 */
 	public function setTranslator(?Translator $translator): self
 	{
 		$this->translator = $translator;
@@ -107,9 +94,6 @@ class DataGrid extends Control
 	}
 
 
-	/**
-	 * Returns the translator.
-	 */
 	public function getTranslator(): ?Translator
 	{
 		return $this->translator;
@@ -126,9 +110,6 @@ class DataGrid extends Control
 	}
 
 
-	/**
-	 * Sets the data source for the DataGrid.
-	 */
 	public function setDataSource(Fluent $source): self
 	{
 		$this->source = $source;
@@ -136,9 +117,6 @@ class DataGrid extends Control
 	}
 
 
-	/**
-	 * Sets primary key used for row actions.
-	 */
 	public function setPrimaryKey(string $primaryKey): self
 	{
 		$this->primaryKey = $primaryKey;
@@ -205,9 +183,6 @@ class DataGrid extends Control
 	}
 
 
-	/**
-	 * Handles sorting when a column header is clicked.
-	 */
 	public function handleSort(string $column, int $page, string $sortOrder = Options::OrderAsc): void
 	{
 		if (!isset($this->columns[$column]) || !$this->columns[$column]->sortable) {
@@ -310,9 +285,6 @@ class DataGrid extends Control
 	}
 
 
-	/**
-	 * Creates filter component and sets callback for filter changes.
-	 */
 	protected function createComponentFilters(): FilterTextControl
 	{
 		$filter = new FilterTextControl;
@@ -344,9 +316,6 @@ class DataGrid extends Control
 	}
 
 
-	/**
-	 * Creates paginator component and sets callback for page changes.
-	 */
 	protected function createComponentPaginator(): PaginatorControl
 	{
 		$control = new PaginatorControl;
@@ -371,9 +340,6 @@ class DataGrid extends Control
 	}
 
 
-	/**
-	 * Creates page size selector component.
-	 */
 	protected function createComponentPageSize(): PageSizeControl
 	{
 		$control = new PageSizeControl;
@@ -443,9 +409,6 @@ class DataGrid extends Control
 	}
 
 
-	/**
-	 * Applies current filter values to the data source.
-	 */
 	private function applyFilters(Fluent $data): void
 	{
 		if (empty($this->filterValues)) {
@@ -459,9 +422,6 @@ class DataGrid extends Control
 	}
 
 
-	/**
-	 * Applies current sorting to the data source.
-	 */
 	private function applySorting(Fluent $data): void
 	{
 		if ($this->column === null || !isset($this->columns[$this->column])) {
@@ -487,9 +447,6 @@ class DataGrid extends Control
 	}
 
 
-	/**
-	 * Counts total items for pagination.
-	 */
 	private function calculateTotalItems(Fluent $data): void
 	{
 		$this->totalItems = $data->count();
@@ -510,7 +467,7 @@ class DataGrid extends Control
 			$data->limit($this->itemsPerPage)->offset($this->paginator->getOffset());
 		}
 
-		/** @var list<array<string, mixed>> */
+		/** @temp list<array<string, mixed>> */
 		return $data->fetchAll();
 	}
 

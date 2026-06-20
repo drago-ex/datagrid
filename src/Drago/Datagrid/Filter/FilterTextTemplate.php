@@ -12,9 +12,6 @@ namespace Drago\Datagrid\Filter;
 use Nette\Bridges\ApplicationLatte\Template;
 
 
-/**
- * Latte template for DataGrid filter component.
- */
 class FilterTextTemplate extends Template
 {
 	public bool $hasActiveFilters = false;

@@ -19,12 +19,9 @@ use Nette\Utils\Paginator;
  */
 class PaginatorTemplate extends Template
 {
-	/** Paginator instance with current page info */
 	public Paginator $paginator;
 
-	/** Current sorting column */
 	public ?string $column = null;
 
-	/** Current sorting order ('ASC' or 'DESC') */
 	public string $order = 'ASC';
 }

@@ -12,9 +12,6 @@ namespace Drago\Datagrid\PageSize;
 use Nette\Bridges\ApplicationLatte\Template;
 
 
-/**
- * Latte template for PageSizeControl
- */
 class PageSizeTemplate extends Template
 {
 	/** @var array<int, string> */
