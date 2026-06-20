@@ -178,7 +178,7 @@ final class FilterTextControl extends Control
 		}
 
 		$form->onSuccess[] = function (Form $form, stdClass $values): void {
-			/** @temp array<string, mixed> $valuesArray */
+			/** @var array<string, mixed> $valuesArray */
 			$valuesArray = (array) $values;
 
 			// Trim all string values

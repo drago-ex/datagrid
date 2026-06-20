@@ -467,7 +467,7 @@ class DataGrid extends Control
 			$data->limit($this->itemsPerPage)->offset($this->paginator->getOffset());
 		}
 
-		/** @temp list<array<string, mixed>> */
+		/** @var list<array<string, mixed>> */
 		return $data->fetchAll();
 	}
 
