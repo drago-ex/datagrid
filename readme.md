@@ -99,7 +99,18 @@ $grid->setDataSource(
 );
 ```
 
-A default `orderBy()` can be used for the initial render. When the user clicks a sortable column, the grid replaces the default order with the selected grid sort.
+The data source controls the initial order. The grid keeps its sorting indicator neutral until a user selects a sortable column. The first click sorts that column ascending, and subsequent clicks toggle between ascending and descending order.
+
+For stable pagination, always use a deterministic initial order. When ordering by a non-unique value, add the primary key as the final sorting criterion.
+
+```php
+$grid->setDataSource(
+	$this->db->select('*')
+		->from('products')
+		->orderBy('name ASC')
+		->orderBy('id ASC')
+);
+```
 
 ## Columns
 
