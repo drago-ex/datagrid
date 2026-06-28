@@ -163,7 +163,7 @@ final class FilterTextControl extends Control
 					$items = $column->filter instanceof SelectFilter ? $column->filter->items : [];
 					$form->addSelect($name, $column->label, $items)
 						->setPrompt('All')
-						->setDefaultValue($this->values[$name] ?? '')
+						->setDefaultValue($this->getSelectDefaultValue($name, $items))
 						->setHtmlAttribute('class', 'form-select form-select-sm datagrid-control')
 						->setHtmlAttribute('data-items-filter');
 
@@ -195,6 +195,25 @@ final class FilterTextControl extends Control
 		};
 
 		return $form;
+	}
+
+
+	/**
+	 * @param array<int|string, string> $items
+	 */
+	private function getSelectDefaultValue(string $name, array $items): int|string|null
+	{
+		$value = $this->values[$name] ?? null;
+
+		if ($value === null || $value === '') {
+			return null;
+		}
+
+		if ((is_int($value) || is_string($value)) && array_key_exists($value, $items)) {
+			return $value;
+		}
+
+		return null;
 	}
 
 
