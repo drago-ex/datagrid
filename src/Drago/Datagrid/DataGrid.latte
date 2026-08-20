@@ -79,7 +79,7 @@
 		<tbody>
 		{foreach $rows as $row}
 			<tr n:class="$rowClickAction ? 'datagrid-row-clickable ajax', $autoHideActions ? 'datagrid-actions-autohide'"
-				n:attr="data-row-click-url => $rowClickAction ? $control->link('action!', ['signal' => $rowClickAction, 'id' => $row[$primaryKey], 'filters' => $filters, 'page' => $page, 'itemsPerPage' => $itemsPerPage, 'column' => $columnName, 'order' => $order]) : null, data-naja-history => $rowClickAction ? 'off' : null">
+				n:attr="data-row-click-url => $rowClickAction && $primaryKey ? $control->link('action!', ['signal' => $rowClickAction, 'id' => $row[$primaryKey], 'filters' => $filters, 'page' => $page, 'itemsPerPage' => $itemsPerPage, 'column' => $columnName, 'order' => $order]) : null">
 				{foreach $columns as $col}
 					<td n:class="$col->getAlignClass()">{$col->renderCell((array) $row)}</td>
 				{/foreach}

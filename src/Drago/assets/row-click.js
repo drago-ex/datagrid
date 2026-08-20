@@ -12,7 +12,7 @@ export default class DataGridRowClick {
 
 					const url = row.getAttribute('data-row-click-url');
 					if (url) {
-						naja.makeRequest('GET', url);
+						naja.makeRequest('GET', url, null, { history: false });
 					}
 				});
 			}
