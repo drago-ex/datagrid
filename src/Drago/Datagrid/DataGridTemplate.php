@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Drago\Datagrid;
 
+use Drago\Datagrid\Column\Column;
 use Nette\Bridges\ApplicationLatte\Template;
 
 
