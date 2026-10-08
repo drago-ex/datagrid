@@ -18,7 +18,10 @@
 		"nette/forms": "^3.2"
 	},
 	"autoload": {
-		"classmap": ["src/"]
+		"classmap": ["src/"],
+		"psr-4": {
+			"Drago\\": "src"
+		}
 	},
 	"require-dev": {
 		"nette/tester": "^2.3",
@@ -26,6 +29,11 @@
 	},
 	"suggest": {
 		"drago-ex/translator": "Configures Latte translation support for bundled templates using translation macros."
+	},
+	"extra": {
+		"drago-translator": {
+			"translation": "src/Datagrid/Translate"
+		}
 	},
 	"scripts": {
 		"phpstan": "phpstan analyse"
