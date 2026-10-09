@@ -14,7 +14,7 @@ export default class DataGridFilter {
 			let hasChanged = false;
 
 			for (let input of allInputs) {
-				if (input.value.trim() !== (input.dataset.lastValue || "")) {
+				if (input.value.trim() !== (input.dataset.lastValue || '')) {
 					hasChanged = true;
 					break;
 				}
@@ -34,11 +34,11 @@ export default class DataGridFilter {
 			if (!inputs) return;
 
 			for (let input of inputs) {
-				if (input.dataset.datagridFilterInitialized === "true") {
+				if (input.dataset.datagridFilterInitialized === 'true') {
 					continue;
 				}
 
-				input.dataset.datagridFilterInitialized = "true";
+				input.dataset.datagridFilterInitialized = 'true';
 				// Store the initial trimmed value to detect changes
 				input.dataset.lastValue = input.value.trim();
 

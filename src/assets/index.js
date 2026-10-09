@@ -1,6 +1,6 @@
-import DataGridFilter from "./datagrid-filter.js";
-import DataGridPage from "./page-items.js";
-import DataGridRowClick from "./row-click.js";
+import DataGridFilter from './datagrid-filter.js';
+import DataGridPage from './page-items.js';
+import DataGridRowClick from './row-click.js';
 
 export default class DataGrid {
 	initialize(naja) {
