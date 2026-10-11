@@ -162,9 +162,9 @@ final class FilterTextControl extends Control
 				} elseif ($type === 'select') {
 					$items = $column->filter instanceof SelectFilter ? $column->filter->items : [];
 					$form->addSelect($name, $column->label, $items)
-						->setPrompt('All')
 						->setHtmlAttribute('class', 'form-select form-select-sm datagrid-control')
 						->setHtmlAttribute('data-items-filter')
+						->setPrompt('All')
 						->setDefaultValue($this->getSelectDefaultValue($name, $items));
 
 				} elseif ($type === 'date') {
