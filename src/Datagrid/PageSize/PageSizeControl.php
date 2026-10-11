@@ -77,8 +77,8 @@ final class PageSizeControl extends Control
 		$form->setMethod($form::Get);
 
 		$form->addSelect('pageSize', 'Items per page', items: $this->getPageSizeItems())
-			->setDefaultValue($this->currentPageSize)
-			->setHtmlAttribute('data-items-page');
+			->setHtmlAttribute('data-items-page')
+			->setDefaultValue($this->currentPageSize);
 
 		$form->onSuccess[] = function (Form $form, \stdClass $values): void {
 			if ($this->onPageChanged) {

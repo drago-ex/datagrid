@@ -153,26 +153,26 @@ final class FilterTextControl extends Control
 
 				if ($type === 'text') {
 					$form->addText($name, $column->label)
-						->setDefaultValue($this->values[$name] ?? '')
 						->setHtmlAttribute('class', 'form-control form-control-sm datagrid-control')
 						->setHtmlAttribute('data-items-filter')
 						->setHtmlAttribute('placeholder', 'Search...')
-						->setHtmlAttribute('autocomplete', 'off');
+						->setHtmlAttribute('autocomplete', 'off')
+						->setDefaultValue($this->values[$name] ?? '');
 
 				} elseif ($type === 'select') {
 					$items = $column->filter instanceof SelectFilter ? $column->filter->items : [];
 					$form->addSelect($name, $column->label, $items)
 						->setPrompt('All')
-						->setDefaultValue($this->getSelectDefaultValue($name, $items))
 						->setHtmlAttribute('class', 'form-select form-select-sm datagrid-control')
-						->setHtmlAttribute('data-items-filter');
+						->setHtmlAttribute('data-items-filter')
+						->setDefaultValue($this->getSelectDefaultValue($name, $items));
 
 				} elseif ($type === 'date') {
 					$form->addText($name, $column->label)
 						->setHtmlType('date')
-						->setDefaultValue($this->values[$name] ?? '')
 						->setHtmlAttribute('class', 'form-control form-control-sm datagrid-control')
-						->setHtmlAttribute('data-items-filter');
+						->setHtmlAttribute('data-items-filter')
+						->setDefaultValue($this->values[$name] ?? '');
 				}
 			}
 		}
