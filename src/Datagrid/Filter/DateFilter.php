@@ -57,6 +57,15 @@ class DateFilter implements Filter
 
 
 	/**
+	 * Returns input type identifier.
+	 */
+	public function getInputType(): string
+	{
+		return 'date';
+	}
+
+
+	/**
 	 * Validates that date string is in YYYY-MM-DD format.
 	 * @throws \InvalidArgumentException
 	 */
@@ -67,14 +76,5 @@ class DateFilter implements Filter
 				'Date filter expects YYYY-MM-DD format, got: \'' . $date . '\'',
 			);
 		}
-	}
-
-
-	/**
-	 * Returns input type identifier.
-	 */
-	public function getInputType(): string
-	{
-		return 'date';
 	}
 }

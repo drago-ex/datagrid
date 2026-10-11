@@ -139,6 +139,27 @@ final class FilterTextControl extends Control
 	}
 
 
+	public function render(): void
+	{
+		$template = $this->template;
+		if ($this->translator !== null) {
+			$template->setTranslator($this->translator);
+		}
+
+		if ($this->filterMode === Options::FilterModeInline) {
+			$this['form']->getElementPrototype()->id = $this->getFormId();
+		}
+
+		$templateFile = $this->filterMode === Options::FilterModeInline
+			? __DIR__ . '/FilterInline.latte'
+			: __DIR__ . '/Filter.latte';
+		$this->template->setFile($templateFile);
+		$this->template->hasActiveFilters = $this->hasActiveFilters;
+		$this->template->filterValues = $this->values;
+		$this->template->render();
+	}
+
+
 	protected function createComponentForm(): Form
 	{
 		$form = new Form;
@@ -214,26 +235,5 @@ final class FilterTextControl extends Control
 		}
 
 		return null;
-	}
-
-
-	public function render(): void
-	{
-		$template = $this->template;
-		if ($this->translator !== null) {
-			$template->setTranslator($this->translator);
-		}
-
-		if ($this->filterMode === Options::FilterModeInline) {
-			$this['form']->getElementPrototype()->id = $this->getFormId();
-		}
-
-		$templateFile = $this->filterMode === Options::FilterModeInline
-			? __DIR__ . '/FilterInline.latte'
-			: __DIR__ . '/Filter.latte';
-		$this->template->setFile($templateFile);
-		$this->template->hasActiveFilters = $this->hasActiveFilters;
-		$this->template->filterValues = $this->values;
-		$this->template->render();
 	}
 }

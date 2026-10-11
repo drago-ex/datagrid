@@ -31,18 +31,6 @@ final class PageSizeControl extends Control
 	private ?Translator $translator = null;
 
 
-	/** @return array<int, string> */
-	private function getPageSizeItems(): array
-	{
-		return [
-			20 => '20',
-			50 => '50',
-			100 => '100',
-			0 => 'All',
-		];
-	}
-
-
 	public function setTranslator(?Translator $translator): void
 	{
 		$this->translator = $translator;
@@ -71,25 +59,6 @@ final class PageSizeControl extends Control
 	}
 
 
-	protected function createComponentForm(): Form
-	{
-		$form = new Form;
-		$form->setMethod($form::Get);
-
-		$form->addSelect('pageSize', 'Items per page', items: $this->getPageSizeItems())
-			->setHtmlAttribute('data-items-page')
-			->setDefaultValue($this->currentPageSize);
-
-		$form->onSuccess[] = function (Form $form, \stdClass $values): void {
-			if ($this->onPageChanged) {
-				($this->onPageChanged)(Options::DefaultPage, (int) $values->pageSize);
-			}
-		};
-
-		return $form;
-	}
-
-
 	public function handleSetPageSize(string|int $size): void
 	{
 		$size = (int) $size;
@@ -110,5 +79,36 @@ final class PageSizeControl extends Control
 		$this->template->currentSize = $this->currentPageSize;
 		$this->template->totalItems = $this->totalItems;
 		$this->template->render();
+	}
+
+
+	protected function createComponentForm(): Form
+	{
+		$form = new Form;
+		$form->setMethod($form::Get);
+
+		$form->addSelect('pageSize', 'Items per page', items: $this->getPageSizeItems())
+			->setHtmlAttribute('data-items-page')
+			->setDefaultValue($this->currentPageSize);
+
+		$form->onSuccess[] = function (Form $form, \stdClass $values): void {
+			if ($this->onPageChanged) {
+				($this->onPageChanged)(Options::DefaultPage, (int) $values->pageSize);
+			}
+		};
+
+		return $form;
+	}
+
+
+	/** @return array<int, string> */
+	private function getPageSizeItems(): array
+	{
+		return [
+			20 => '20',
+			50 => '50',
+			100 => '100',
+			0 => 'All',
+		];
 	}
 }

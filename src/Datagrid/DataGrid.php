@@ -285,6 +285,33 @@ class DataGrid extends Control
 	}
 
 
+	/**
+	 * Redraws the DataGrid component and its subcomponents in AJAX requests
+	 * while preserving filters, sorting, and pagination.
+	 * @throws InvalidLinkException
+	 */
+	public function redrawDataGrid(): void
+	{
+		if (!$this->getPresenter()->isAjax()) {
+			return;
+		}
+
+		if ($this->historyUrl !== null) {
+			$this->getPresenter()->payload->postGet = true;
+			$this->getPresenter()->payload->url = $this->historyUrl;
+			$this->historyUrl = null;
+		} else {
+			$this->getPresenter()->payload->url = $this->getPresenter()->link('//this');
+		}
+
+		$this->redrawControl('dataGrid');
+
+		foreach ([$this['paginator'], $this['filters'], $this['pageSize']] as $component) {
+			$component->redrawControl();
+		}
+	}
+
+
 	protected function createComponentFilters(): FilterTextControl
 	{
 		$filter = new FilterTextControl;
@@ -556,32 +583,5 @@ class DataGrid extends Control
 		$this['pageSize']->setCurrentPageSize($this->itemsPerPage);
 
 		$template->render();
-	}
-
-
-	/**
-	 * Redraws the DataGrid component and its subcomponents in AJAX requests
-	 * while preserving filters, sorting, and pagination.
-	 * @throws InvalidLinkException
-	 */
-	public function redrawDataGrid(): void
-	{
-		if (!$this->getPresenter()->isAjax()) {
-			return;
-		}
-
-		if ($this->historyUrl !== null) {
-			$this->getPresenter()->payload->postGet = true;
-			$this->getPresenter()->payload->url = $this->historyUrl;
-			$this->historyUrl = null;
-		} else {
-			$this->getPresenter()->payload->url = $this->getPresenter()->link('//this');
-		}
-
-		$this->redrawControl('dataGrid');
-
-		foreach ([$this['paginator'], $this['filters'], $this['pageSize']] as $component) {
-			$component->redrawControl();
-		}
 	}
 }
