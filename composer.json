@@ -30,12 +30,12 @@
 			"Drago\\": "src"
 		}
 	},
-	"scripts": {
-		"phpstan": "phpstan analyse"
-	},
 	"extra": {
 		"drago-translator": {
 			"translation": "src/Datagrid/Translate"
 		}
+	},
+	"scripts": {
+		"phpstan": "phpstan analyse"
 	}
 }
