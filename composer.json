@@ -2,7 +2,7 @@
 	"name": "drago-ex/datagrid",
 	"description": "A simple datagrid for sorting and filtering data.",
 	"type": "library",
-	"license": ["MIT"],
+	"license": "MIT",
 	"authors": [
 		{
 			"name": "Zdeněk Papučík",
@@ -25,7 +25,9 @@
 		"phpstan/phpstan-nette": "^2.0"
 	},
 	"autoload": {
-		"classmap": ["src/"],
+		"classmap": [
+			"src/"
+		],
 		"psr-4": {
 			"Drago\\": "src"
 		}
@@ -36,6 +38,7 @@
 		}
 	},
 	"scripts": {
-		"phpstan": "phpstan analyse"
+		"phpstan": "phpstan analyse",
+		"tester": "tester tests -s"
 	}
 }

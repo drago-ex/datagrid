@@ -4,11 +4,12 @@ Drago DataGrid is a Nette component for rendering Bootstrap 5 tables with filter
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/drago-ex/datagrid/blob/main/license)
 [![PHP version](https://badge.fury.io/ph/drago-ex%2Fdatagrid.svg)](https://badge.fury.io/ph/drago-ex%2Fdatagrid)
+[![Tests](https://github.com/drago-ex/datagrid/actions/workflows/tests.yml/badge.svg)](https://github.com/drago-ex/datagrid/actions/workflows/tests.yml)
 [![Coding Style](https://github.com/drago-ex/datagrid/actions/workflows/coding-style.yml/badge.svg)](https://github.com/drago-ex/datagrid/actions/workflows/coding-style.yml)
 
 ## Requirements
 
-- PHP >= 8.3
+- PHP >= 8.3, < 9
 - Nette Framework
 - Dibi
 - Latte
