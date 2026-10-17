@@ -24,6 +24,9 @@ class Options
 	public const int DefaultPage = 1;
 	public const int DefaultItemsPerPage = 20;
 
+	/** Page sizes offered to the user; 0 means all rows. */
+	public const array PageSizes = [20, 50, 100, 0];
+
 	public const string FilterModeTop = 'top';
 	public const string FilterModeInline = 'inline';
 }

@@ -9,49 +9,43 @@ declare(strict_types=1);
 
 namespace Drago\Datagrid\Filter;
 
+use DateTimeImmutable;
 use Dibi\Fluent;
 
 
 /**
  * Date-based DataGrid filter.
- * Supports filtering by date range or specific date.
+ * Supports filtering by a specific date (YYYY-MM-DD) or a range (YYYY-MM-DD|YYYY-MM-DD, either side optional).
+ * Values come from the URL, so invalid ones are ignored.
  */
 class DateFilter implements Filter
 {
-	/**
-	 * Applies date filter condition.
-	 * Supports format: YYYY-MM-DD or range: YYYY-MM-DD|YYYY-MM-DD
-	 * @throws \InvalidArgumentException
-	 */
 	public function apply(Fluent $fluent, string $column, mixed $value): void
 	{
-		if ($value === null || $value === '') {
+		if (!is_string($value) || $value === '') {
 			return;
 		}
 
-		$value = (string) $value;
-
-		// Check if it's a date range (format: YYYY-MM-DD|YYYY-MM-DD)
-		if (str_contains($value, '|')) {
-			[$fromDate, $toDate] = explode('|', $value, 2);
-			$fromDate = trim($fromDate);
-			$toDate = trim($toDate);
-
-			if ($fromDate !== '' && $toDate !== '') {
-				$this->validateDateFormat($fromDate);
-				$this->validateDateFormat($toDate);
-				$fluent->where('%n BETWEEN %s AND %s', $column, $fromDate, $toDate);
-			} elseif ($fromDate !== '') {
-				$this->validateDateFormat($fromDate);
-				$fluent->where('%n >= %s', $column, $fromDate);
-			} elseif ($toDate !== '') {
-				$this->validateDateFormat($toDate);
-				$fluent->where('%n <= %s', $column, $toDate);
+		if (!str_contains($value, '|')) {
+			if ($this->parseDate($value) !== null) {
+				$fluent->where('DATE(%n) = %s', $column, $value);
 			}
-		} else {
-			// Single date
-			$this->validateDateFormat($value);
-			$fluent->where('DATE(%n) = %s', $column, $value);
+			return;
+		}
+
+		[$fromDate, $toDate] = array_map('trim', explode('|', $value, 2));
+		$from = $fromDate === '' ? null : $this->parseDate($fromDate);
+		$to = $toDate === '' ? null : $this->parseDate($toDate);
+		if (($fromDate !== '' && $from === null) || ($toDate !== '' && $to === null)) {
+			return;
+		}
+
+		// Comparing with the start of the next day keeps the whole last day for DATETIME columns too.
+		if ($from !== null) {
+			$fluent->where('%n >= %s', $column, $from->format('Y-m-d'));
+		}
+		if ($to !== null) {
+			$fluent->where('%n < %s', $column, $to->modify('+1 day')->format('Y-m-d'));
 		}
 	}
 
@@ -65,16 +59,12 @@ class DateFilter implements Filter
 	}
 
 
-	/**
-	 * Validates that date string is in YYYY-MM-DD format.
-	 * @throws \InvalidArgumentException
-	 */
-	private function validateDateFormat(string $date): void
+	private function parseDate(string $date): ?DateTimeImmutable
 	{
-		if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
-			throw new \InvalidArgumentException(
-				'Date filter expects YYYY-MM-DD format, got: \'' . $date . '\'',
-			);
+		if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $date, $m) || !checkdate((int) $m[2], (int) $m[3], (int) $m[1])) {
+			return null;
 		}
+
+		return new DateTimeImmutable($date);
 	}
 }

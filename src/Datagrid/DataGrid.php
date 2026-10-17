@@ -26,8 +26,6 @@ use Nette\Application\UI\Control;
 use Nette\Application\UI\InvalidLinkException;
 use Nette\Localization\Translator;
 use Nette\Utils\Paginator as UtilsPaginator;
-use Tracy\Debugger;
-use Tracy\ILogger;
 
 
 /**
@@ -217,7 +215,7 @@ class DataGrid extends Control
 		?string $order = null,
 	): void
 	{
-		if ($id <= 0 || $page < 1 || $itemsPerPage < 1) {
+		if ($id <= 0 || $page < 1 || !in_array($itemsPerPage, Options::PageSizes, true)) {
 			return;
 		}
 		if ($order !== null && !in_array($order, [Options::OrderAsc, Options::OrderDesc], true)) {
@@ -248,6 +246,29 @@ class DataGrid extends Control
 				return;
 			}
 		}
+	}
+
+
+	/**
+	 * Persistent parameters come from the URL, so values the grid does not offer are replaced
+	 * with defaults: an unbounded page size could load the whole table.
+	 * @param array<string, mixed> $params
+	 */
+	public function loadState(array $params): void
+	{
+		parent::loadState($params);
+
+		if (!in_array($this->itemsPerPage, Options::PageSizes, true)) {
+			$this->itemsPerPage = Options::DefaultItemsPerPage;
+		}
+		if ($this->page < 1) {
+			$this->page = Options::DefaultPage;
+		}
+		if (!in_array($this->order, [Options::OrderAsc, Options::OrderDesc], true)) {
+			$this->order = Options::OrderAsc;
+		}
+
+		$this->filterValues = array_filter($this->filterValues, is_scalar(...));
 	}
 
 
@@ -461,13 +482,10 @@ class DataGrid extends Control
 
 		$data->removeClause('ORDER BY');
 
+		// Natural sort uses REGEXP_SUBSTR(), available in MySQL 8 and MariaDB 10.0.5+.
 		if ($columnObj->isNaturalSort()) {
-			try {
-				$data->orderBy("CAST(REGEXP_SUBSTR(%n, '[0-9]+') AS UNSIGNED) {$order}", $this->column);
-				return;
-			} catch (\Throwable $e) {
-				Debugger::log($e, ILogger::WARNING);
-			}
+			$data->orderBy("CAST(REGEXP_SUBSTR(%n, '[0-9]+') AS UNSIGNED) {$order}", $this->column);
+			return;
 		}
 
 		$data->orderBy("%n {$order}", $this->column);

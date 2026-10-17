@@ -62,6 +62,10 @@ final class PageSizeControl extends Control
 	public function handleSetPageSize(string|int $size): void
 	{
 		$size = (int) $size;
+		if (!in_array($size, Options::PageSizes, true)) {
+			return;
+		}
+
 		if ($this->onPageChanged) {
 			($this->onPageChanged)(Options::DefaultPage, $size);
 		}
@@ -104,11 +108,11 @@ final class PageSizeControl extends Control
 	/** @return array<int, string> */
 	private function getPageSizeItems(): array
 	{
-		return [
-			20 => '20',
-			50 => '50',
-			100 => '100',
-			0 => 'All',
-		];
+		$items = [];
+		foreach (Options::PageSizes as $size) {
+			$items[$size] = $size === 0 ? 'All' : (string) $size;
+		}
+
+		return $items;
 	}
 }
