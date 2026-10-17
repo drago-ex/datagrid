@@ -37,7 +37,7 @@ test('"All" is an allowed page size', function () {
 
 
 test('A page size that the grid does not offer falls back to the default', function () {
-	Assert::same(Options::DefaultItemsPerPage, loadState(['itemsPerPage' => 1000000])->itemsPerPage);
+	Assert::same(Options::DefaultItemsPerPage, loadState(['itemsPerPage' => 1_000_000])->itemsPerPage);
 	Assert::same(Options::DefaultItemsPerPage, loadState(['itemsPerPage' => -5])->itemsPerPage);
 });
 
