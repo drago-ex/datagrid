@@ -290,8 +290,7 @@ class DataGrid extends Control
 	 */
 	public function render(): void
 	{
-		$this->validateConfiguration();
-		$data = clone $this->source;
+		$data = clone $this->validateConfiguration();
 
 		$this['filters']->setValues($this->filterValues);
 
@@ -419,11 +418,11 @@ class DataGrid extends Control
 
 
 	/**
-	 * Validates configuration before rendering.
+	 * Validates configuration before rendering and returns the data source.
 	 * @throws InvalidConfigurationException
 	 * @throws InvalidDataSourceException
 	 */
-	private function validateConfiguration(): void
+	private function validateConfiguration(): Fluent
 	{
 		if ($this->source === null) {
 			throw new InvalidDataSourceException('Data source is not set.');
@@ -431,6 +430,8 @@ class DataGrid extends Control
 		if ($this->actions !== [] && $this->primaryKey === null) {
 			throw new InvalidConfigurationException('Primary key must be set when using actions.');
 		}
+
+		return $this->source;
 	}
 
 
@@ -575,7 +576,7 @@ class DataGrid extends Control
 		$template->primaryKey = $this->primaryKey;
 		$template->page = $this->paginator->getPage();
 		$template->itemsPerPage = $this->paginator->getItemsPerPage();
-		$template->totalItems = $this->paginator->getItemCount();
+		$template->totalItems = $this->totalItems;
 		$template->filters = $this->filterValues;
 		$hasFilters = false;
 		foreach ($this->columns as $column) {
@@ -593,7 +594,7 @@ class DataGrid extends Control
 		$this['paginator']->setPaginator(
 			$this->paginator->getPage(),
 			$this->paginator->getItemsPerPage(),
-			$this->paginator->getItemCount(),
+			$this->totalItems,
 		);
 		$this['paginator']->setSorting($this->column, $this->order);
 

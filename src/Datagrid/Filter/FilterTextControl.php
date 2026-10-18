@@ -52,7 +52,7 @@ final class FilterTextControl extends Control
 	 */
 	public function onFilterChanged(callable $callback): void
 	{
-		$this->onFilterChanged = $callback;
+		$this->onFilterChanged = $callback(...);
 	}
 
 
@@ -74,7 +74,7 @@ final class FilterTextControl extends Control
 	 */
 	public function onReset(callable $callback): void
 	{
-		$this->onReset = $callback;
+		$this->onReset = $callback(...);
 	}
 
 
@@ -83,7 +83,7 @@ final class FilterTextControl extends Control
 	 */
 	public function onClearFilter(callable $callback): void
 	{
-		$this->onClearFilter = $callback;
+		$this->onClearFilter = $callback(...);
 	}
 
 
