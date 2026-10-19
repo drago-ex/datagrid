@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Drago\Datagrid\Paginator;
 
 use Closure;
-use Drago\Datagrid\Options;
 use Nette\Application\UI\Control;
 use Nette\Localization\Translator;
 use Nette\Utils\Paginator as UtilsPaginator;
@@ -18,7 +17,7 @@ use Nette\Utils\Paginator as UtilsPaginator;
 
 /**
  * Paginator UI control for DataGrid.
- * Handles page changes, sorting, and rendering of pagination component.
+ * Handles page changes and renders the pagination.
  *
  * @property-read PaginatorTemplate $template
  */
@@ -26,12 +25,8 @@ final class PaginatorControl extends Control
 {
 	private UtilsPaginator $paginator;
 
-	/** @var Closure(int, ?string, ?string): void|null */
+	/** @var Closure(int): void|null */
 	private ?Closure $onPageChanged = null;
-
-	private ?string $column = null;
-
-	private string $order = Options::OrderAsc;
 
 	private ?Translator $translator = null;
 
@@ -58,7 +53,7 @@ final class PaginatorControl extends Control
 
 	/**
 	 * Registers a callback invoked when the page changes.
-	 * @param callable(int, ?string, ?string): void $callback
+	 * @param callable(int): void $callback
 	 */
 	public function onPageChanged(callable $callback): void
 	{
@@ -66,28 +61,17 @@ final class PaginatorControl extends Control
 	}
 
 
-	public function handlePage(int $page, ?string $column = null, ?string $order = null): void
+	/**
+	 * Sorting and filters are persistent parameters of the grid, so the links keep them.
+	 */
+	public function handlePage(int $page): void
 	{
 		$this->paginator->setPage($page);
 
-		if ($column !== null) {
-			$this->column = $column;
-		}
-		if ($order !== null) {
-			$this->order = $order;
-		}
-
 		if ($this->onPageChanged) {
-			($this->onPageChanged)($page, $this->column, $this->order);
+			($this->onPageChanged)($page);
 		}
 		$this->redrawControl();
-	}
-
-
-	public function setSorting(?string $column, string $order): void
-	{
-		$this->column = $column;
-		$this->order = $order;
 	}
 
 
@@ -99,8 +83,6 @@ final class PaginatorControl extends Control
 		}
 		$template->setFile(__DIR__ . '/Paginator.latte');
 		$template->paginator = $this->paginator;
-		$template->order = $this->order;
-		$template->column = $this->column;
 		$template->render();
 	}
 }

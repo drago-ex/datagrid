@@ -128,10 +128,10 @@ Column arguments:
 - `sortable` - enables header sorting, default is `true`
 - `formatter` - optional callback for rendering cell values
 
-Natural numeric sorting can be enabled on text columns:
+Natural sorting puts `Article 4` before `Article 40`; it orders by the text before the first number, then by the number and then by the whole value:
 
 ```php
-$grid->addColumnText('code', 'Code')->setNaturalSort();
+$grid->addColumnText('title', 'Title')->setNaturalSort();
 ```
 
 Natural sorting uses `REGEXP_SUBSTR()`, which needs MySQL 8 or MariaDB 10.0.5 and newer.
@@ -195,46 +195,37 @@ Set the primary key before adding actions:
 $grid->setPrimaryKey('id');
 ```
 
-Add action callbacks:
+Edit and delete have shortcuts with a primary and a danger button:
 
 ```php
-$grid->addAction('Edit', 'edit!', 'ajax btn btn-sm btn-primary', function (int $id): void {
-	$this->redirect('edit', $id);
-});
-
-$grid->addAction('Delete', 'delete!', 'ajax btn btn-sm btn-danger', function (int $id): void {
-	// Delete row
-});
+$grid->addActionEdit(fn(int $id) => $this->handleEdit($id));
+$grid->addActionDelete(fn(int $id) => $this->handleDelete($id));
 ```
 
-Actions can be shown or hidden per row:
+Other actions get a name, a label and a callback that receives the row ID:
 
 ```php
 $grid->addAction(
-	'Activate',
-	'activate!',
-	'ajax btn btn-sm btn-success',
+	name: 'activate',
+	label: 'Activate',
 	callback: fn(int $id) => $this->activate($id),
+	class: 'ajax btn btn-xs btn-success',
 	condition: fn(array $row): bool => !$row['active'],
 );
 ```
 
-The `condition` callback receives the current row as `array<string, mixed>`.
+The name only identifies the action (letters, digits, `-` and `_`); every action link leads to the grid's `action!` signal and keeps the current filters, page and sorting. The optional `condition` receives the row as `array<string, mixed>` and decides whether the row shows the action. Actions are displayed in the order they are added.
 
 ## Row Click
 
-The whole row can trigger an action:
+The whole row can run an action; its button is then not displayed:
 
 ```php
-$grid->setPrimaryKey('id');
-$grid->setRowClickAction('edit!');
-
-$grid->addAction('Edit', 'edit!', 'ajax btn btn-sm btn-primary', function (int $id): void {
-	$this->redirect('edit', $id);
-});
+$grid->setRowClickAction('edit');
+$grid->addActionEdit(fn(int $id) => $this->handleEdit($id));
 ```
 
-If the action signal matches `setRowClickAction()`, the action button is hidden and only the row click is used.
+The action must be added, otherwise rendering fails; when the action is added only for some users, set the row click in the same condition.
 
 ## Action Display
 
@@ -244,7 +235,12 @@ Show row actions only on hover:
 $grid->setAutoHideActions();
 ```
 
-Actions with signals `edit!` and `delete!` are displayed after other custom actions.
+## Upgrading from 1.x
+
+- `addAction($label, $signal, $class, $callback, $condition)` is now `addAction($name, $label, $callback, $class, $condition)` and returns the `Action`; the callback is required.
+- Action names have no `!`: `'edit!'` becomes `'edit'`, also in `setRowClickAction()`.
+- `edit` and `delete` are no longer moved to the end, actions keep the order they are added in.
+- The natural sort also orders by the text before the number; before, only the first number decided.
 
 ## Formatting Values
 
@@ -276,7 +272,7 @@ The grid supports `Nette\Localization\Translator`:
 $grid->setTranslator($this->translator);
 ```
 
-Translated values include column labels, action labels, filter labels, reset button and pagination text.
+Translated values include column labels, action labels, filter labels, reset button and pagination text; the bundled `cs` translations also cover the default `Edit` and `Delete` labels.
 
 ## AJAX
 

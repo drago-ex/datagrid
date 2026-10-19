@@ -50,3 +50,20 @@ test('Columns expose alignment and filter configuration', function () {
 	Assert::type(DateFilter::class, (new ColumnDate('created', 'Created'))->setFilterDate()->filter);
 	Assert::exception(fn() => $text->setAlign('invalid'), InvalidArgumentException::class);
 });
+
+
+test('A column orders by its value', function () {
+	$fluent = (new Dibi\Connection(['driver' => 'dummy']))->select('*')->from('items');
+	(new ColumnText('title', 'Title', true, null))->applySorting($fluent, 'DESC');
+	Assert::contains('ORDER BY [title] DESC', preg_replace('~\s+~', ' ', (string) $fluent));
+});
+
+
+test('The natural sort orders by the text before the number, the number and the whole value', function () {
+	$fluent = (new Dibi\Connection(['driver' => 'dummy']))->select('*')->from('items');
+	(new ColumnText('title', 'Title', true, null))->setNaturalSort()->applySorting($fluent, 'ASC');
+	Assert::contains(
+		"ORDER BY REGEXP_SUBSTR([title], '^[^0-9]*') ASC , CAST(REGEXP_SUBSTR([title], '[0-9]+') AS UNSIGNED) ASC , [title] ASC",
+		preg_replace('~\s+~', ' ', (string) $fluent),
+	);
+});

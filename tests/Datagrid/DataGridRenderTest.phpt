@@ -44,8 +44,8 @@ test('Rendering without a data source fails before anything is rendered', functi
 
 test('Actions need a primary key', function () {
 	$grid = (new DataGrid)
-		->setDataSource((new Connection(['driver' => 'dummy']))->select('*')->from('items'))
-		->addAction('Edit', 'edit!');
+		->setDataSource((new Connection(['driver' => 'dummy']))->select('*')->from('items'));
+	$grid->addActionEdit(fn(int $id) => null);
 
 	Assert::exception(
 		fn() => $grid->render(),
@@ -69,9 +69,9 @@ test('The paginator callback may be any callable', function () {
 	$recorder = new CallbackRecorder;
 	$control = new PaginatorControl;
 	$control->onPageChanged([$recorder, 'record']);
-	$control->handlePage(3, 'name', Options::OrderDesc);
+	$control->handlePage(3);
 
-	Assert::same([[3, 'name', Options::OrderDesc]], $recorder->calls);
+	Assert::same([[3]], $recorder->calls);
 });
 
 

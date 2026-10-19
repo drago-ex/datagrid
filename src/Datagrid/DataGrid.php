@@ -55,7 +55,7 @@ class DataGrid extends Control
 	/** @var array<string, Column> */
 	private array $columns = [];
 
-	/** @var list<Action> */
+	/** @var array<string, Action> */
 	private array $actions = [];
 
 	private string $filterMode = Options::FilterModeTop;
@@ -78,9 +78,12 @@ class DataGrid extends Control
 	}
 
 
-	public function setRowClickAction(string $signal): self
+	/**
+	 * A click on the row runs the action with this name; its button is then not rendered.
+	 */
+	public function setRowClickAction(string $name): self
 	{
-		$this->rowClickAction = $signal;
+		$this->rowClickAction = $name;
 		return $this;
 	}
 
@@ -158,42 +161,68 @@ class DataGrid extends Control
 
 
 	/**
-	 * Adds a row action with optional callback and optional visibility condition.
-	 * @param callable(array<string, mixed>): bool|null $condition
+	 * Adds a row action; actions are rendered in the order they are added.
+	 * @param callable(int): void $callback Receives the row ID
+	 * @param callable(array<string, mixed>): bool|null $condition Decides whether the row shows the action
+	 * @throws InvalidConfigurationException
 	 */
 	public function addAction(
+		string $name,
 		string $label,
-		string $signal,
+		callable $callback,
 		?string $class = null,
-		?callable $callback = null,
 		?callable $condition = null,
-	): self
+	): Action
 	{
-		$action = new Action($label, $signal, $class);
-		if ($callback !== null) {
-			$action->addCallback($callback);
+		if (!preg_match('#^[a-zA-Z0-9_-]+$#D', $name)) {
+			throw new InvalidConfigurationException("Action name '$name' may contain only letters, digits, '-' and '_'.");
 		}
+		if (isset($this->actions[$name])) {
+			throw new InvalidConfigurationException("Action '$name' already exists.");
+		}
+
+		$action = new Action($name, $label, $callback, $class);
 		if ($condition !== null) {
 			$action->setCondition($condition);
 		}
-		$this->actions[] = $action;
-		return $this;
+		return $this->actions[$name] = $action;
 	}
 
 
-	public function handleSort(string $column, int $page, string $sortOrder = Options::OrderAsc): void
+	/**
+	 * Adds the 'edit' action with a primary button.
+	 * @param callable(int): void $callback Receives the row ID
+	 * @throws InvalidConfigurationException
+	 */
+	public function addActionEdit(callable $callback, string $label = 'Edit'): Action
+	{
+		return $this->addAction('edit', $label, $callback, 'ajax btn btn-xs btn-primary');
+	}
+
+
+	/**
+	 * Adds the 'delete' action with a danger button.
+	 * @param callable(int): void $callback Receives the row ID
+	 * @throws InvalidConfigurationException
+	 */
+	public function addActionDelete(callable $callback, string $label = 'Delete'): Action
+	{
+		return $this->addAction('delete', $label, $callback, 'ajax btn btn-xs btn-danger');
+	}
+
+
+	/**
+	 * Sorts by the column; the current page, filters and page size stay in the persistent parameters.
+	 */
+	public function handleSort(string $column, string $sortOrder = Options::OrderAsc): void
 	{
 		if (!isset($this->columns[$column]) || !$this->columns[$column]->sortable) {
-			return;
-		}
-		if ($page < 1) {
 			return;
 		}
 		if (!in_array($sortOrder, [Options::OrderAsc, Options::OrderDesc], true)) {
 			return;
 		}
 
-		$this->page = $page;
 		$this->column = $column;
 		$this->order = $sortOrder;
 
@@ -202,50 +231,18 @@ class DataGrid extends Control
 
 
 	/**
-	 * Handles execution of row actions while preserving current grid state.
-	 * @param array<string, mixed> $filters
+	 * Executes a row action; the grid state (filters, page, sorting) comes from the persistent
+	 * parameters, which every link of the grid carries.
 	 */
-	public function handleAction(
-		string $signal,
-		int $id,
-		array $filters = [],
-		int $page = Options::DefaultPage,
-		int $itemsPerPage = Options::DefaultItemsPerPage,
-		?string $column = null,
-		?string $order = null,
-	): void
+	public function handleAction(string $name, int $id): void
 	{
-		if ($id <= 0 || $page < 1 || !in_array($itemsPerPage, Options::PageSizes, true)) {
-			return;
-		}
-		if ($order !== null && !in_array($order, [Options::OrderAsc, Options::OrderDesc], true)) {
-			return;
-		}
-
-		$validSignals = array_map(fn(Action $a) => $a->signal, $this->actions);
-		if (!in_array($signal, $validSignals, true)) {
+		$action = $this->actions[$name] ?? null;
+		if ($action === null || $id <= 0) {
 			return;
 		}
 
-		if (!empty($filters)) {
-			$this->filterValues = $filters;
-		}
-		$this->page = $page;
-		$this->itemsPerPage = $itemsPerPage;
-		if ($column !== null && isset($this->columns[$column])) {
-			$this->column = $column;
-		}
-		if ($order !== null) {
-			$this->order = $order;
-		}
-
-		foreach ($this->actions as $action) {
-			if ($action->signal === $signal) {
-				$action->execute($id);
-				$this->redrawDataGrid();
-				return;
-			}
-		}
+		$action->execute($id);
+		$this->redrawDataGrid();
 	}
 
 
@@ -367,20 +364,13 @@ class DataGrid extends Control
 	{
 		$control = new PaginatorControl;
 		$control->setTranslator($this->translator);
-		$control->onPageChanged(function (int $page, ?string $column, ?string $order): void {
+		$control->onPageChanged(function (int $page): void {
 			$this->page = $page;
-			if ($column !== null) {
-				$this->column = $column;
-			}
-			if ($order !== null) {
-				$this->order = $order;
-			}
 			$this->redrawDataGrid();
 		});
 
 		if ($this->paginator->getItemCount() > 0) {
 			$control->setPaginator($this->paginator->getPage(), $this->paginator->getItemsPerPage(), $this->paginator->getItemCount());
-			$control->setSorting($this->column, $this->order);
 		}
 
 		return $control;
@@ -429,6 +419,9 @@ class DataGrid extends Control
 		}
 		if ($this->actions !== [] && $this->primaryKey === null) {
 			throw new InvalidConfigurationException('Primary key must be set when using actions.');
+		}
+		if ($this->rowClickAction !== null && !isset($this->actions[$this->rowClickAction])) {
+			throw new InvalidConfigurationException("Row click action '{$this->rowClickAction}' is not added by addAction().");
 		}
 
 		return $this->source;
@@ -482,14 +475,7 @@ class DataGrid extends Control
 			: Options::OrderAsc;
 
 		$data->removeClause('ORDER BY');
-
-		// Natural sort uses REGEXP_SUBSTR(), available in MySQL 8 and MariaDB 10.0.5+.
-		if ($columnObj->isNaturalSort()) {
-			$data->orderBy("CAST(REGEXP_SUBSTR(%n, '[0-9]+') AS UNSIGNED) {$order}", $this->column);
-			return;
-		}
-
-		$data->orderBy("%n {$order}", $this->column);
+		$columnObj->applySorting($data, $order);
 	}
 
 
@@ -558,19 +544,7 @@ class DataGrid extends Control
 		$template->columnName = $this->column;
 		$template->order = $this->order;
 
-		// Sort actions: special actions first, edit and delete last
-		$actions = $this->actions;
-		usort($actions, function (Action $a, Action $b): int {
-			$standard = ['edit!', 'delete!'];
-			$isAStandard = in_array($a->signal, $standard, true);
-			$isBStandard = in_array($b->signal, $standard, true);
-			if ($isAStandard === $isBStandard) {
-				return 0;
-			}
-			return $isAStandard ? 1 : -1;
-		});
-
-		$template->actions = $actions;
+		$template->actions = array_values($this->actions);
 		$template->autoHideActions = $this->autoHideActions;
 		$template->rowClickAction = $this->rowClickAction;
 		$template->primaryKey = $this->primaryKey;
@@ -596,7 +570,6 @@ class DataGrid extends Control
 			$this->paginator->getItemsPerPage(),
 			$this->totalItems,
 		);
-		$this['paginator']->setSorting($this->column, $this->order);
 
 		$this['pageSize']->setTotalItems($this->totalItems);
 		$this['pageSize']->setCurrentPageSize($this->itemsPerPage);

@@ -19,7 +19,8 @@ Use this file as package-specific guidance when working in this repository. Keep
 ## Key Parts
 - `Drago\Datagrid\DataGrid`: persistent parameters come from the URL; `loadState()` replaces unsupported page sizes (`Options::PageSizes`), pages and orders with defaults and drops non-scalar filter values.
 - Filters (`Filter\TextFilter`, `DateFilter`, `SelectFilter`) ignore invalid input instead of throwing; date ranges include the whole last day; select values must be configured options.
-- Natural sorting uses `REGEXP_SUBSTR()` (MySQL 8, MariaDB). The SQL of filters is tested with Dibi's `dummy` driver in `tests/Datagrid/FilterTest.phpt`.
+- Sorting is built by `Column::applySorting()`; the natural sort orders by the text before the first number, the number and the whole value, using `REGEXP_SUBSTR()` (MySQL 8, MariaDB 10.0.5+). The SQL of filters is tested with Dibi's `dummy` driver in `tests/Datagrid/FilterTest.phpt`.
+- Row actions (`Action`) are identified by a name without `!`; all of them go through the `action!` signal, whose links carry only the name and the row ID, the rest of the grid state comes from the persistent parameters (also for sorting and the paginator). Actions render in the order they are added; `setRowClickAction()` must name an added action.
 
 ## Dependencies
 

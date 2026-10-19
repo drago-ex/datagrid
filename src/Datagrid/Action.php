@@ -9,26 +9,35 @@ declare(strict_types=1);
 
 namespace Drago\Datagrid;
 
+use Closure;
 
+
+/**
+ * Row action. Its link always leads to the grid's action! signal, which calls the callback
+ * with the row ID; the name only identifies the action, it is not a signal of its own.
+ */
 class Action
 {
-	/** @var list<callable(int): void> */
-	private array $callbacks = [];
+	/** @var Closure(int): void */
+	private Closure $callback;
 
-	/** @var (callable(array<string, mixed>): bool)|null */
-	private $condition;
+	/** @var (Closure(array<string, mixed>): bool)|null */
+	private ?Closure $condition = null;
 
 
 	/**
+	 * @param string $name Action name, used in the link and in setRowClickAction()
 	 * @param string $label Action label displayed in the UI
-	 * @param string $signal Signal used for triggering this action
-	 * @param string|null $class Optional CSS class for the action link/button
+	 * @param callable(int): void $callback Receives the row ID
+	 * @param string|null $class CSS class of the link, default 'ajax text-decoration-none'
 	 */
 	public function __construct(
+		public readonly string $name,
 		public readonly string $label,
-		public readonly string $signal,
+		callable $callback,
 		public readonly ?string $class = null,
 	) {
+		$this->callback = $callback(...);
 	}
 
 
@@ -39,7 +48,7 @@ class Action
 	 */
 	public function setCondition(callable $condition): self
 	{
-		$this->condition = $condition;
+		$this->condition = $condition(...);
 		return $this;
 	}
 
@@ -50,33 +59,15 @@ class Action
 	 */
 	public function isVisible(array $row): bool
 	{
-		if ($this->condition === null) {
-			return true;
-		}
-		return ($this->condition)($row);
+		return $this->condition === null || ($this->condition)($row);
 	}
 
 
 	/**
-	 * Adds a callback to be executed when the action is triggered.
-	 * @param callable(int): void $callback Callback function receiving the row ID
-	 * @return $this Fluent interface
-	 */
-	public function addCallback(callable $callback): self
-	{
-		$this->callbacks[] = $callback;
-		return $this;
-	}
-
-
-	/**
-	 * Executes all registered callbacks with the given row ID.
-	 * @param int $id ID of the row this action is executed for
+	 * Executes the action for the row with the given ID.
 	 */
 	public function execute(int $id): void
 	{
-		foreach ($this->callbacks as $callback) {
-			$callback($id);
-		}
+		($this->callback)($id);
 	}
 }

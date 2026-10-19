@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Drago\Datagrid\Column;
 
 use Closure;
+use Dibi\Fluent;
 use Drago\Datagrid\Filter\Filter;
 
 
@@ -53,6 +54,23 @@ abstract class Column
 	public function isNaturalSort(): bool
 	{
 		return $this->naturalSort;
+	}
+
+
+	/**
+	 * Orders the query by this column. The natural sort orders by the text before the first
+	 * number, then by the number and then by the whole value, so 'Article 4' comes before
+	 * 'Article 40' and values without a number keep their alphabetical place.
+	 * REGEXP_SUBSTR() needs MySQL 8 or MariaDB 10.0.5+.
+	 */
+	public function applySorting(Fluent $data, string $order): void
+	{
+		if ($this->naturalSort) {
+			$data->orderBy("REGEXP_SUBSTR(%n, '^[^0-9]*') {$order}", $this->name)
+				->orderBy("CAST(REGEXP_SUBSTR(%n, '[0-9]+') AS UNSIGNED) {$order}", $this->name);
+		}
+
+		$data->orderBy("%n {$order}", $this->name);
 	}
 
 

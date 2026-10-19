@@ -79,7 +79,7 @@
 		<tbody>
 		{foreach $rows as $row}
 			<tr n:class="$rowClickAction ? 'datagrid-row-clickable ajax', $autoHideActions ? 'datagrid-actions-autohide'"
-				n:attr="data-row-click-url => $rowClickAction && $primaryKey ? $control->link('action!', ['signal' => $rowClickAction, 'id' => $row[$primaryKey], 'filters' => $filters, 'page' => $page, 'itemsPerPage' => $itemsPerPage, 'column' => $columnName, 'order' => $order]) : null">
+				n:attr="data-row-click-url => $rowClickAction && $primaryKey ? $control->link('action!', ['name' => $rowClickAction, 'id' => $row[$primaryKey]]) : null">
 				{foreach $columns as $col}
 					{* renderCell() escapes the value itself, only an Html object from a formatter stays HTML *}
 					<td n:class="$col->getAlignClass()">{$col->renderCell((array) $row)|noescape}</td>
@@ -88,8 +88,8 @@
 				{if $actions !== []}
 					<td class="text-end">
 						{foreach $actions as $ac}
-							{if $ac->signal !== $rowClickAction && $ac->isVisible((array) $row)}
-								{include 'action', signal: $ac->signal, label: $ac->label, id: $row[$primaryKey], class: $ac->class, filters: $filters, page: $page, itemsPerPage: $itemsPerPage, column: $columnName, order: $order}
+							{if $ac->name !== $rowClickAction && $ac->isVisible((array) $row)}
+								{include 'action', name: $ac->name, label: $ac->label, id: $row[$primaryKey], class: $ac->class}
 							{/if}
 						{/foreach}
 					</td>
