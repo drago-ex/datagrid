@@ -53,3 +53,21 @@ test('Filter values that are not scalars are dropped', function () {
 	$grid = loadState(['filterValues' => ['name' => 'John', 'created' => ['2024-01-01']]]);
 	Assert::same(['name' => 'John'], $grid->getFilterValues());
 });
+
+
+test('Sorting, filters, paging and the page size are read-only signals, row actions are not', function () {
+	foreach ([
+		['articles-dataGrid', 'sort'],
+		['articles-grid-filters', 'resetFilters'],
+		['articles-grid-filters', 'clearFilter'],
+		['articles-grid-filters-form', 'submit'],
+		['articles-grid-paginator', 'page'],
+		['articles-grid-pageSize', 'setPageSize'],
+	] as [$receiver, $signal]) {
+		Assert::true(DataGrid::isReadOnlySignal($receiver, $signal), "$receiver:$signal");
+	}
+
+	Assert::false(DataGrid::isReadOnlySignal('articles-grid', 'action'));
+	Assert::false(DataGrid::isReadOnlySignal('articles-delete', 'submit'));
+	Assert::false(DataGrid::isReadOnlySignal('articles', 'delete'));
+});

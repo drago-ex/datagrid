@@ -12,7 +12,6 @@ namespace Drago\Datagrid\PageSize;
 use Closure;
 use Drago\Datagrid\Options;
 use Nette\Application\UI\Control;
-use Nette\Application\UI\Form;
 use Nette\Localization\Translator;
 
 
@@ -83,25 +82,6 @@ final class PageSizeControl extends Control
 		$this->template->currentSize = $this->currentPageSize;
 		$this->template->totalItems = $this->totalItems;
 		$this->template->render();
-	}
-
-
-	protected function createComponentForm(): Form
-	{
-		$form = new Form;
-		$form->setMethod($form::Get);
-
-		$form->addSelect('pageSize', 'Items per page', items: $this->getPageSizeItems())
-			->setHtmlAttribute('data-items-page')
-			->setDefaultValue($this->currentPageSize);
-
-		$form->onSuccess[] = function (Form $form, \stdClass $values): void {
-			if ($this->onPageChanged) {
-				($this->onPageChanged)(Options::DefaultPage, (int) $values->pageSize);
-			}
-		};
-
-		return $form;
 	}
 
 

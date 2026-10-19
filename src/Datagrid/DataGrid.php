@@ -162,6 +162,7 @@ class DataGrid extends Control
 
 	/**
 	 * Adds a row action; actions are rendered in the order they are added.
+	 * The grid is not redrawn after the action, the callback calls redrawDataGrid() when it changes data.
 	 * @param callable(int): void $callback Receives the row ID
 	 * @param callable(array<string, mixed>): bool|null $condition Decides whether the row shows the action
 	 * @throws InvalidConfigurationException
@@ -241,8 +242,9 @@ class DataGrid extends Control
 			return;
 		}
 
+		// Opening a form or a dialog changes nothing in the grid, so the callback calls
+		// redrawDataGrid() itself when the action changes the data.
 		$action->execute($id);
-		$this->redrawDataGrid();
 	}
 
 
@@ -266,6 +268,23 @@ class DataGrid extends Control
 		}
 
 		$this->filterValues = array_filter($this->filterValues, is_scalar(...));
+	}
+
+
+	/**
+	 * Tells whether a signal (as returned by Presenter::getSignal()) only changes what a grid shows:
+	 * sorting, the filters with their form, the paginator and the page size. Row actions are not
+	 * read-only. Meant for ACL checks such as the isReadOnlySignal() hook of drago-ex/permission.
+	 */
+	public static function isReadOnlySignal(string $receiver, string $signal): bool
+	{
+		$path = explode('-', $receiver);
+		if (end($path) === 'form') {
+			array_pop($path);
+		}
+
+		return in_array(end($path), ['filters', 'paginator', 'pageSize'], true)
+			|| $signal === 'sort';
 	}
 
 

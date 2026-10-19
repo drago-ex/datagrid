@@ -214,7 +214,7 @@ $grid->addAction(
 );
 ```
 
-The name only identifies the action (letters, digits, `-` and `_`); every action link leads to the grid's `action!` signal and keeps the current filters, page and sorting. The optional `condition` receives the row as `array<string, mixed>` and decides whether the row shows the action. Actions are displayed in the order they are added.
+The name only identifies the action (letters, digits, `-` and `_`); every action link leads to the grid's `action!` signal and keeps the current filters, page and sorting. The optional `condition` receives the row as `array<string, mixed>` and decides whether the row shows the action. Actions are displayed in the order they are added. The grid is not redrawn after an action, because opening a form or a dialog changes nothing in it; a callback that changes data calls `$grid->redrawDataGrid()`.
 
 ## Row Click
 
@@ -241,6 +241,7 @@ $grid->setAutoHideActions();
 - Action names have no `!`: `'edit!'` becomes `'edit'`, also in `setRowClickAction()`.
 - `edit` and `delete` are no longer moved to the end, actions keep the order they are added in.
 - The natural sort also orders by the text before the number; before, only the first number decided.
+- The grid is no longer redrawn after every action; call `redrawDataGrid()` in callbacks that change data.
 
 ## Formatting Values
 

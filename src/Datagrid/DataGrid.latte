@@ -6,11 +6,8 @@
 {snippet dataGrid}
 	{var $hasActiveFilters = array_filter($filters, fn($v) => $v !== null && $v !== '') !== []}
 
-	{if $hasFilters && $filterMode === 'top'}
-		{control filters}
-	{/if}
-
-	{if $hasFilters && $filterMode === 'inline'}
+	{* in the inline mode the control renders only the form, its inputs are in the table header *}
+	{if $hasFilters}
 		{control filters}
 	{/if}
 
