@@ -16,6 +16,11 @@ Use this file as package-specific guidance when working in this repository. Keep
 - `.github/`: CI workflows; keep their PHP versions and commands consistent with Composer and the package scripts.
 - `composer.json`: package metadata, dependency constraints, autoloading, and available Composer scripts.
 
+## Key Parts
+- `Drago\Datagrid\DataGrid`: persistent parameters come from the URL; `loadState()` replaces unsupported page sizes (`Options::PageSizes`), pages and orders with defaults and drops non-scalar filter values.
+- Filters (`Filter\TextFilter`, `DateFilter`, `SelectFilter`) ignore invalid input instead of throwing; date ranges include the whole last day; select values must be configured options.
+- Natural sorting uses `REGEXP_SUBSTR()` (MySQL 8, MariaDB). The SQL of filters is tested with Dibi's `dummy` driver in `tests/Datagrid/FilterTest.phpt`.
+
 ## Dependencies
 
 Composer constraints describe the package contract. Before changing integration behavior, inspect the source and the actual call sites in this package; do not infer runtime usage solely from dependency declarations.

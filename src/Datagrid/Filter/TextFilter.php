@@ -23,7 +23,7 @@ class TextFilter implements Filter
 	 */
 	public function apply(Fluent $fluent, string $column, mixed $value): void
 	{
-		if ($value === null || $value === '') {
+		if (!is_scalar($value) || $value === '') {
 			return;
 		}
 

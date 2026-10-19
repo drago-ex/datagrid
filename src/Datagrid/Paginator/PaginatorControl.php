@@ -62,7 +62,7 @@ final class PaginatorControl extends Control
 	 */
 	public function onPageChanged(callable $callback): void
 	{
-		$this->onPageChanged = $callback;
+		$this->onPageChanged = $callback(...);
 	}
 
 

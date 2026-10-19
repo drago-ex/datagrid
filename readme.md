@@ -134,6 +134,8 @@ Natural numeric sorting can be enabled on text columns:
 $grid->addColumnText('code', 'Code')->setNaturalSort();
 ```
 
+Natural sorting uses `REGEXP_SUBSTR()`, which needs MySQL 8 or MariaDB 10.0.5 and newer.
+
 Column text alignment can be changed with Bootstrap alignment helpers:
 
 ```php
@@ -162,7 +164,8 @@ Filter types:
 - `setFilterSelect(array $items)` - exact match select
 - `setFilterDate()` - date filter in `YYYY-MM-DD` format
 
-Date filters also support range values in the form `YYYY-MM-DD|YYYY-MM-DD`.
+Date filters also support range values in the form `YYYY-MM-DD|YYYY-MM-DD`; either side can be empty.
+Both days are included, also for DATETIME columns.
 
 Active filters can be cleared individually with the small clear button next to the filter input. The reset button clears all filters at once.
 
@@ -285,5 +288,7 @@ Text filters are submitted by pressing Enter. Select and date filters are submit
 
 - Cell values are escaped unless a formatter returns `Nette\Utils\Html`.
 - Filters use parameterized Dibi queries.
+- Filter values come from the URL, so invalid values are ignored: a date that is not `YYYY-MM-DD`, an array instead of a single value, or a select value that is not one of the configured options.
+- Page size is limited to the offered values (20, 50, 100 and All); other values from the URL use the default.
 - Sort direction is normalized to `ASC` or `DESC` before it is applied to SQL.
 - Empty filter values are removed from persistent parameters.
