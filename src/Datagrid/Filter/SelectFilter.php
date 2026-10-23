@@ -20,13 +20,17 @@ class SelectFilter implements Filter
 	/** @var array<int|string, string> */
 	public array $items;
 
+	/** Whether the option labels are translated; data (e.g. names from the database) are not. */
+	public bool $translate;
+
 
 	/**
 	 * @param array<int|string, string> $items Dropdown options
 	 */
-	public function __construct(array $items)
+	public function __construct(array $items, bool $translate = true)
 	{
 		$this->items = $items;
+		$this->translate = $translate;
 	}
 
 

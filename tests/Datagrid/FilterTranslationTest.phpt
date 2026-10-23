@@ -1,0 +1,74 @@
+<?php
+
+/**
+ * Test: DataGrid select filter and the translator
+ */
+
+declare(strict_types=1);
+
+use Drago\Datagrid\Column\ColumnText;
+use Drago\Datagrid\Filter\FilterTextControl;
+use Nette\Application\UI\Presenter;
+use Nette\Forms\Controls\SelectBox;
+use Nette\Http\Request;
+use Nette\Http\Response;
+use Nette\Http\UrlScript;
+use Nette\Localization\Translator;
+use Tester\Assert;
+
+require __DIR__ . '/../bootstrap.php';
+
+
+/** Translates by a dictionary and remembers the messages it was asked for. */
+final class RecordingTranslator implements Translator
+{
+	/** @var list<string> */
+	public array $asked = [];
+
+
+	public function translate(string|Stringable $message, mixed ...$parameters): string
+	{
+		$this->asked[] = (string) $message;
+		return ['Category' => 'Kategorie', 'All' => 'Vše', 'Draft' => 'Koncept'][(string) $message] ?? (string) $message;
+	}
+}
+
+
+function filterSelect(ColumnText $column, Translator $translator): SelectBox
+{
+	$control = new FilterTextControl;
+	$control->setTranslator($translator);
+	$control->setColumns([$column->name => $column]);
+
+	$presenter = new class extends Presenter {
+	};
+	$presenter->setParent(null, 'Test');
+	$presenter->injectPrimary(new Request(new UrlScript('http://example.com/')), new Response);
+	$presenter->addComponent($control, 'filters');
+
+	$select = $control['form'][$column->name];
+	assert($select instanceof SelectBox);
+	return $select;
+}
+
+
+test('Items of a select filter are translated by default', function () {
+	$translator = new RecordingTranslator;
+	$select = filterSelect((new ColumnText('status', 'Status', true, null))->setFilterSelect(['draft' => 'Draft']), $translator);
+
+	Assert::contains('>Koncept</option>', (string) $select->getControl());
+});
+
+
+test('Items marked as data are not sent to the translator, the caption and the prompt still are', function () {
+	$translator = new RecordingTranslator;
+	$column = (new ColumnText('category_id', 'Category', true, null))->setFilterSelect([1 => 'News', 2 => 'Draft'], translate: false);
+	$select = filterSelect($column, $translator);
+	$html = (string) $select->getControl() . $select->getLabel();
+
+	Assert::contains('>Vše</option>', $html);
+	Assert::contains('>Draft</option>', $html);
+	Assert::contains('Kategorie', $html);
+	Assert::notContains('News', $translator->asked);
+	Assert::notContains('Draft', $translator->asked);
+});

@@ -27,10 +27,13 @@ class ColumnText extends Column
 	}
 
 
-	/** @param array<int|string, string> $items */
-	public function setFilterSelect(array $items): self
+	/**
+	 * @param array<int|string, string> $items
+	 * @param bool $translate false for data such as names from the database, which the translator does not know
+	 */
+	public function setFilterSelect(array $items, bool $translate = true): self
 	{
-		$this->setFilter(new SelectFilter($items));
+		$this->setFilter(new SelectFilter($items, $translate));
 		return $this;
 	}
 

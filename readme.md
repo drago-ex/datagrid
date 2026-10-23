@@ -163,7 +163,7 @@ $grid->addColumnDate('created_at', 'Created')->setFilterDate();
 
 Filter types:
 - `setFilterText()` - LIKE search
-- `setFilterSelect(array $items)` - exact match select
+- `setFilterSelect(array $items, bool $translate = true)` - exact match select
 - `setFilterDate()` - date filter in `YYYY-MM-DD` format
 
 Date filters also support range values in the form `YYYY-MM-DD|YYYY-MM-DD`; either side can be empty.
@@ -279,6 +279,14 @@ $grid->setTranslator($this->translator);
 ```
 
 Translated values include column labels, action labels, filter labels, reset button and pagination text; the bundled `cs` translations also cover the default `Edit` and `Delete` labels.
+
+Options of a select filter are translated too. Options that are data, such as names from the database, are left
+untranslated with `translate: false`, so the translator does not report them as missing:
+
+```php
+$grid->addColumnText('category_id', 'Category')
+	->setFilterSelect($categories, translate: false);
+```
 
 ## AJAX
 

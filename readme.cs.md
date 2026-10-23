@@ -163,7 +163,7 @@ $grid->addColumnDate('created_at', 'Created')->setFilterDate();
 
 Typy filtrů:
 - `setFilterText()` - hledání přes LIKE
-- `setFilterSelect(array $items)` - výběr s přesnou shodou
+- `setFilterSelect(array $items, bool $translate = true)` - výběr s přesnou shodou
 - `setFilterDate()` - filtr data ve formátu `YYYY-MM-DD`
 
 Filtry data podporují i rozsah ve tvaru `YYYY-MM-DD|YYYY-MM-DD`; kterákoli strana může být prázdná.
@@ -279,6 +279,14 @@ $grid->setTranslator($this->translator);
 ```
 
 Překládají se popisky sloupců, akcí a filtrů, tlačítko pro reset a texty stránkování; dodané překlady `cs` pokrývají i výchozí popisky `Edit` a `Delete`.
+
+Překládají se i položky výběrového filtru. Položky, které jsou daty, třeba názvy z databáze, nechte nepřeložené
+pomocí `translate: false`, aby je translator nehlásil jako chybějící:
+
+```php
+$grid->addColumnText('category_id', 'Category')
+	->setFilterSelect($categories, translate: false);
+```
 
 ## AJAX
 

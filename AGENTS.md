@@ -7,7 +7,7 @@ Use this file as package-specific guidance when working in this repository. Keep
 - **Type**: library
 - **Purpose**: A simple datagrid for sorting and filtering data.
 - **PHP**: >=8.3 <9
-- **Runtime dependencies**: latte/latte (^3.1), tracy/tracy (^2.11), dibi/dibi (^5.0), nette/application (^3.2), nette/forms (^3.2)
+- **Runtime dependencies**: latte/latte (^3.1), tracy/tracy (^2.11), dibi/dibi (^5.0), nette/application (^3.2), nette/forms (^3.2), nette/utils (^4.0)
 - **License**: MIT
 
 ## Repository Layout
@@ -18,7 +18,7 @@ Use this file as package-specific guidance when working in this repository. Keep
 
 ## Key Parts
 - `Drago\Datagrid\DataGrid`: persistent parameters come from the URL; `loadState()` replaces unsupported page sizes (`Options::PageSizes`), pages and orders with defaults and drops non-scalar filter values.
-- Filters (`Filter\TextFilter`, `DateFilter`, `SelectFilter`) ignore invalid input instead of throwing; date ranges include the whole last day; select values must be configured options.
+- Filters (`Filter\TextFilter`, `DateFilter`, `SelectFilter`) ignore invalid input instead of throwing; date ranges include the whole last day; select values must be configured options. `setFilterSelect($items, translate: false)` is for data (e.g. names from the database): the top filter form wraps those items in `Html` (Nette does not translate `HtmlStringable`, the caption and the prompt still are), the inline template prints them as they are; translated items are translated in both modes. The page size select translates only "All", not the numbers.
 - Sorting is built by `Column::applySorting()`; the natural sort orders by the text before the first number, the number and the whole value, using `REGEXP_SUBSTR()` (MySQL 8, MariaDB 10.0.5+). The SQL of filters is tested with Dibi's `dummy` driver in `tests/Datagrid/FilterTest.phpt`.
 - Row actions (`Action`) are identified by a name without `!`; all of them go through the `action!` signal, whose links carry only the name and the row ID, the rest of the grid state comes from the persistent parameters (also for sorting and the paginator). Actions render in the order they are added; `setRowClickAction()` must name an added action. `Action::setVisible(false)` hides an action (button and row click) in all rows, e.g. by permission; it does not refuse the signal.
 

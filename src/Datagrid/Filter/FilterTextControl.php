@@ -10,6 +10,7 @@ use Drago\Datagrid\Options;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
 use Nette\Localization\Translator;
+use Nette\Utils\Html;
 use stdClass;
 
 
@@ -182,7 +183,11 @@ final class FilterTextControl extends Control
 
 				} elseif ($type === 'select') {
 					$items = $column->filter instanceof SelectFilter ? $column->filter->items : [];
-					$form->addSelect($name, $column->label, $items)
+					$options = $column->filter instanceof SelectFilter && !$column->filter->translate
+						? array_map(fn(string $label): Html => Html::el()->setText($label), $items) // Html is not translated
+						: $items;
+
+					$form->addSelect($name, $column->label, $options)
 						->setHtmlAttribute('class', 'form-select form-select-sm datagrid-control')
 						->setHtmlAttribute('data-items-filter')
 						->setPrompt('All')

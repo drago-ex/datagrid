@@ -43,7 +43,7 @@
 									<option value="">{_'All'}</option>
 									{foreach $col->filter->items as $value => $label}
 										<option value="{$value}" n:attr="selected => ($filters[$col->name] ?? '') == $value">
-											{$label}
+											{$col->filter->translate ? ($label|translate) : $label}
 										</option>
 									{/foreach}
 								</select>
