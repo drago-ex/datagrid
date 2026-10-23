@@ -1,5 +1,7 @@
 # Drago DataGrid
 
+English | [Čeština](readme.cs.md)
+
 Drago DataGrid is a Nette component for rendering Bootstrap 5 tables with filtering, sorting, pagination and row actions.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/drago-ex/datagrid/blob/main/license)
@@ -245,14 +247,6 @@ Show row actions only on hover:
 ```php
 $grid->setAutoHideActions();
 ```
-
-## Upgrading from 1.x
-
-- `addAction($label, $signal, $class, $callback, $condition)` is now `addAction($name, $label, $callback, $class, $condition)` and returns the `Action`; the callback is required.
-- Action names have no `!`: `'edit!'` becomes `'edit'`, also in `setRowClickAction()`.
-- `edit` and `delete` are no longer moved to the end, actions keep the order they are added in.
-- The natural sort also orders by the text before the number; before, only the first number decided.
-- The grid is no longer redrawn after every action; call `redrawDataGrid()` in callbacks that change data.
 
 ## Formatting Values
 
