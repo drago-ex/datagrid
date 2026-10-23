@@ -85,7 +85,7 @@
 				{if $actions !== []}
 					<td class="text-end">
 						{foreach $actions as $ac}
-							{if $ac->name !== $rowClickAction && $ac->isVisible((array) $row)}
+							{if $ac->isVisible((array) $row)}
 								{include 'action', name: $ac->name, label: $ac->label, id: $row[$primaryKey], class: $ac->class}
 							{/if}
 						{/foreach}

@@ -225,7 +225,18 @@ $grid->setRowClickAction('edit');
 $grid->addActionEdit(fn(int $id) => $this->handleEdit($id));
 ```
 
-The action must be added, otherwise rendering fails; when the action is added only for some users, set the row click in the same condition.
+The action must be added, otherwise rendering fails.
+
+## Hiding Actions
+
+`setVisible()` hides an action in all rows, typically by the user's permission:
+
+```php
+$grid->addActionEdit(fn(int $id) => $this->handleEdit($id))
+	->setVisible($this->isWriteAllowed());
+```
+
+A hidden action has no button and no row click, and the action column disappears when no action is left. It only decides the display; the `action!` signal itself is guarded by the presenter's authorization.
 
 ## Action Display
 

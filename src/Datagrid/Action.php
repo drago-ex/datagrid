@@ -24,6 +24,8 @@ class Action
 	/** @var (Closure(array<string, mixed>): bool)|null */
 	private ?Closure $condition = null;
 
+	private bool $visible = true;
+
 
 	/**
 	 * @param string $name Action name, used in the link and in setRowClickAction()
@@ -54,12 +56,24 @@ class Action
 
 
 	/**
-	 * Evaluates whether this action should be visible for the given row.
-	 * @param array<string, mixed> $row
+	 * Shows or hides the action in all rows, e.g. by the user's permission. It only decides
+	 * whether the button is rendered; the signal itself is guarded by the presenter's authorization.
+	 * @return $this
 	 */
-	public function isVisible(array $row): bool
+	public function setVisible(bool $visible = true): self
 	{
-		return $this->condition === null || ($this->condition)($row);
+		$this->visible = $visible;
+		return $this;
+	}
+
+
+	/**
+	 * Evaluates whether this action should be visible, for the given row when one is passed.
+	 * @param array<string, mixed>|null $row
+	 */
+	public function isVisible(?array $row = null): bool
+	{
+		return $this->visible && ($row === null || $this->condition === null || ($this->condition)($row));
 	}
 
 

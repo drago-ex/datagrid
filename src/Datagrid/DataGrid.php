@@ -563,9 +563,16 @@ class DataGrid extends Control
 		$template->columnName = $this->column;
 		$template->order = $this->order;
 
-		$template->actions = array_values($this->actions);
+		// A hidden action has no button and no row click; the row click action has no button of its own.
+		$rowClickAction = $this->rowClickAction !== null && $this->actions[$this->rowClickAction]->isVisible()
+			? $this->rowClickAction
+			: null;
+		$template->actions = array_values(array_filter(
+			$this->actions,
+			fn(Action $action): bool => $action->name !== $this->rowClickAction && $action->isVisible(),
+		));
 		$template->autoHideActions = $this->autoHideActions;
-		$template->rowClickAction = $this->rowClickAction;
+		$template->rowClickAction = $rowClickAction;
 		$template->primaryKey = $this->primaryKey;
 		$template->page = $this->paginator->getPage();
 		$template->itemsPerPage = $this->paginator->getItemsPerPage();

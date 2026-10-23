@@ -57,6 +57,32 @@ test('The condition decides whether the row shows the action', function () {
 });
 
 
+test('A hidden action is not shown in any row, whatever its condition says', function () {
+	$action = createGrid()->addAction(
+		'approve',
+		'Approve',
+		fn(int $id) => null,
+		condition: fn(array $row): bool => true,
+	)->setVisible(false);
+
+	Assert::false($action->isVisible());
+	Assert::false($action->isVisible(['approved' => 0]));
+	Assert::true($action->setVisible()->isVisible(['approved' => 0]));
+});
+
+
+test('Without a row only the visibility decides, the condition is not asked', function () {
+	$action = createGrid()->addAction(
+		'approve',
+		'Approve',
+		fn(int $id) => null,
+		condition: fn(array $row): bool => throw new LogicException('Must not be called.'),
+	);
+
+	Assert::true($action->isVisible());
+});
+
+
 test('The action name is not a signal, so the old "edit!" is refused', function () {
 	Assert::exception(
 		fn() => createGrid()->addAction('edit!', 'Edit', fn(int $id) => null),
