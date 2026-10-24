@@ -24,6 +24,7 @@ use Drago\Datagrid\Paginator\PaginatorControl;
 use Nette\Application\Attributes\Persistent;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\InvalidLinkException;
+use Nette\Application\UI\Presenter;
 use Nette\Localization\Translator;
 use Nette\Utils\Paginator as UtilsPaginator;
 
@@ -275,16 +276,32 @@ class DataGrid extends Control
 	 * Tells whether a signal (as returned by Presenter::getSignal()) only changes what a grid shows:
 	 * sorting, the filters with their form, the paginator and the page size. Row actions are not
 	 * read-only. Meant for ACL checks such as the isReadOnlySignal() hook of drago-ex/permission.
+	 *
+	 * The receiver is looked up in the presenter, so a "sort" signal of another component stays a write.
+	 * Only signals named like the grid ones are looked up: the check runs at startup, before the action,
+	 * and must not create other components early.
 	 */
-	public static function isReadOnlySignal(string $receiver, string $signal): bool
+	public static function isReadOnlySignal(Presenter $presenter, string $receiver, string $signal): bool
 	{
 		$path = explode('-', $receiver);
-		if (end($path) === 'form') {
+		$isForm = end($path) === 'form';
+		if ($isForm) {
 			array_pop($path);
 		}
 
-		return in_array(end($path), ['filters', 'paginator', 'pageSize'], true)
-			|| $signal === 'sort';
+		if ($receiver === '' || ($signal !== 'sort' && !in_array(end($path), ['filters', 'paginator', 'pageSize'], true))) {
+			return false;
+		}
+
+		$component = $presenter->getComponent($receiver, false);
+		if ($isForm) {
+			return $component?->getParent() instanceof FilterTextControl;
+		}
+
+		return ($signal === 'sort' && $component instanceof self)
+			|| $component instanceof FilterTextControl
+			|| $component instanceof PaginatorControl
+			|| $component instanceof PageSizeControl;
 	}
 
 
