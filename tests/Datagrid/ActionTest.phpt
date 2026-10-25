@@ -121,3 +121,25 @@ test('An unknown action from the URL is ignored', function () {
 
 	Assert::noError(fn() => $grid->handleAction('drop', 1));
 });
+
+
+test('A signal of a hidden action, or of a row its condition leaves out, does not run the callback', function () {
+	$called = [];
+	$grid = createGrid();
+	$grid->addAction('approve', 'Approve', function (int $id) use (&$called): void {
+		$called[] = "approve $id";
+	});
+	$grid->addAction('delete', 'Delete', function (int $id) use (&$called): void {
+		$called[] = "delete $id";
+	})->setVisible(false);
+	$grid->addAction('publish', 'Publish', function (int $id) use (&$called): void {
+		$called[] = "publish $id";
+	}, condition: fn(array $row): bool => true);
+
+	$grid->handleAction('approve', 3);
+	$grid->handleAction('delete', 3);
+	// the dummy data source has no row 3, so the condition cannot accept it
+	$grid->handleAction('publish', 3);
+
+	Assert::same(['approve 3'], $called);
+});

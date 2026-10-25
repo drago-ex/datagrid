@@ -25,6 +25,7 @@ use Nette\Application\Attributes\Persistent;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\InvalidLinkException;
 use Nette\Application\UI\Presenter;
+use Nette\ComponentModel\Container;
 use Nette\Localization\Translator;
 use Nette\Utils\Paginator as UtilsPaginator;
 
@@ -243,9 +244,40 @@ class DataGrid extends Control
 			return;
 		}
 
+		// a hidden action (setVisible) or one its row condition leaves out has no button, so it is not run
+		// by a signal sent directly either; the row is loaded only for an action with a condition
+		if (!$action->isVisible()) {
+			return;
+		}
+
+		if ($action->hasCondition()) {
+			$row = $this->findRow($id);
+			if ($row === null || !$action->isVisible($row)) {
+				return;
+			}
+		}
+
 		// Opening a form or a dialog changes nothing in the grid, so the callback calls
 		// redrawDataGrid() itself when the action changes the data.
 		$action->execute($id);
+	}
+
+
+	/**
+	 * The row of the ID from the data source, for the condition of an action; null when it does not exist.
+	 * @return array<string, mixed>|null
+	 */
+	private function findRow(int $id): ?array
+	{
+		if ($this->source === null || $this->primaryKey === null) {
+			return null;
+		}
+
+		$row = (clone $this->source)
+			->where('%n = ?', $this->primaryKey, $id)
+			->fetch();
+
+		return $row === null ? null : (array) $row;
 	}
 
 
@@ -277,9 +309,10 @@ class DataGrid extends Control
 	 * sorting, the filters with their form, the paginator and the page size. Row actions are not
 	 * read-only. Meant for ACL checks such as the isReadOnlySignal() hook of drago-ex/permission.
 	 *
-	 * The receiver is looked up in the presenter, so a "sort" signal of another component stays a write.
-	 * Only signals named like the grid ones are looked up: the check runs at startup, before the action,
-	 * and must not create other components early.
+	 * The class of the receiver is found without creating any component: the check runs at startup, before
+	 * the action, whose state the component factories may need. An attached component gives its class, one not
+	 * created yet the return type of its createComponent<Name>() factory; a "sort" signal of another component
+	 * stays a write.
 	 */
 	public static function isReadOnlySignal(Presenter $presenter, string $receiver, string $signal): bool
 	{
@@ -293,15 +326,56 @@ class DataGrid extends Control
 			return false;
 		}
 
-		$component = $presenter->getComponent($receiver, false);
-		if ($isForm) {
-			return $component?->getParent() instanceof FilterTextControl;
+		$class = self::findComponentClass($presenter, $path);
+		if ($class === null) {
+			return false;
 		}
 
-		return ($signal === 'sort' && $component instanceof self)
-			|| $component instanceof FilterTextControl
-			|| $component instanceof PaginatorControl
-			|| $component instanceof PageSizeControl;
+		if ($isForm) {
+			return is_a($class, FilterTextControl::class, true);
+		}
+
+		return ($signal === 'sort' && is_a($class, self::class, true))
+			|| is_a($class, FilterTextControl::class, true)
+			|| is_a($class, PaginatorControl::class, true)
+			|| is_a($class, PageSizeControl::class, true);
+	}
+
+
+	/**
+	 * Class of the component at the path, without creating it: an attached component gives its class,
+	 * one not created yet the declared return type of the factory of its parent; null when unknown.
+	 * @param list<string> $path
+	 * @return class-string|null
+	 */
+	private static function findComponentClass(Presenter $presenter, array $path): ?string
+	{
+		$node = $presenter;
+		$class = $presenter::class;
+		foreach ($path as $name) {
+			$child = $node?->getComponents()[$name] ?? null;
+			if ($child !== null) {
+				$node = $child instanceof Container ? $child : null;
+				$class = $child::class;
+				continue;
+			}
+
+			$method = 'createComponent' . ucfirst($name);
+			if (!method_exists($class, $method)) {
+				return null;
+			}
+
+			$type = (new \ReflectionMethod($class, $method))->getReturnType();
+			if (!$type instanceof \ReflectionNamedType || $type->isBuiltin()) {
+				return null;
+			}
+
+			/** @var class-string $class */
+			$class = $type->getName();
+			$node = null;
+		}
+
+		return $class;
 	}
 
 
@@ -590,6 +664,7 @@ class DataGrid extends Control
 		));
 		$template->autoHideActions = $this->autoHideActions;
 		$template->rowClickAction = $rowClickAction;
+		$template->rowClick = $rowClickAction !== null ? $this->actions[$rowClickAction] : null;
 		$template->primaryKey = $this->primaryKey;
 		$template->page = $this->paginator->getPage();
 		$template->itemsPerPage = $this->paginator->getItemsPerPage();

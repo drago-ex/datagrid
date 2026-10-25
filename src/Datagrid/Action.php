@@ -67,6 +67,13 @@ class Action
 	}
 
 
+	/** The action is shown only in rows its condition accepts. */
+	public function hasCondition(): bool
+	{
+		return $this->condition !== null;
+	}
+
+
 	/**
 	 * Evaluates whether this action should be visible, for the given row when one is passed.
 	 * @param array<string, mixed>|null $row

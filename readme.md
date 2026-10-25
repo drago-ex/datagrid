@@ -238,7 +238,9 @@ $grid->addActionEdit(fn(int $id) => $this->handleEdit($id))
 	->setVisible($this->isWriteAllowed());
 ```
 
-A hidden action has no button and no row click, and the action column disappears when no action is left. It only decides the display; the `action!` signal itself is guarded by the presenter's authorization.
+A hidden action has no button and no row click, and the action column disappears when no action is left. The grid
+also refuses the `action!` signal of a hidden action, or of a row its condition leaves out, so it cannot be sent
+directly; the access itself is still checked by the presenter's authorization.
 
 ## Action Display
 

@@ -238,7 +238,9 @@ $grid->addActionEdit(fn(int $id) => $this->handleEdit($id))
 	->setVisible($this->isWriteAllowed());
 ```
 
-Skrytá akce nemá tlačítko ani kliknutí na řádek a sloupec akcí zmizí, když žádná akce nezbude. Rozhoduje jen o zobrazení; samotný signál `action!` hlídá autorizace presenteru.
+Skrytá akce nemá tlačítko ani kliknutí na řádek a sloupec akcí zmizí, když žádná akce nezbude. Grid navíc odmítne
+signál `action!` skryté akce i řádku, který její podmínka vynechá, takže ji nejde poslat přímo; samotný přístup dál
+hlídá autorizace presenteru.
 
 ## Zobrazení akcí
 

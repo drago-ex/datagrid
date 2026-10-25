@@ -33,6 +33,9 @@ class DataGridTemplate extends Template
 	public bool $autoHideActions = false;
 	public ?string $rowClickAction = null;
 
+	/** The row click action, whose row condition decides which rows are clickable. */
+	public ?Action $rowClick = null;
+
 	public ?string $primaryKey = null;
 
 	public int $page = Options::DefaultPage;

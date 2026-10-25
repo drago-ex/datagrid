@@ -75,8 +75,10 @@
 
 		<tbody>
 		{foreach $rows as $row}
-			<tr n:class="$rowClickAction ? 'datagrid-row-clickable ajax', $autoHideActions ? 'datagrid-actions-autohide'"
-				n:attr="data-row-click-url => $rowClickAction && $primaryKey ? $control->link('action!', ['name' => $rowClickAction, 'id' => $row[$primaryKey]]) : null">
+			{* a row its condition leaves out is not clickable (handleAction() refuses it too) *}
+			{var bool $clickable = $rowClick !== null && $primaryKey && $rowClick->isVisible((array) $row)}
+			<tr n:class="$clickable ? 'datagrid-row-clickable ajax', $autoHideActions ? 'datagrid-actions-autohide'"
+				n:attr="data-row-click-url => $clickable ? $control->link('action!', ['name' => $rowClickAction, 'id' => $row[$primaryKey]]) : null">
 				{foreach $columns as $col}
 					{* renderCell() escapes the value itself, only an Html object from a formatter stays HTML *}
 					<td n:class="$col->getAlignClass()">{$col->renderCell((array) $row)|noescape}</td>

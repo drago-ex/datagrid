@@ -108,3 +108,35 @@ test('Signals of other components named like the grid ones are not read-only', f
 	Assert::false(DataGrid::isReadOnlySignal($presenter, 'unknown', 'sort'));
 	Assert::false(DataGrid::isReadOnlySignal($presenter, 'unknown-filters-form', 'submit'));
 });
+
+
+class FactoryArticles extends Control
+{
+	protected function createComponentGrid(): DataGrid
+	{
+		throw new LogicException('The grid must not be created by the check.');
+	}
+}
+
+
+test('Signals of a grid not created yet are recognized from the factory return types, without creating it', function () {
+	$presenter = new class extends Presenter {
+		protected function createComponentArticles(): FactoryArticles
+		{
+			throw new LogicException('The control must not be created by the check.');
+		}
+
+
+		protected function createComponentMenu(): Control
+		{
+			throw new LogicException('The menu must not be created by the check.');
+		}
+	};
+
+	Assert::true(DataGrid::isReadOnlySignal($presenter, 'articles-grid', 'sort'));
+	Assert::true(DataGrid::isReadOnlySignal($presenter, 'articles-grid-filters-form', 'submit'));
+	Assert::true(DataGrid::isReadOnlySignal($presenter, 'articles-grid-paginator', 'page'));
+	Assert::false(DataGrid::isReadOnlySignal($presenter, 'articles', 'sort'));
+	Assert::false(DataGrid::isReadOnlySignal($presenter, 'menu', 'sort'));
+	Assert::false(DataGrid::isReadOnlySignal($presenter, 'unknown-grid', 'sort'));
+});
