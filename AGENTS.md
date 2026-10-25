@@ -7,7 +7,7 @@ Use this file as package-specific guidance when working in this repository. Keep
 - **Type**: library
 - **Purpose**: A simple datagrid for sorting and filtering data.
 - **PHP**: >=8.3 <9
-- **Runtime dependencies**: latte/latte (^3.1), tracy/tracy (^2.11), dibi/dibi (^5.0), nette/application (^3.2), nette/forms (^3.2), nette/utils (^4.0)
+- **Runtime dependencies**: latte/latte (^3.1), dibi/dibi (^5.0), nette/application (^3.2), nette/forms (^3.2), nette/utils (^4.0)
 - **License**: MIT
 
 ## Repository Layout
@@ -26,7 +26,7 @@ Use this file as package-specific guidance when working in this repository. Keep
 ## Dependencies
 
 Composer constraints describe the package contract. Before changing integration behavior, inspect the source and the actual call sites in this package; do not infer runtime usage solely from dependency declarations.
-Development dependencies include nette/tester (^2.3), phpstan/phpstan-nette (^2.0).
+Development dependencies include nette/tester (^2.5), phpstan/phpstan-nette (^2.0).
 
 ## Essential Commands
 
