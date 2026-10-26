@@ -52,6 +52,21 @@ function filterSelect(ColumnText $column, Translator $translator): SelectBox
 }
 
 
+test('The page size "All" is translated by the control, the numbers stay', function () {
+	$control = new Drago\Datagrid\PageSize\PageSizeControl;
+	$control->setTranslator(new class implements Nette\Localization\Translator {
+		public function translate(string|Stringable $message, mixed ...$parameters): string
+		{
+			return $message === 'All' ? 'Vše' : (string) $message;
+		}
+	});
+	$items = (fn() => $this->getPageSizeItems())->call($control);
+	Assert::same('Vše', $items[0]);
+	Assert::same('20', $items[20]);
+	Assert::same('All', (fn() => $this->getPageSizeItems())->call(new Drago\Datagrid\PageSize\PageSizeControl)[0]);
+});
+
+
 test('Items of a select filter are translated by default', function () {
 	$translator = new RecordingTranslator;
 	$select = filterSelect((new ColumnText('status', 'Status', true, null))->setFilterSelect(['draft' => 'Draft']), $translator);

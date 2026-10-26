@@ -85,12 +85,13 @@ final class PageSizeControl extends Control
 	}
 
 
-	/** @return array<int, string> */
+	/** @return array<int, string> labels by size, translated; size 0 is "All" */
 	private function getPageSizeItems(): array
 	{
+		$all = (string) ($this->translator?->translate('All') ?? 'All');
 		$items = [];
 		foreach (Options::PageSizes as $size) {
-			$items[$size] = $size === 0 ? 'All' : (string) $size;
+			$items[$size] = $size === 0 ? $all : (string) $size;
 		}
 
 		return $items;
