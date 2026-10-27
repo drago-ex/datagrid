@@ -1,7 +1,5 @@
 # Drago DataGrid
 
-English | [Čeština](readme.cs.md)
-
 Drago DataGrid is a Nette component for rendering Bootstrap 5 tables with filtering, sorting, pagination and row actions.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/drago-ex/datagrid/blob/main/license)

@@ -1,7 +1,5 @@
 # Drago DataGrid
 
-[English](readme.md) | Čeština
-
 Drago DataGrid je komponenta pro Nette, která vykresluje tabulky Bootstrapu 5 s filtrováním, řazením, stránkováním a akcemi řádků.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/drago-ex/datagrid/blob/main/license)
