@@ -1,10 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * Test: DataGrid configuration checks and control callbacks
  */
-
-declare(strict_types=1);
 
 use Dibi\Connection;
 use Drago\Datagrid\DataGrid;

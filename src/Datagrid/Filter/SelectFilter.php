@@ -1,15 +1,14 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * Drago Extension
  * Package built on Nette Framework
  */
 
-declare(strict_types=1);
-
 namespace Drago\Datagrid\Filter;
 
 use Dibi\Fluent;
+use function array_key_exists, is_scalar;
 
 
 /**

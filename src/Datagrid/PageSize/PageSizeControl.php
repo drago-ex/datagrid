@@ -1,11 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * Drago Extension
  * Package built on the Nette Framework
  */
-
-declare(strict_types=1);
 
 namespace Drago\Datagrid\PageSize;
 

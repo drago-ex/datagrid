@@ -1,10 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * Test: DataGrid columns
  */
-
-declare(strict_types=1);
 
 use Drago\Datagrid\Column\ColumnDate;
 use Drago\Datagrid\Column\ColumnText;
@@ -33,7 +31,7 @@ test('Text column renders explicit Html objects as markup', function () {
 
 
 test('Date column formats valid values and safely handles missing or invalid values', function () {
-	$column = new ColumnDate('created', 'Created', true);
+	$column = new ColumnDate('created', 'Created');
 	Assert::same('2024-02-03', $column->renderCell(['created' => '2024-02-03 12:00:00']));
 	Assert::same('', $column->renderCell([]));
 	Assert::same('', $column->renderCell(['created' => 'not a date']));

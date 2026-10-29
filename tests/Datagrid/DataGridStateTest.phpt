@@ -1,10 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * Test: DataGrid persistent parameters
  */
-
-declare(strict_types=1);
 
 use Drago\Datagrid\DataGrid;
 use Drago\Datagrid\Options;

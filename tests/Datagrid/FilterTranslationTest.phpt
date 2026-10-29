@@ -1,10 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * Test: DataGrid select filter and the translator
  */
-
-declare(strict_types=1);
 
 use Drago\Datagrid\Column\ColumnText;
 use Drago\Datagrid\Filter\FilterTextControl;

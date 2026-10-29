@@ -1,17 +1,16 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * Drago Extension
  * Package built on Nette Framework
  */
 
-declare(strict_types=1);
-
 namespace Drago\Datagrid\Column;
 
 use Closure;
 use Dibi\Fluent;
 use Drago\Datagrid\Filter\Filter;
+use function sprintf;
 
 
 /**

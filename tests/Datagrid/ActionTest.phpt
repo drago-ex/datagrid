@@ -1,10 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * Test: DataGrid row actions
  */
-
-declare(strict_types=1);
 
 use Dibi\Connection;
 use Drago\Datagrid\Action;

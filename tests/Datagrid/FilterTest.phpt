@@ -1,10 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * Test: DataGrid filters
  */
-
-declare(strict_types=1);
 
 use Dibi\Connection;
 use Dibi\Fluent;

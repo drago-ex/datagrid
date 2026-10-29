@@ -1,11 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * Drago Extension
  * Package built on Nette Framework
  */
-
-declare(strict_types=1);
 
 namespace Drago\Datagrid;
 
@@ -28,15 +26,15 @@ class Action
 
 
 	/**
-	 * @param string $name Action name, used in the link and in setRowClickAction()
-	 * @param string $label Action label displayed in the UI
 	 * @param callable(int): void $callback Receives the row ID
-	 * @param string|null $class CSS class of the link, default 'ajax text-decoration-none'
 	 */
 	public function __construct(
+		/** @var string Action name, used in the link and in setRowClickAction() */
 		public readonly string $name,
+		/** @var string Action label displayed in the UI */
 		public readonly string $label,
 		callable $callback,
+		/** @var string|null CSS class of the link, default 'ajax text-decoration-none' */
 		public readonly ?string $class = null,
 	) {
 		$this->callback = $callback(...);

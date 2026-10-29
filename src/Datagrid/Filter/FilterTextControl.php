@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Drago\Datagrid\Filter;
 
@@ -9,9 +7,11 @@ use Drago\Datagrid\Column\Column;
 use Drago\Datagrid\Options;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
+use Nette\Application\UI\Presenter;
 use Nette\Localization\Translator;
 use Nette\Utils\Html;
 use stdClass;
+use function array_key_exists, is_int, is_string;
 
 
 /**
@@ -65,7 +65,7 @@ final class FilterTextControl extends Control
 
 	public function getFormId(): string
 	{
-		$path = $this->lookupPath('Nette\Application\UI\Presenter');
+		$path = $this->lookupPath(Presenter::class);
 		return 'dg-filter-' . str_replace(['-', ':'], '_', $path);
 	}
 
@@ -169,7 +169,6 @@ final class FilterTextControl extends Control
 
 		foreach ($this->columns as $column) {
 			if ($column->filter !== null) {
-
 				$type = $column->filter->getInputType();
 				$name = $column->name;
 

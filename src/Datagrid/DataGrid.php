@@ -1,11 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * Drago Extension
  * Package built on Nette Framework
  */
-
-declare(strict_types=1);
 
 namespace Drago\Datagrid;
 
@@ -28,6 +26,7 @@ use Nette\Application\UI\Presenter;
 use Nette\ComponentModel\Container;
 use Nette\Localization\Translator;
 use Nette\Utils\Paginator as UtilsPaginator;
+use function array_key_exists, in_array, sprintf;
 
 
 /**
@@ -38,16 +37,21 @@ use Nette\Utils\Paginator as UtilsPaginator;
  */
 class DataGrid extends Control
 {
-	#[Persistent] public ?string $column = null;
+	#[Persistent]
+	public ?string $column = null;
 
-	#[Persistent] public string $order = Options::OrderAsc;
+	#[Persistent]
+	public string $order = Options::OrderAsc;
 
-	#[Persistent] public int $page = Options::DefaultPage;
+	#[Persistent]
+	public int $page = Options::DefaultPage;
 
-	#[Persistent] public int $itemsPerPage = Options::DefaultItemsPerPage;
+	#[Persistent]
+	public int $itemsPerPage = Options::DefaultItemsPerPage;
 
 	/** @var array<string, mixed> Persistent current filter values */
-	#[Persistent] public array $filterValues = [];
+	#[Persistent]
+	public array $filterValues = [];
 
 	private bool $autoHideActions = false;
 	private ?string $rowClickAction = null;
