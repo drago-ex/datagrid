@@ -220,6 +220,7 @@ class DataGrid extends Control
 
 	/**
 	 * Sorts by the column; the current page, filters and page size stay in the persistent parameters.
+	 * @throws InvalidLinkException
 	 */
 	public function handleSort(string $column, string $sortOrder = Options::OrderAsc): void
 	{
@@ -494,7 +495,12 @@ class DataGrid extends Control
 				return null;
 			}
 
-			$type = (new \ReflectionMethod($class, $method))->getReturnType();
+			try {
+				$type = (new \ReflectionMethod($class, $method))->getReturnType();
+			} catch (\ReflectionException) {
+				return null;
+			}
+
 			if (!$type instanceof \ReflectionNamedType || $type->isBuiltin()) {
 				return null;
 			}

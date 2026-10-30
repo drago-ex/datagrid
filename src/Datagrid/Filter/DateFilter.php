@@ -64,6 +64,6 @@ class DateFilter implements Filter
 			return null;
 		}
 
-		return new DateTimeImmutable($date);
+		return DateTimeImmutable::createFromFormat('!Y-m-d', $date) ?: null;
 	}
 }
