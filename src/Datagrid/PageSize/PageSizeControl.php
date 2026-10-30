@@ -13,9 +13,7 @@ use Nette\Application\UI\Control;
 use Nette\Localization\Translator;
 
 
-/**
- * @property-read PageSizeTemplate $template
- */
+/** @property-read PageSizeTemplate $template */
 final class PageSizeControl extends Control
 {
 	/** @var Closure(int, int): void|null */

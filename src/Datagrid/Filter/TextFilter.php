@@ -11,9 +11,7 @@ use Dibi\Fluent;
 use function is_scalar;
 
 
-/**
- * Text-based DataGrid filter.
- */
+/** Text-based DataGrid filter. */
 class TextFilter implements Filter
 {
 	/**
@@ -32,9 +30,7 @@ class TextFilter implements Filter
 	}
 
 
-	/**
-	 * Returns input type identifier.
-	 */
+	/** Returns input type identifier. */
 	public function getInputType(): string
 	{
 		return 'text';

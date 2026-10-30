@@ -84,9 +84,7 @@ class DataGrid extends Control
 	}
 
 
-	/**
-	 * A click on the row runs the action with this name; its button is then not rendered.
-	 */
+	/** A click on the row runs the action with this name; its button is then not rendered. */
 	public function setRowClickAction(string $name): self
 	{
 		$this->rowClickAction = $name;
@@ -107,9 +105,7 @@ class DataGrid extends Control
 	}
 
 
-	/**
-	 * Sets the filter display mode ('top' or 'inline').
-	 */
+	/** Sets the filter display mode ('top' or 'inline'). */
 	public function setFilterMode(string $mode): self
 	{
 		$this->filterMode = $mode;

@@ -48,9 +48,7 @@ final class FilterTextControl extends Control
 	}
 
 
-	/**
-	 * @param callable(array<string, mixed>): void $callback
-	 */
+	/** @param callable(array<string, mixed>): void $callback */
 	public function onFilterChanged(callable $callback): void
 	{
 		$this->onFilterChanged = $callback(...);
@@ -70,18 +68,14 @@ final class FilterTextControl extends Control
 	}
 
 
-	/**
-	 * @param callable(): void $callback
-	 */
+	/** @param callable(): void $callback */
 	public function onReset(callable $callback): void
 	{
 		$this->onReset = $callback(...);
 	}
 
 
-	/**
-	 * @param callable(string): void $callback
-	 */
+	/** @param callable(string): void $callback */
 	public function onClearFilter(callable $callback): void
 	{
 		$this->onClearFilter = $callback(...);
@@ -114,18 +108,14 @@ final class FilterTextControl extends Control
 	}
 
 
-	/**
-	 * @param array<string, Column> $columns
-	 */
+	/** @param array<string, Column> $columns */
 	public function setColumns(array $columns): void
 	{
 		$this->columns = $columns;
 	}
 
 
-	/**
-	 * @param array<string, mixed> $values
-	 */
+	/** @param array<string, mixed> $values */
 	public function setValues(array $values): void
 	{
 		$this->values = $values;
@@ -223,9 +213,7 @@ final class FilterTextControl extends Control
 	}
 
 
-	/**
-	 * @param array<int|string, string> $items
-	 */
+	/** @param array<int|string, string> $items */
 	private function getSelectDefaultValue(string $name, array $items): int|string|null
 	{
 		$value = $this->values[$name] ?? null;

@@ -59,9 +59,7 @@ final class PaginatorControl extends Control
 	}
 
 
-	/**
-	 * Sorting and filters are persistent parameters of the grid, so the links keep them.
-	 */
+	/** Sorting and filters are persistent parameters of the grid, so the links keep them. */
 	public function handlePage(int $page): void
 	{
 		$this->paginator->setPage($page);

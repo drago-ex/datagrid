@@ -11,9 +11,7 @@ use Nette\Bridges\ApplicationLatte\Template;
 use Nette\Utils\Paginator;
 
 
-/**
- * Template for PaginatorControl.
- */
+/** Template for PaginatorControl. */
 class PaginatorTemplate extends Template
 {
 	public Paginator $paginator;

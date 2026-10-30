@@ -11,9 +11,7 @@ use Dibi\Fluent;
 use function array_key_exists, is_scalar;
 
 
-/**
- * Select/dropdown DataGrid filter.
- */
+/** Select/dropdown DataGrid filter. */
 class SelectFilter implements Filter
 {
 	/** @var array<int|string, string> */
@@ -23,9 +21,7 @@ class SelectFilter implements Filter
 	public bool $translate;
 
 
-	/**
-	 * @param array<int|string, string> $items Dropdown options
-	 */
+	/** @param array<int|string, string> $items Dropdown options */
 	public function __construct(array $items, bool $translate = true)
 	{
 		$this->items = $items;
@@ -33,9 +29,7 @@ class SelectFilter implements Filter
 	}
 
 
-	/**
-	 * Applies exact-match filter condition. Only configured options are accepted, because values come from the URL.
-	 */
+	/** Applies exact-match filter condition. Only configured options are accepted, because values come from the URL. */
 	public function apply(Fluent $fluent, string $column, mixed $value): void
 	{
 		if (!is_scalar($value) || $value === '' || !array_key_exists((string) $value, $this->items)) {
@@ -46,9 +40,7 @@ class SelectFilter implements Filter
 	}
 
 
-	/**
-	 * Returns input type identifier.
-	 */
+	/** Returns input type identifier. */
 	public function getInputType(): string
 	{
 		return 'select';

@@ -12,9 +12,7 @@ use Drago\Datagrid\Filter\DateFilter;
 use Drago\Datagrid\Options;
 
 
-/**
- * Date column with configurable format.
- */
+/** Date column with configurable format. */
 class ColumnDate extends Column
 {
 	public function __construct(

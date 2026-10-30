@@ -49,9 +49,7 @@ class DateFilter implements Filter
 	}
 
 
-	/**
-	 * Returns input type identifier.
-	 */
+	/** Returns input type identifier. */
 	public function getInputType(): string
 	{
 		return 'date';

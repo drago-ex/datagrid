@@ -25,9 +25,7 @@ class Action
 	private bool $visible = true;
 
 
-	/**
-	 * @param callable(int): void $callback Receives the row ID
-	 */
+	/** @param callable(int): void $callback Receives the row ID */
 	public function __construct(
 		/** @var string Action name, used in the link and in setRowClickAction() */
 		public readonly string $name,
@@ -82,9 +80,7 @@ class Action
 	}
 
 
-	/**
-	 * Executes the action for the row with the given ID.
-	 */
+	/** Executes the action for the row with the given ID. */
 	public function execute(int $id): void
 	{
 		($this->callback)($id);

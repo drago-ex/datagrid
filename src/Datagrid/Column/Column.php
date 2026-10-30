@@ -13,9 +13,7 @@ use Drago\Datagrid\Filter\Filter;
 use function sprintf;
 
 
-/**
- * Base DataGrid column definition.
- */
+/** Base DataGrid column definition. */
 abstract class Column
 {
 	public const string AlignLeft = 'start';
@@ -73,9 +71,7 @@ abstract class Column
 	}
 
 
-	/**
-	 * Sets Bootstrap text alignment for this column.
-	 */
+	/** Sets Bootstrap text alignment for this column. */
 	public function setAlign(string $align): static
 	{
 		if (!in_array($align, [self::AlignLeft, self::AlignCenter, self::AlignRight], true)) {
