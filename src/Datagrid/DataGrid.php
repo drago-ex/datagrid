@@ -19,14 +19,13 @@ use Drago\Datagrid\Exception\InvalidDataSourceException;
 use Drago\Datagrid\Filter\FilterTextControl;
 use Drago\Datagrid\PageSize\PageSizeControl;
 use Drago\Datagrid\Paginator\PaginatorControl;
+use Drago\Permission\Access;
 use Nette\Application\Attributes\Persistent;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\InvalidLinkException;
-use Nette\Application\UI\Presenter;
-use Nette\ComponentModel\Container;
 use Nette\Localization\Translator;
 use Nette\Utils\Paginator as UtilsPaginator;
-use function array_key_exists, in_array, sprintf;
+use function array_key_exists, sprintf;
 
 
 /**
@@ -218,6 +217,7 @@ class DataGrid extends Control
 	 * Sorts by the column; the current page, filters and page size stay in the persistent parameters.
 	 * @throws InvalidLinkException
 	 */
+	#[Access]
 	public function handleSort(string $column, string $sortOrder = Options::OrderAsc): void
 	{
 		if (!isset($this->columns[$column]) || !$this->columns[$column]->sortable) {
@@ -236,8 +236,10 @@ class DataGrid extends Control
 
 	/**
 	 * Executes a row action; the grid state (filters, page, sorting) comes from the persistent
-	 * parameters, which every link of the grid carries.
+	 * parameters, which every link of the grid carries. drago-ex/permission checks it as the privilege
+	 * named like the action ("edit", "delete").
 	 */
+	#[Access(parameter: 'name')]
 	public function handleAction(string $name, int $id): void
 	{
 		$action = $this->actions[$name] ?? null;
@@ -284,44 +286,6 @@ class DataGrid extends Control
 		}
 
 		$this->filterValues = array_filter($this->filterValues, is_scalar(...));
-	}
-
-
-	/**
-	 * Tells whether a signal (as returned by Presenter::getSignal()) only changes what a grid shows:
-	 * sorting, the filters with their form, the paginator and the page size. Row actions are not
-	 * read-only. Meant for ACL checks such as the isReadOnlySignal() hook of drago-ex/permission.
-	 *
-	 * The class of the receiver is found without creating any component: the check runs at startup, before
-	 * the action, whose state the component factories may need. An attached component gives its class, one not
-	 * created yet the return type of its createComponent<Name>() factory; a "sort" signal of another component
-	 * stays a write.
-	 */
-	public static function isReadOnlySignal(Presenter $presenter, string $receiver, string $signal): bool
-	{
-		$path = explode('-', $receiver);
-		$isForm = end($path) === 'form';
-		if ($isForm) {
-			array_pop($path);
-		}
-
-		if ($receiver === '' || ($signal !== 'sort' && !in_array(end($path), ['filters', 'paginator', 'pageSize'], true))) {
-			return false;
-		}
-
-		$class = self::findComponentClass($presenter, $path);
-		if ($class === null) {
-			return false;
-		}
-
-		if ($isForm) {
-			return is_a($class, FilterTextControl::class, true);
-		}
-
-		return ($signal === 'sort' && is_a($class, self::class, true))
-			|| is_a($class, FilterTextControl::class, true)
-			|| is_a($class, PaginatorControl::class, true)
-			|| is_a($class, PageSizeControl::class, true);
 	}
 
 
@@ -465,48 +429,6 @@ class DataGrid extends Control
 			->fetch();
 
 		return $row === null ? null : (array) $row;
-	}
-
-
-	/**
-	 * Class of the component at the path, without creating it: an attached component gives its class,
-	 * one not created yet the declared return type of the factory of its parent; null when unknown.
-	 * @param list<string> $path
-	 * @return class-string|null
-	 */
-	private static function findComponentClass(Presenter $presenter, array $path): ?string
-	{
-		$node = $presenter;
-		$class = $presenter::class;
-		foreach ($path as $name) {
-			$child = $node?->getComponents()[$name] ?? null;
-			if ($child !== null) {
-				$node = $child instanceof Container ? $child : null;
-				$class = $child::class;
-				continue;
-			}
-
-			$method = 'createComponent' . ucfirst($name);
-			if (!method_exists($class, $method)) {
-				return null;
-			}
-
-			try {
-				$type = (new \ReflectionMethod($class, $method))->getReturnType();
-			} catch (\ReflectionException) {
-				return null;
-			}
-
-			if (!$type instanceof \ReflectionNamedType || $type->isBuiltin()) {
-				return null;
-			}
-
-			/** @var class-string $class */
-			$class = $type->getName();
-			$node = null;
-		}
-
-		return $class;
 	}
 
 

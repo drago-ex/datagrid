@@ -18,11 +18,13 @@
 		"nette/utils": "^4.0"
 	},
 	"suggest": {
-		"drago-ex/translator": "Configures Latte translation support for bundled templates using translation macros."
+		"drago-ex/translator": "Configures Latte translation support for bundled templates using translation macros.",
+		"drago-ex/permission": "Checks sorting, filters and paging with the page and row actions by their names (the Access attribute)."
 	},
 	"require-dev": {
 		"nette/tester": "^2.5",
-		"phpstan/phpstan-nette": "^2.0"
+		"phpstan/phpstan-nette": "^2.0",
+		"drago-ex/permission": "^2.0"
 	},
 	"autoload": {
 		"classmap": [

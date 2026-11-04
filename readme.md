@@ -22,7 +22,7 @@ Drago DataGrid is a Nette component for rendering Bootstrap 5 tables with filter
 composer require drago-ex/datagrid
 ```
 
-## Frontend Assets
+## Assets
 
 Add the Composer package as a local npm dependency:
 
@@ -46,10 +46,13 @@ Import the assets:
 ```js
 import naja from 'naja';
 import DataGrid from 'drago-datagrid';
-import 'drago-datagrid/styles/datagrid';
 
 naja.initialize();
 new DataGrid().initialize(naja);
+```
+
+```scss
+@import 'drago-datagrid/styles/datagrid';
 ```
 
 ## Basic Usage

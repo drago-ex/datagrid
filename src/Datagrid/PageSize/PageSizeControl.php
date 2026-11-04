@@ -9,11 +9,13 @@ namespace Drago\Datagrid\PageSize;
 
 use Closure;
 use Drago\Datagrid\Options;
+use Drago\Permission\Access;
 use Nette\Application\UI\Control;
 use Nette\Localization\Translator;
 
 
 /** @property-read PageSizeTemplate $template */
+#[Access]
 final class PageSizeControl extends Control
 {
 	/** @var Closure(int, int): void|null */

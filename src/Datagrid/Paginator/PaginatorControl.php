@@ -8,6 +8,7 @@
 namespace Drago\Datagrid\Paginator;
 
 use Closure;
+use Drago\Permission\Access;
 use Nette\Application\UI\Control;
 use Nette\Localization\Translator;
 use Nette\Utils\Paginator as UtilsPaginator;
@@ -19,6 +20,7 @@ use Nette\Utils\Paginator as UtilsPaginator;
  *
  * @property-read PaginatorTemplate $template
  */
+#[Access]
 final class PaginatorControl extends Control
 {
 	private UtilsPaginator $paginator;

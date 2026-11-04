@@ -22,7 +22,7 @@ Drago DataGrid je komponenta pro Nette, která vykresluje tabulky Bootstrapu 5 s
 composer require drago-ex/datagrid
 ```
 
-## Assety frontendu
+## Assety
 
 Přidejte balíček z Composeru jako lokální závislost npm:
 
@@ -46,10 +46,13 @@ Importujte assety:
 ```js
 import naja from 'naja';
 import DataGrid from 'drago-datagrid';
-import 'drago-datagrid/styles/datagrid';
 
 naja.initialize();
 new DataGrid().initialize(naja);
+```
+
+```scss
+@import 'drago-datagrid/styles/datagrid';
 ```
 
 ## Základní použití

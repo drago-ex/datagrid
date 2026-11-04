@@ -5,6 +5,7 @@ namespace Drago\Datagrid\Filter;
 use Closure;
 use Drago\Datagrid\Column\Column;
 use Drago\Datagrid\Options;
+use Drago\Permission\Access;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
 use Nette\Application\UI\Presenter;
@@ -15,10 +16,11 @@ use function array_key_exists, is_int, is_string;
 
 
 /**
- * DataGrid filter component.
+ * DataGrid filter component; its signals and form only change what the grid shows.
  *
  * @property-read FilterTextTemplate $template
  */
+#[Access]
 final class FilterTextControl extends Control
 {
 	/** @var Closure(array<string, mixed>): void|null */
