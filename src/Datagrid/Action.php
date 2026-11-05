@@ -34,6 +34,8 @@ class Action
 		callable $callback,
 		/** @var string|null CSS class of the link, default 'ajax text-decoration-none' */
 		public readonly ?string $class = null,
+		/** @var string|null Icon classes (e.g. Font Awesome); the label is then its tooltip and aria-label */
+		public readonly ?string $icon = null,
 	) {
 		$this->callback = $callback(...);
 	}

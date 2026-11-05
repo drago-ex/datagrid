@@ -88,7 +88,7 @@
 					<td class="text-end">
 						{foreach $actions as $ac}
 							{if $ac->isVisible((array) $row)}
-								{include 'action', name: $ac->name, label: $ac->label, id: $row[$primaryKey], class: $ac->class}
+								{include 'action', name: $ac->name, label: $ac->label, id: $row[$primaryKey], class: $ac->class, icon: $ac->icon}
 							{/if}
 						{/foreach}
 					</td>

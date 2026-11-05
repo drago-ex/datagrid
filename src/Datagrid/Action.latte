@@ -1,6 +1,8 @@
-{define action, string $name, string $label, int $id, ?string $class = null}
+{define action, string $name, string $label, int $id, ?string $class = null, ?string $icon = null}
 	{* The grid state (filters, page, sorting) is added by Nette from the persistent parameters. *}
-	<a n:href="action!, name: $name, id: $id" data-naja-history="off" class="{$class ?? 'ajax text-decoration-none'}">
-		{_$label}
+	{* With an icon the label is its tooltip (data-tooltip, styles/tooltip of drago-ex/component) and its name for screen readers. *}
+	<a n:href="action!, name: $name, id: $id" data-naja-history="off" class="{$class ?? 'ajax text-decoration-none'}"
+		n:attr="aria-label: $icon !== null ? ($label|translate), data-tooltip: $icon !== null ? true : null">
+		{if $icon !== null}<i class="{$icon}" aria-hidden="true"></i>{else}{_$label}{/if}
 	</a>
 {/define}

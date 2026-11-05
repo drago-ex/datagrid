@@ -174,6 +174,7 @@ class DataGrid extends Control
 		callable $callback,
 		?string $class = null,
 		?callable $condition = null,
+		?string $icon = null,
 	): Action
 	{
 		if (!preg_match('#^[a-zA-Z0-9_-]+$#D', $name)) {
@@ -183,7 +184,7 @@ class DataGrid extends Control
 			throw new InvalidConfigurationException("Action '$name' already exists.");
 		}
 
-		$action = new Action($name, $label, $callback, $class);
+		$action = new Action($name, $label, $callback, $class, $icon);
 		if ($condition !== null) {
 			$action->setCondition($condition);
 		}
@@ -198,7 +199,7 @@ class DataGrid extends Control
 	 */
 	public function addActionEdit(callable $callback, string $label = 'Edit'): Action
 	{
-		return $this->addAction('edit', $label, $callback, 'ajax btn btn-xs btn-primary');
+		return $this->addAction('edit', $label, $callback, 'ajax btn btn-xs btn-primary', icon: 'fa-solid fa-pen');
 	}
 
 
@@ -209,7 +210,7 @@ class DataGrid extends Control
 	 */
 	public function addActionDelete(callable $callback, string $label = 'Delete'): Action
 	{
-		return $this->addAction('delete', $label, $callback, 'ajax btn btn-xs btn-danger');
+		return $this->addAction('delete', $label, $callback, 'ajax btn btn-xs btn-danger', icon: 'fa-solid fa-trash');
 	}
 
 

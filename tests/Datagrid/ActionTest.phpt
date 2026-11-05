@@ -31,6 +31,15 @@ test('The edit and delete shortcuts add actions with default labels and buttons'
 });
 
 
+test('The shortcuts render icons with the label as tooltip, other actions text unless given an icon', function () {
+	$grid = createGrid();
+	Assert::same('fa-solid fa-pen', $grid->addActionEdit(fn(int $id) => null)->icon);
+	Assert::same('fa-solid fa-trash', $grid->addActionDelete(fn(int $id) => null)->icon);
+	Assert::null($grid->addAction('archive', 'Archive', fn(int $id) => null)->icon);
+	Assert::same('fa-solid fa-check', $grid->addAction('approve', 'Approve', fn(int $id) => null, icon: 'fa-solid fa-check')->icon);
+});
+
+
 test('An action calls its callback with the row ID', function () {
 	$ids = [];
 	$action = new Action('approve', 'Approve', function (int $id) use (&$ids): void {

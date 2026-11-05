@@ -55,6 +55,12 @@ new DataGrid().initialize(naja);
 @import 'drago-datagrid/styles/datagrid';
 ```
 
+The tooltips of the icon actions (edit, delete) come from [drago-ex/component](https://github.com/drago-ex/component):
+
+```scss
+@import 'drago-component/styles/tooltip';
+```
+
 ## Basic Usage
 
 ```php
@@ -198,7 +204,7 @@ Set the primary key before adding actions:
 $grid->setPrimaryKey('id');
 ```
 
-Edit and delete have shortcuts with a primary and a danger button:
+Edit and delete have shortcuts with a primary and a danger button with an icon (pencil, trash):
 
 ```php
 $grid->addActionEdit(fn(int $id) => $this->handleEdit($id));
@@ -214,10 +220,15 @@ $grid->addAction(
 	callback: fn(int $id) => $this->activate($id),
 	class: 'ajax btn btn-xs btn-success',
 	condition: fn(array $row): bool => !$row['active'],
+	icon: 'fa-solid fa-check',
 );
 ```
 
 The name only identifies the action (letters, digits, `-` and `_`); every action link leads to the grid's `action!` signal and keeps the current filters, page and sorting. The optional `condition` receives the row as `array<string, mixed>` and decides whether the row shows the action. Actions are displayed in the order they are added. The grid is not redrawn after an action, because opening a form or a dialog changes nothing in it; a callback that changes data calls `$grid->redrawDataGrid()`.
+
+An action with an `icon` (classes of an icon font such as Font Awesome) shows only the icon; its label becomes
+`aria-label` and a tooltip (`data-tooltip`) styled by `drago-component/styles/tooltip` of
+[drago-ex/component](https://github.com/drago-ex/component). An action without an icon shows its label.
 
 ## Row Click
 
