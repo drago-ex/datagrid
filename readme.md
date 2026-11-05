@@ -24,7 +24,7 @@ composer require drago-ex/datagrid
 
 ## Assets
 
-Add the Composer package as a local npm dependency:
+Add the Composer package as a local npm dependency (Drago Project installs it by itself):
 
 ```json
 {
