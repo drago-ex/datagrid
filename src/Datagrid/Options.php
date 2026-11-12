@@ -27,4 +27,7 @@ class Options
 
 	public const string FilterModeTop = 'top';
 	public const string FilterModeInline = 'inline';
+
+	/** For setRowClickAction(): a click on a row chooses it for the bulk actions. */
+	public const string RowClickSelect = 'select';
 }

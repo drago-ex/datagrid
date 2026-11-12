@@ -1,6 +1,6 @@
 # Drago DataGrid
 
-Drago DataGrid is a Nette component for rendering Bootstrap 5 tables with filtering, sorting, pagination and row actions.
+Drago DataGrid is a Nette component for rendering Bootstrap 5 tables with filtering, sorting, pagination, row actions, bulk actions for chosen rows, switches of a state right in the table and an export to CSV.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/drago-ex/datagrid/blob/main/license)
 [![PHP version](https://badge.fury.io/ph/drago-ex%2Fdatagrid.svg)](https://badge.fury.io/ph/drago-ex%2Fdatagrid)
@@ -13,7 +13,8 @@ Drago DataGrid is a Nette component for rendering Bootstrap 5 tables with filter
 - Nette Framework
 - Dibi
 - Latte
-- Bootstrap 5
+- Bootstrap 5 with [compostrap](https://github.com/compostrap/compostrap) (styles of the table, the bar of bulk actions, badges)
+- Bootstrap Icons
 - Naja
 
 ## Installation
@@ -46,19 +47,32 @@ Import the assets:
 ```js
 import naja from 'naja';
 import DataGrid from 'drago-datagrid';
+import { RowSelection } from 'compostrap/selection';
 
 naja.initialize();
 new DataGrid().initialize(naja);
+
+// the checkboxes of the rows and the bar of the bulk actions
+RowSelection.init();
 ```
 
-```scss
-@import 'drago-datagrid/styles/datagrid';
+Date filters open the calendar of compostrap, which needs the npm package `vanilla-calendar-pro`:
+
+```js
+import { Datepicker } from 'compostrap/datepicker';
+
+Datepicker.init();
 ```
 
-The tooltips of the icon actions (edit, delete) come from [drago-ex/component](https://github.com/drago-ex/component):
+The grid has no styles of its own, it prints the classes of compostrap:
 
 ```scss
-@import 'drago-component/styles/tooltip';
+@import 'compostrap/src/scss/theme';
+@import 'compostrap/src/scss/tooltip';
+@import 'compostrap/src/scss/elements';
+@import 'compostrap/src/scss/datagrid';
+@import 'compostrap/src/scss/selection';
+@import 'compostrap/src/scss/datepicker';
 ```
 
 ## Basic Usage
@@ -171,10 +185,10 @@ $grid->addColumnDate('created_at', 'Created')->setFilterDate();
 Filter types:
 - `setFilterText()` - LIKE search
 - `setFilterSelect(array $items, bool $translate = true)` - exact match select
-- `setFilterDate()` - date filter in `YYYY-MM-DD` format
+- `setFilterDate()` - one day, chosen in a calendar
+- `setFilterDate(range: true)` - a range of days, chosen as the first and the last day in a calendar of two months
 
-Date filters also support range values in the form `YYYY-MM-DD|YYYY-MM-DD`; either side can be empty.
-Both days are included, also for DATETIME columns.
+The value of a date filter is `YYYY-MM-DD`; a range is two dates (`YYYY-MM-DD – YYYY-MM-DD` as the calendar writes them, or `YYYY-MM-DD|YYYY-MM-DD`, where either side can be empty). Both days are included, also for DATETIME columns. A range is filtered once both days are chosen.
 
 Active filters can be cleared individually with the small clear button next to the filter input. The reset button clears all filters at once.
 
@@ -204,7 +218,8 @@ Set the primary key before adding actions:
 $grid->setPrimaryKey('id');
 ```
 
-Edit and delete have shortcuts with a primary and a danger button with an icon (pencil, trash):
+The actions of a row are a menu under a button of three dots at the end of the row. Edit and delete have shortcuts
+with an icon (pencil, trash); delete is red and separated from the actions before it:
 
 ```php
 $grid->addActionEdit(fn(int $id) => $this->handleEdit($id));
@@ -218,28 +233,67 @@ $grid->addAction(
 	name: 'activate',
 	label: 'Activate',
 	callback: fn(int $id) => $this->activate($id),
-	class: 'ajax btn btn-xs btn-success',
 	condition: fn(array $row): bool => !$row['active'],
-	icon: 'fa-solid fa-check',
+	icon: 'bi bi-check2-circle',
 );
 ```
 
-The name only identifies the action (letters, digits, `-` and `_`); every action link leads to the grid's `action!` signal and keeps the current filters, page and sorting. The optional `condition` receives the row as `array<string, mixed>` and decides whether the row shows the action. Actions are displayed in the order they are added. The grid is not redrawn after an action, because opening a form or a dialog changes nothing in it; a callback that changes data calls `$grid->redrawDataGrid()`.
+The name only identifies the action (letters, digits, `-` and `_`; `select` is reserved); every action link leads to the grid's `action!` signal and keeps the current filters, page and sorting. The optional `condition` receives the row as `array<string, mixed>` and decides whether the row shows the action. Actions are displayed in the order they are added. The grid is not redrawn after an action, because opening a form or a dialog changes nothing in it; a callback that changes data calls `$grid->redrawDataGrid()`.
 
-An action with an `icon` (classes of an icon font such as Font Awesome) shows only the icon; its label becomes
-`aria-label` and a tooltip (`data-tooltip`) styled by `drago-component/styles/tooltip` of
-[drago-ex/component](https://github.com/drago-ex/component). An action without an icon shows its label.
+Further arguments: `icon` (classes of an icon font, shown before the label), `danger: true` (a red item, separated from the items before it) and `class` (the class of the menu item instead of `ajax dropdown-item`).
+
+## Bulk Actions
+
+Bulk actions work with the rows a user chooses. Once the grid has one, every row gets a checkbox, the header a
+checkbox that chooses all rows of the page, and a bar with the buttons of the actions appears while a row is chosen.
+They can stand next to the row actions or replace them, which saves the column of the three dots.
+
+```php
+$grid->setPrimaryKey('id');
+
+$grid->addBulkActionEdit(fn(int $id) => $this->handleEdit($id));
+$grid->addBulkAction('publish', 'Publish', fn(array $ids) => $this->publish($ids), icon: 'bi bi-check2-circle');
+$grid->addBulkActionExport();
+$grid->addBulkActionDelete(fn(array $ids) => $this->delete($ids));
+```
+
+- `addBulkAction(name, label, callback, icon, danger, single, ajax)` - the callback receives the IDs of the chosen rows (`list<int>`). `danger: true` makes the button red, `single: true` makes it an action for one row (the button is disabled while more rows are chosen), `ajax: false` sends the request without AJAX for an action that answers with a file.
+- `addBulkActionEdit(callback)` - the action `edit` for one chosen row; the callback receives its ID.
+- `addBulkActionDelete(callback)` - the action `delete` with a red button.
+- `addBulkActionExport()` - the action `export`: the chosen rows as a CSV file, see [Export to CSV](#export-to-csv).
+
+The buttons stand in the order the actions are added. Every button sends the checkboxes to the grid's `bulk!` signal by POST and keeps the current filters, page and sorting. As with row actions, the grid is not redrawn by itself: a callback that changes data calls `$grid->redrawDataGrid()`, which also clears the selection.
+
+`setVisible()` hides a bulk action, typically by the user's permission; without a visible bulk action the grid has no checkboxes:
+
+```php
+$grid->addBulkActionDelete(fn(array $ids) => $this->delete($ids))
+	->setVisible($this->isAllowed('delete'));
+```
 
 ## Row Click
 
-The whole row can run an action; its button is then not displayed:
+A click on a row can do one of two things.
+
+It runs a row action; the item of that action is then not in the menu of the row:
 
 ```php
 $grid->setRowClickAction('edit');
 $grid->addActionEdit(fn(int $id) => $this->handleEdit($id));
 ```
 
-The action must be added, otherwise rendering fails.
+Or it chooses the row for the bulk actions, like a click on its checkbox, so one row is chosen without aiming at
+the checkbox:
+
+```php
+use Drago\Datagrid\Options;
+
+$grid->setRowClickAction(Options::RowClickSelect); // 'select'
+$grid->addBulkActionEdit(fn(int $id) => $this->handleEdit($id));
+```
+
+The named row action, or a bulk action for the choosing, must be added, otherwise rendering fails. A click on
+a link, a button or a field in the row keeps its own meaning.
 
 ## Hiding Actions
 
@@ -250,17 +304,85 @@ $grid->addActionEdit(fn(int $id) => $this->handleEdit($id))
 	->setVisible($this->isWriteAllowed());
 ```
 
-A hidden action has no button and no row click, and the action column disappears when no action is left. The grid
-also refuses the `action!` signal of a hidden action, or of a row its condition leaves out, so it cannot be sent
-directly; the access itself is still checked by the presenter's authorization.
+A hidden action has no item in the menu and no row click, and the action column disappears when no action is left. The grid
+also refuses the `action!` signal of a hidden action, or of a row its condition leaves out, and the `bulk!` signal of
+a hidden bulk action, so they cannot be sent directly; the access itself is still checked by the presenter's authorization.
 
 ## Action Display
 
-Show row actions only on hover:
+Show the menu of a row only under the mouse (and with the keyboard focus in the row):
 
 ```php
 $grid->setAutoHideActions();
 ```
+
+## Export to CSV
+
+The grid exports its rows in two ways, which can be used together:
+
+```php
+// the button "Export" under the table: all rows of the current filters, not only the shown page
+$grid->setExport('articles.csv');
+
+// the button "Export" in the bar of the bulk actions: only the chosen rows
+$grid->addBulkActionExport();
+```
+
+`setExport(fileName, delimiter, button)` sets the name of the downloaded file and the delimiter for both; `button: false` sets them without showing the button under the table. Without it the file is `export.csv`.
+
+The file holds the columns of the grid with their labels in the first line and the texts the grid shows in the cells (after the formatter, without HTML), in the current sorting. It is UTF-8 with the byte order mark and the cells are separated by a semicolon, so a spreadsheet with a decimal comma (e.g. the Czech one) opens it by a double click; pass `delimiter: ','` for a comma. A text that starts like a formula (`=`, `+`, `-`, `@`) gets an apostrophe before it, so a spreadsheet does not run it.
+
+A column that makes no sense in a file, e.g. one with buttons, is left out:
+
+```php
+$grid->addColumnText('comments', 'Comments', formatter: $this->formatComments(...))
+	->setExportable(false);
+```
+
+## Switches
+
+A state with two values (published or draft, active or not) can be changed right in the table by a switch,
+without opening a form and without a bulk action:
+
+```php
+$grid->addColumnText('status', 'Status')
+	->setSwitch(
+		name: 'publish',
+		callback: fn(int $id, bool $on) => $this->publish($id, $on),
+		on: 'published',
+		labels: ['Published', 'Draft'],
+		enabled: $this->isAllowed('publish'),
+	);
+```
+
+- `name` identifies the switch in its link (letters, digits, `-` and `_`).
+- `callback` receives the row ID and the new state; it saves it and calls `$grid->redrawDataGrid()`.
+- `on` is the value of the column that means "on" (`true` by default, which also fits `1`).
+- `labels` are the texts next to the switch for on and off; they are translated.
+- `enabled: false` shows the state only: the switch cannot be changed and the grid refuses its signal.
+
+A change is sent to the grid's `switch!` signal by POST and keeps the current filters, page and sorting. The
+column can still be sorted and filtered, and the export writes the label of the state.
+
+## Badges
+
+A state of a row (published, draft, active) reads best as a light colored badge. `setBadges()` maps the values of
+a column to a label and a color of the theme (`primary`, `secondary`, `success`, `danger`, `warning`, `info`):
+
+```php
+$grid->addColumnText('status', 'Status')
+	->setBadges([
+		'published' => ['Published', 'success'],
+		'draft' => ['Draft', 'secondary'],
+	])
+	->setFilterSelect(['published' => 'Published', 'draft' => 'Draft']);
+```
+
+The badge is only read, it is not a button: a state is changed by a switch (above) or by an action. A value without a badge is printed as
+a text (through the formatter, when the column has one). Labels are translated; pass `translate: false` for labels
+that are data. The export writes the label.
+
+A badge that does something on a click stays possible with a formatter that returns `Nette\Utils\Html`, see below.
 
 ## Formatting Values
 
@@ -292,7 +414,7 @@ The grid supports `Nette\Localization\Translator`:
 $grid->setTranslator($this->translator);
 ```
 
-Translated values include column labels, action labels, filter labels, reset button and pagination text; the bundled `cs` translations also cover the default `Edit` and `Delete` labels.
+Translated values include column labels, action labels, labels of badges, filter labels, reset button, the texts of the selection and pagination text; the bundled `cs` translations also cover the default `Edit`, `Delete` and `Export` labels.
 
 Options of a select filter are translated too. Options that are data, such as names from the database, are left
 untranslated with `translate: false`, so the translator does not report them as missing:
@@ -304,7 +426,7 @@ $grid->addColumnText('category_id', 'Category')
 
 ## AJAX
 
-The grid is built for Naja. Filtering, sorting, pagination, page size changes and row actions are handled through AJAX and keep browser history updated.
+The grid is built for Naja. Filtering, sorting, pagination, page size changes, row actions and bulk actions are handled through AJAX and keep browser history updated; an export is a plain download.
 
 Text filters are submitted by pressing Enter. Select and date filters are submitted automatically when their value changes.
 
@@ -316,3 +438,5 @@ Text filters are submitted by pressing Enter. Select and date filters are submit
 - Page size is limited to the offered values (20, 50, 100 and All); other values from the URL use the default.
 - Sort direction is normalized to `ASC` or `DESC` before it is applied to SQL.
 - Empty filter values are removed from persistent parameters.
+- A bulk action takes only positive whole numbers as row IDs, each once; a hidden action is not run, and a switch that is not enabled is not changed.
+- Signals are checked by the presenter's authorization. With [drago-ex/permission](https://github.com/drago-ex/permission) a row action, a bulk action and a switch need the privilege named like them (`edit`, `delete`, `export`, `publish`), the button of the export `export`.

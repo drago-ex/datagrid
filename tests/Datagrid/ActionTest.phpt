@@ -21,22 +21,22 @@ function createGrid(): DataGrid
 }
 
 
-test('The edit and delete shortcuts add actions with default labels and buttons', function () {
+test('The edit and delete shortcuts add menu items with default labels, the delete one red', function () {
 	$grid = createGrid();
 	$edit = $grid->addActionEdit(fn(int $id) => null);
 	$delete = $grid->addActionDelete(fn(int $id) => null, 'Remove');
 
-	Assert::same(['edit', 'Edit', 'ajax btn btn-xs btn-primary'], [$edit->name, $edit->label, $edit->class]);
-	Assert::same(['delete', 'Remove', 'ajax btn btn-xs btn-danger'], [$delete->name, $delete->label, $delete->class]);
+	Assert::same(['edit', 'Edit', null, false], [$edit->name, $edit->label, $edit->class, $edit->danger]);
+	Assert::same(['delete', 'Remove', null, true], [$delete->name, $delete->label, $delete->class, $delete->danger]);
 });
 
 
-test('The shortcuts render icons with the label as tooltip, other actions text unless given an icon', function () {
+test('The shortcuts have icons, other actions only when given one', function () {
 	$grid = createGrid();
-	Assert::same('fa-solid fa-pen', $grid->addActionEdit(fn(int $id) => null)->icon);
-	Assert::same('fa-solid fa-trash', $grid->addActionDelete(fn(int $id) => null)->icon);
+	Assert::same('bi bi-pencil', $grid->addActionEdit(fn(int $id) => null)->icon);
+	Assert::same('bi bi-trash', $grid->addActionDelete(fn(int $id) => null)->icon);
 	Assert::null($grid->addAction('archive', 'Archive', fn(int $id) => null)->icon);
-	Assert::same('fa-solid fa-check', $grid->addAction('approve', 'Approve', fn(int $id) => null, icon: 'fa-solid fa-check')->icon);
+	Assert::same('bi bi-check', $grid->addAction('approve', 'Approve', fn(int $id) => null, icon: 'bi bi-check')->icon);
 });
 
 

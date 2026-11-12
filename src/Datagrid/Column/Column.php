@@ -10,6 +10,7 @@ namespace Drago\Datagrid\Column;
 use Closure;
 use Dibi\Fluent;
 use Drago\Datagrid\Filter\Filter;
+use Nette\Localization\Translator;
 use function sprintf;
 
 
@@ -20,8 +21,10 @@ abstract class Column
 	public const string AlignCenter = 'center';
 	public const string AlignRight = 'end';
 
+	protected ?Translator $translator = null;
 	private bool $naturalSort = false;
 	private string $align = self::AlignLeft;
+	private bool $exportable = true;
 
 
 	public function __construct(
@@ -104,6 +107,39 @@ abstract class Column
 	public function getAlignClass(): string
 	{
 		return 'text-' . $this->align;
+	}
+
+
+	/** Leaves the column out of the CSV export, e.g. a column of buttons. */
+	public function setExportable(bool $exportable = true): static
+	{
+		$this->exportable = $exportable;
+		return $this;
+	}
+
+
+	public function isExportable(): bool
+	{
+		return $this->exportable;
+	}
+
+
+	/** Set by the grid before it renders or exports, for the texts a column translates itself. */
+	public function setTranslator(?Translator $translator): static
+	{
+		$this->translator = $translator;
+		return $this;
+	}
+
+
+	/**
+	 * The value of the cell for the CSV export: the text the grid shows, without HTML.
+	 * @param array<string, mixed> $row
+	 */
+	public function exportCell(array $row): string
+	{
+		$text = html_entity_decode(strip_tags($this->renderCell($row)), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+		return trim((string) preg_replace('#\s+#u', ' ', $text));
 	}
 
 

@@ -26,9 +26,10 @@ class ColumnDate extends Column
 	}
 
 
-	public function setFilterDate(): self
+	/** The filter of one day, or with a range of days from a first to a last one (both included). */
+	public function setFilterDate(bool $range = false): self
 	{
-		$this->setFilter(new DateFilter);
+		$this->setFilter(new DateFilter($range));
 		return $this;
 	}
 

@@ -14,15 +14,28 @@ use function is_string;
 
 /**
  * Date-based DataGrid filter.
- * Supports filtering by a specific date (YYYY-MM-DD) or a range (YYYY-MM-DD|YYYY-MM-DD, either side optional).
+ * Supports filtering by a specific date (YYYY-MM-DD) or a range: YYYY-MM-DD|YYYY-MM-DD with either side
+ * optional, or two dates as the datepicker writes them (YYYY-MM-DD – YYYY-MM-DD).
  * Values come from the URL, so invalid ones are ignored.
  */
 class DateFilter implements Filter
 {
+	public function __construct(
+		/** @var bool The field of the filter chooses a range of days instead of one day */
+		public readonly bool $range = false,
+	) {
+	}
+
+
 	public function apply(Fluent $fluent, string $column, mixed $value): void
 	{
 		if (!is_string($value) || $value === '') {
 			return;
+		}
+
+		// two dates with any separator between them (the range of the datepicker) are a range like from|to
+		if (!str_contains($value, '|') && preg_match('/^(\d{4}-\d{2}-\d{2})\D+(\d{4}-\d{2}-\d{2})$/D', trim($value), $m)) {
+			$value = min($m[1], $m[2]) . '|' . max($m[1], $m[2]);
 		}
 
 		if (!str_contains($value, '|')) {

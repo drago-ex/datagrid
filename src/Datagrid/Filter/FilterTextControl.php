@@ -185,11 +185,18 @@ final class FilterTextControl extends Control
 						->setDefaultValue($this->getSelectDefaultValue($name, $items));
 
 				} elseif ($type === 'date') {
-					$form->addText($name, $column->label)
-						->setHtmlType('date')
-						->setHtmlAttribute('class', 'form-control form-control-sm datagrid-control')
+					// the calendar of the datepicker (compostrap); a range is chosen in two months side by side
+					$range = $column->filter instanceof DateFilter && $column->filter->range;
+					$input = $form->addText($name, $column->label)
+						->setHtmlAttribute('class', 'form-control form-control-sm datagrid-control' . ($range ? ' datagrid-control-range' : ''))
 						->setHtmlAttribute('data-items-filter')
+						->setHtmlAttribute('data-bs-toggle', 'datepicker')
+						->setHtmlAttribute('autocomplete', 'off')
 						->setDefaultValue($this->values[$name] ?? '');
+					if ($range) {
+						$input->setHtmlAttribute('data-bs-selection-mode', 'multiple-ranged')
+							->setHtmlAttribute('data-bs-display-months-count', 2);
+					}
 				}
 			}
 		}

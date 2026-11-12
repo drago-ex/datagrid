@@ -51,8 +51,15 @@ export default class DataGridFilter {
 					submitIfChanged(e.target.form);
 				});
 
-				if (input.tagName === 'SELECT' || input.type === 'date') {
+				// a select and a date (the calendar of the datepicker) filter at once; a range of dates only
+				// when it is whole or emptied, because the first click in the calendar gives one date
+				if (input.tagName === 'SELECT' || input.dataset.bsToggle === 'datepicker') {
 					input.addEventListener('change', (e) => {
+						const dates = e.target.value.match(/\d{4}-\d{2}-\d{2}/g) || [];
+						if (e.target.dataset.bsSelectionMode === 'multiple-ranged' && dates.length === 1) {
+							return;
+						}
+
 						submitIfChanged(e.target.form);
 					});
 				}

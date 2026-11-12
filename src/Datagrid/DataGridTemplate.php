@@ -28,6 +28,15 @@ class DataGridTemplate extends Template
 	/** @var list<Action> */
 	public array $actions = [];
 
+	/** @var list<BulkAction> Bulk actions the user may run */
+	public array $bulkActions = [];
+
+	/** A click on a row chooses it for the bulk actions. */
+	public bool $rowClickSelect = false;
+
+	/** The button that exports all rows of the current filters. */
+	public bool $exportButton = false;
+
 	public bool $autoHideActions = false;
 	public ?string $rowClickAction = null;
 

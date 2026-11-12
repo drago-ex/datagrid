@@ -32,10 +32,12 @@ class Action
 		/** @var string Action label displayed in the UI */
 		public readonly string $label,
 		callable $callback,
-		/** @var string|null CSS class of the link, default 'ajax text-decoration-none' */
+		/** @var string|null CSS class of the menu item, default 'ajax dropdown-item' */
 		public readonly ?string $class = null,
-		/** @var string|null Icon classes (e.g. Font Awesome); the label is then its tooltip and aria-label */
+		/** @var string|null Icon classes (e.g. 'bi bi-pencil' of Bootstrap Icons), shown before the label */
 		public readonly ?string $icon = null,
+		/** @var bool A destructive action: red, separated from the actions before it */
+		public readonly bool $danger = false,
 	) {
 		$this->callback = $callback(...);
 	}

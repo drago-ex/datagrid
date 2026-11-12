@@ -6,9 +6,8 @@
 		".": "./src/assets/index.js",
 		"./datagrid-filter": "./src/assets/datagrid-filter.js",
 		"./page-items": "./src/assets/page-items.js",
-		"./styles/datagrid": "./src/assets/datagrid.scss"
+		"./switch": "./src/assets/switch.js"
 	},
-	"sideEffects": ["**/*.scss"],
 	"devDependencies": {
 		"naja": "^3.2.1"
 	},

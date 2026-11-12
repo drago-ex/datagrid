@@ -46,10 +46,19 @@ test('A date range includes the whole last day', function () {
 });
 
 
+test('Two dates written by the datepicker are a range, in any order', function () {
+	foreach (['2024-02-01 – 2024-02-03', '2024-02-03 – 2024-02-01', '2024-02-01,2024-02-03'] as $value) {
+		$sql = query(fn(Fluent $f) => (new DateFilter(range: true))->apply($f, 'created', $value));
+		Assert::contains("[created] >= '2024-02-01'", $sql);
+		Assert::contains("[created] < '2024-02-04'", $sql);
+	}
+});
+
+
 test('Invalid filter values from the URL are ignored instead of failing', function () {
 	$plain = query(fn(Fluent $f) => null);
 
-	foreach (['not a date', '2024-13-45', '2024-02-01|garbage', ['2024-02-01']] as $value) {
+	foreach (['not a date', '2024-13-45', '2024-02-01|garbage', '2024-02-01 – 2024-13-45', ['2024-02-01']] as $value) {
 		Assert::same($plain, query(fn(Fluent $f) => (new DateFilter)->apply($f, 'created', $value)));
 	}
 

@@ -15,7 +15,11 @@
 		{control paginator}
 	</div>
 
-	<div class="order-3 d-flex align-items-center text-nowrap">
+	<div class="order-3 d-flex align-items-center gap-3 text-nowrap">
+		{* all rows of the current filters as a CSV file, not only the shown page; a download, so no AJAX *}
+		<a n:if="$exportButton && $totalItems > 0" n:href="export!" class="btn btn-sm btn-text datagrid-export" aria-label="{_'Export all listed items to CSV'}" data-tooltip>
+			<i class="bi bi-download me-1" aria-hidden="true"></i>{_'Export'}
+		</a>
 		{control pageSize}
 	</div>
 </div>

@@ -20,17 +20,21 @@ use Drago\Datagrid\Filter\FilterTextControl;
 use Drago\Datagrid\PageSize\PageSizeControl;
 use Drago\Datagrid\Paginator\PaginatorControl;
 use Drago\Permission\Access;
+use Nette\Application\AbortException;
 use Nette\Application\Attributes\Persistent;
+use Nette\Application\Responses\CallbackResponse;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\InvalidLinkException;
+use Nette\Http\IRequest;
+use Nette\Http\IResponse;
 use Nette\Localization\Translator;
 use Nette\Utils\Paginator as UtilsPaginator;
-use function array_key_exists, sprintf;
+use function array_key_exists, count, is_array, sprintf;
 
 
 /**
  * DataGrid component for displaying tabular data
- * with filtering, sorting, pagination, and row actions.
+ * with filtering, sorting, pagination, row actions, bulk actions and a CSV export.
  *
  * @property-read DataGridTemplate $template
  */
@@ -63,6 +67,13 @@ class DataGrid extends Control
 	/** @var array<string, Action> */
 	private array $actions = [];
 
+	/** @var array<string, BulkAction> */
+	private array $bulkActions = [];
+
+	private string $exportFile = 'export.csv';
+	private string $exportDelimiter = ';';
+	private bool $exportButton = false;
+
 	private string $filterMode = Options::FilterModeTop;
 	private UtilsPaginator $paginator;
 	private int $totalItems = 0;
@@ -83,7 +94,10 @@ class DataGrid extends Control
 	}
 
 
-	/** A click on the row runs the action with this name; its button is then not rendered. */
+	/**
+	 * A click on the row runs the row action with this name (its item is then not in the menu of the row),
+	 * or with Options::RowClickSelect ('select') it chooses the row for the bulk actions like its checkbox.
+	 */
 	public function setRowClickAction(string $name): self
 	{
 		$this->rowClickAction = $name;
@@ -175,16 +189,20 @@ class DataGrid extends Control
 		?string $class = null,
 		?callable $condition = null,
 		?string $icon = null,
+		bool $danger = false,
 	): Action
 	{
 		if (!preg_match('#^[a-zA-Z0-9_-]+$#D', $name)) {
 			throw new InvalidConfigurationException("Action name '$name' may contain only letters, digits, '-' and '_'.");
 		}
+		if ($name === Options::RowClickSelect) {
+			throw new InvalidConfigurationException("Action name '$name' is reserved for setRowClickAction().");
+		}
 		if (isset($this->actions[$name])) {
 			throw new InvalidConfigurationException("Action '$name' already exists.");
 		}
 
-		$action = new Action($name, $label, $callback, $class, $icon);
+		$action = new Action($name, $label, $callback, $class, $icon, $danger);
 		if ($condition !== null) {
 			$action->setCondition($condition);
 		}
@@ -193,24 +211,100 @@ class DataGrid extends Control
 
 
 	/**
-	 * Adds the 'edit' action with a primary button.
+	 * Adds the 'edit' action with a pencil.
 	 * @param callable(int): void $callback Receives the row ID
 	 * @throws InvalidConfigurationException
 	 */
 	public function addActionEdit(callable $callback, string $label = 'Edit'): Action
 	{
-		return $this->addAction('edit', $label, $callback, 'ajax btn btn-xs btn-primary', icon: 'fa-solid fa-pen');
+		return $this->addAction('edit', $label, $callback, icon: 'bi bi-pencil');
 	}
 
 
 	/**
-	 * Adds the 'delete' action with a danger button.
+	 * Adds the 'delete' action, red and separated from the other actions.
 	 * @param callable(int): void $callback Receives the row ID
 	 * @throws InvalidConfigurationException
 	 */
 	public function addActionDelete(callable $callback, string $label = 'Delete'): Action
 	{
-		return $this->addAction('delete', $label, $callback, 'ajax btn btn-xs btn-danger', icon: 'fa-solid fa-trash');
+		return $this->addAction('delete', $label, $callback, icon: 'bi bi-trash', danger: true);
+	}
+
+
+	/**
+	 * Adds an action for the rows chosen by their checkboxes; the grid then has the column of checkboxes and
+	 * the bar with the buttons of these actions, in the order they are added.
+	 * The grid is not redrawn after the action, the callback calls redrawDataGrid() when it changes data.
+	 * @param callable(list<int>): void $callback Receives the IDs of the chosen rows
+	 * @param bool $single The action is for one row only, its button is disabled while more rows are chosen
+	 * @param bool $ajax false for an action that answers with a file
+	 * @throws InvalidConfigurationException
+	 */
+	public function addBulkAction(
+		string $name,
+		string $label,
+		callable $callback,
+		?string $icon = null,
+		bool $danger = false,
+		bool $single = false,
+		bool $ajax = true,
+	): BulkAction
+	{
+		if (!preg_match('#^[a-zA-Z0-9_-]+$#D', $name)) {
+			throw new InvalidConfigurationException("Bulk action name '$name' may contain only letters, digits, '-' and '_'.");
+		}
+		if (isset($this->bulkActions[$name])) {
+			throw new InvalidConfigurationException("Bulk action '$name' already exists.");
+		}
+
+		return $this->bulkActions[$name] = new BulkAction($name, $label, $callback, $icon, $danger, $single, $ajax);
+	}
+
+
+	/**
+	 * Adds the bulk action 'edit' for one chosen row.
+	 * @param callable(int): void $callback Receives the row ID
+	 * @throws InvalidConfigurationException
+	 */
+	public function addBulkActionEdit(callable $callback, string $label = 'Edit'): BulkAction
+	{
+		return $this->addBulkAction('edit', $label, fn(array $ids) => $callback($ids[0]), 'bi bi-pencil', single: true);
+	}
+
+
+	/**
+	 * Adds the bulk action 'delete' with a red button.
+	 * @param callable(list<int>): void $callback Receives the IDs of the chosen rows
+	 * @throws InvalidConfigurationException
+	 */
+	public function addBulkActionDelete(callable $callback, string $label = 'Delete'): BulkAction
+	{
+		return $this->addBulkAction('delete', $label, $callback, 'bi bi-trash', danger: true);
+	}
+
+
+	/**
+	 * Adds the bulk action 'export': the chosen rows as a CSV file (its name and delimiter come from setExport()).
+	 * @throws InvalidConfigurationException
+	 */
+	public function addBulkActionExport(string $label = 'Export'): BulkAction
+	{
+		return $this->addBulkAction('export', $label, fn(array $ids) => $this->sendExport($ids), 'bi bi-download', ajax: false);
+	}
+
+
+	/**
+	 * Sets the CSV export: the name of the file and the delimiter (a semicolon opens in a spreadsheet with
+	 * a decimal comma, e.g. the Czech one). With the button, the grid shows "Export" under the table, which
+	 * exports all rows of the current filters, not only the shown page.
+	 */
+	public function setExport(string $fileName = 'export.csv', string $delimiter = ';', bool $button = true): self
+	{
+		$this->exportFile = $fileName;
+		$this->exportDelimiter = $delimiter;
+		$this->exportButton = $button;
+		return $this;
 	}
 
 
@@ -264,6 +358,61 @@ class DataGrid extends Control
 		// Opening a form or a dialog changes nothing in the grid, so the callback calls
 		// redrawDataGrid() itself when the action changes the data.
 		$action->execute($id);
+	}
+
+
+	/**
+	 * Executes a bulk action for the rows whose checkboxes came in the POST field "ids". drago-ex/permission
+	 * checks it as the privilege named like the action ("delete", "export").
+	 */
+	#[Access(parameter: 'name')]
+	public function handleBulk(string $name): void
+	{
+		$action = $this->bulkActions[$name] ?? null;
+		if ($action === null || !$action->isVisible()) {
+			return;
+		}
+
+		$ids = $this->getSelectedIds();
+		if ($ids === [] || ($action->single && count($ids) !== 1)) {
+			return;
+		}
+
+		$action->execute($ids);
+	}
+
+
+	/**
+	 * Changes the state of a row by the switch of a column (ColumnText::setSwitch()); the new state comes in the
+	 * POST field "on". drago-ex/permission checks it as the privilege named like the switch ("publish").
+	 */
+	#[Access(parameter: 'name')]
+	public function handleSwitch(string $name, int $id): void
+	{
+		$post = $this->getPresenter()->getHttpRequest()->getPost('on');
+		if ($id <= 0 || !is_scalar($post)) {
+			return;
+		}
+
+		foreach ($this->columns as $column) {
+			if ($column instanceof ColumnText && $column->getSwitchName() === $name && $column->isSwitchEnabled()) {
+				$column->toggle($id, (string) $post === '1');
+				return;
+			}
+		}
+	}
+
+
+	/**
+	 * Sends all rows of the current filters as a CSV file (the button of setExport()).
+	 * @throws AbortException
+	 */
+	#[Access('export')]
+	public function handleExport(): void
+	{
+		if ($this->exportButton) {
+			$this->sendExport();
+		}
 	}
 
 
@@ -416,6 +565,63 @@ class DataGrid extends Control
 
 
 	/**
+	 * The IDs of the chosen rows from the POST field "ids": positive whole numbers, each once.
+	 * @return list<int>
+	 */
+	private function getSelectedIds(): array
+	{
+		$values = $this->getPresenter()->getHttpRequest()->getPost('ids');
+		if (!is_array($values)) {
+			return [];
+		}
+
+		$ids = [];
+		foreach ($values as $value) {
+			if (is_scalar($value) && ctype_digit((string) $value) && (int) $value > 0) {
+				$ids[(int) $value] = (int) $value;
+			}
+		}
+
+		return array_values($ids);
+	}
+
+
+	/**
+	 * Sends the rows of the current filters and sorting as a CSV file; with IDs only those rows.
+	 * @param list<int>|null $ids
+	 * @throws AbortException
+	 */
+	private function sendExport(?array $ids = null): void
+	{
+		if ($this->source === null) {
+			return;
+		}
+
+		$data = clone $this->source;
+		$this->applyFilters($data);
+		$this->applySorting($data);
+		if ($ids !== null && $this->primaryKey !== null) {
+			$data->where('%n IN %in', $this->primaryKey, $ids);
+		}
+
+		foreach ($this->columns as $column) {
+			$column->setTranslator($this->translator);
+		}
+
+		$csv = (new CsvExport($this->columns, $this->exportDelimiter, $this->translator))->write($data->fetchAll());
+		$fileName = $this->exportFile;
+
+		$this->getPresenter()->sendResponse(new CallbackResponse(
+			function (IRequest $request, IResponse $response) use ($csv, $fileName): void {
+				$response->setContentType('text/csv', 'utf-8');
+				$response->setHeader('Content-Disposition', 'attachment; filename="' . addcslashes($fileName, '"\\') . '"');
+				echo $csv;
+			},
+		));
+	}
+
+
+	/**
 	 * The row of the ID from the data source, for the condition of an action; null when it does not exist.
 	 * @return array<string, mixed>|null
 	 */
@@ -456,10 +662,19 @@ class DataGrid extends Control
 		if ($this->source === null) {
 			throw new InvalidDataSourceException('Data source is not set.');
 		}
-		if ($this->actions !== [] && $this->primaryKey === null) {
+		if (($this->actions !== [] || $this->bulkActions !== []) && $this->primaryKey === null) {
 			throw new InvalidConfigurationException('Primary key must be set when using actions.');
 		}
-		if ($this->rowClickAction !== null && !isset($this->actions[$this->rowClickAction])) {
+		foreach ($this->columns as $column) {
+			if ($column instanceof ColumnText && $column->getSwitchName() !== null && $this->primaryKey === null) {
+				throw new InvalidConfigurationException('Primary key must be set when using a switch.');
+			}
+		}
+		if ($this->rowClickAction === Options::RowClickSelect) {
+			if ($this->bulkActions === []) {
+				throw new InvalidConfigurationException('The row click chooses rows for bulk actions, add one by addBulkAction().');
+			}
+		} elseif ($this->rowClickAction !== null && !isset($this->actions[$this->rowClickAction])) {
 			throw new InvalidConfigurationException("Row click action '{$this->rowClickAction}' is not added by addAction().");
 		}
 
@@ -583,8 +798,32 @@ class DataGrid extends Control
 		$template->columnName = $this->column;
 		$template->order = $this->order;
 
+		foreach ($this->columns as $column) {
+			$column->setTranslator($this->translator);
+
+			// a switch sends its change to the switch! signal with its name and the row ID
+			if ($column instanceof ColumnText && $column->getSwitchName() !== null) {
+				$name = $column->getSwitchName();
+				$key = (string) $this->primaryKey;
+				$column->setSwitchLink(fn(array $row): array => [
+					$this->link('switch!', ['name' => $name, 'id' => $row[$key]]),
+					$this->getUniqueId() . '-' . $name . '-' . $row[$key],
+				]);
+			}
+		}
+
+		// bulk actions: the checkboxes and the bar are rendered only when the user may run at least one
+		$template->bulkActions = array_values(array_filter(
+			$this->bulkActions,
+			fn(BulkAction $action): bool => $action->isVisible(),
+		));
+		$template->rowClickSelect = $this->rowClickAction === Options::RowClickSelect && $template->bulkActions !== [];
+		$template->exportButton = $this->exportButton;
+
 		// A hidden action has no button and no row click; the row click action has no button of its own.
-		$rowClickAction = $this->rowClickAction !== null && $this->actions[$this->rowClickAction]->isVisible()
+		$rowClickAction = $this->rowClickAction !== null
+			&& $this->rowClickAction !== Options::RowClickSelect
+			&& $this->actions[$this->rowClickAction]->isVisible()
 			? $this->rowClickAction
 			: null;
 		$template->actions = array_values(array_filter(

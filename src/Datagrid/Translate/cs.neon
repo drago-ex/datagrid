@@ -16,5 +16,15 @@
 "Items per page": "Položek na stránku"
 
 # actions
+"Actions": "Akce"
 "Edit": "Upravit"
 "Delete": "Smazat"
+
+# bulk actions and export
+"Data table": "Tabulka dat"
+"Select all": "Vybrat vše"
+"Select the row": "Vybrat řádek"
+"selected": "vybráno"
+"Clear the selection": "Zrušit výběr"
+"Export": "Export"
+"Export all listed items to CSV": "Exportovat všechny položky výpisu do CSV"

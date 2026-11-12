@@ -5,15 +5,30 @@
 
 {snippet dataGrid}
 	{var $hasActiveFilters = array_filter($filters, fn($v) => $v !== null && $v !== '') !== []}
+	{var bool $bulk = $bulkActions !== [] && $primaryKey}
 
 	{* in the inline mode the control renders only the form, its inputs are in the table header *}
 	{if $hasFilters}
 		{control filters}
 	{/if}
 
+	{* bulk actions: the checkboxes of the rows and the buttons of the bar belong to one form (the selection
+	   of compostrap: data-selection, selection-cell, selection-bar); a click on a row chooses it with
+	   data-selection-rows. The form has nothing to validate: with novalidate the validation script
+	   (netteForms, live-form-validation) leaves it alone, or it would add its message element into the
+	   first row. An attribute that is off is left out (null), a false would print ="false" and the
+	   selectors of the script would still match it *}
+	<form n:tag-if="$bulk" method="post" class="datagrid-bulk" novalidate data-selection n:attr="data-selection-rows => $rowClickSelect ? true : null">
+
+	{* the table scrolls inside its box on a narrow screen, by the keyboard too *}
+	<div class="table-responsive" tabindex="0" role="region" aria-label="{_'Data table'}">
 	<table class="table table-sm table-borderless table-hover datagrid-table">
 		<thead>
 		<tr>
+			<th n:if="$bulk" class="selection-cell">
+				<input type="checkbox" class="form-check-input" data-selection-all aria-label="{_'Select all'}">
+			</th>
+
 			{foreach $columns as $col}
 				<th n:class="'fw-semibold', $col->getAlignClass()">
 					{include 'sortable', sortable: $col->sortable, name: $col->name, label: ($col->label|translate)}
@@ -29,6 +44,8 @@
 
 		{if $hasFilters && $filterMode === 'inline'}
 		<tr class="datagrid-filter-row">
+			<th n:if="$bulk" class="selection-cell p-1"></th>
+
 			{foreach $columns as $col}
 				<th class="p-1">
 					{if $col->filter !== null}
@@ -39,6 +56,7 @@
 									name="{$col->name}"
 									form="{$filterFormId}"
 									class="form-select form-select-sm datagrid-control"
+									aria-label="{$col->label|translate}"
 									data-items-filter>
 									<option value="">{_'All'}</option>
 									{foreach $col->filter->items as $value => $label}
@@ -48,17 +66,23 @@
 									{/foreach}
 								</select>
 							{else}
+								{* a date is chosen in the calendar of the datepicker (compostrap), a range in two months
+								   side by side; the value stays ISO, so the filter reads it *}
+								{var bool $isDate = $col->filter->getInputType() === 'date'}
+								{var bool $isRange = $isDate && $col->filter->range}
 								<input
-									type="{$col->filter->getInputType() === 'date' ? 'date' : 'text'}"
+									type="text"
 									name="{$col->name}"
 									form="{$filterFormId}"
-									class="form-control form-control-sm datagrid-control"
+									n:class="'form-control form-control-sm datagrid-control', $isRange ? 'datagrid-control-range'"
+									aria-label="{$col->label|translate}"
 									data-items-filter
 									value="{$filters[$col->name] ?? ''}"
+									n:attr="data-bs-toggle => $isDate ? 'datepicker' : null, data-bs-selection-mode => $isRange ? 'multiple-ranged' : null, data-bs-display-months-count => $isRange ? 2 : null"
 									autocomplete="off">
 							{/if}
 							{if $isFilterActive}
-								<a n:href="filters:clearFilter!, name: $col->name" class="btn btn-secondary btn-sm datagrid-filter-clear ajax" data-naja-history="replace" aria-label="{_'Clear filter'}">&times;</a>
+								<a n:href="filters:clearFilter!, name: $col->name" class="btn btn-secondary btn-sm datagrid-filter-clear ajax" data-naja-history="replace" aria-label="{_'Clear filter'}" data-tooltip>&times;</a>
 							{/if}
 						</div>
 					{/if}
@@ -79,23 +103,57 @@
 			{var bool $clickable = $rowClick !== null && $primaryKey && $rowClick->isVisible((array) $row)}
 			<tr n:class="$clickable ? 'datagrid-row-clickable ajax', $autoHideActions ? 'datagrid-actions-autohide'"
 				n:attr="data-row-click-url => $clickable ? $control->link('action!', ['name' => $rowClickAction, 'id' => $row[$primaryKey]]) : null">
+				<td n:if="$bulk" class="selection-cell">
+					<input type="checkbox" class="form-check-input" data-selection-item name="ids[]" value="{$row[$primaryKey]}" aria-label="{_'Select the row'}">
+				</td>
+
 				{foreach $columns as $col}
 					{* renderCell() escapes the value itself, only an Html object from a formatter stays HTML *}
 					<td n:class="$col->getAlignClass()">{$col->renderCell((array) $row)|noescape}</td>
 				{/foreach}
 
 				{if $actions !== []}
-					<td class="text-end">
-						{foreach $actions as $ac}
-							{if $ac->isVisible((array) $row)}
-								{include 'action', name: $ac->name, label: $ac->label, id: $row[$primaryKey], class: $ac->class, icon: $ac->icon}
-							{/if}
-						{/foreach}
+					{* the actions of a row are a menu under one button; the fixed strategy keeps the menu from
+					   being cut off by the scrolling box of the table *}
+					{var $rowActions = array_filter($actions, fn($ac) => $ac->isVisible((array) $row))}
+					<td class="text-end datagrid-actions">
+						<div n:if="$rowActions" class="dropdown">
+							<button type="button" class="btn btn-xs btn-icon btn-text" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false" aria-label="{_'Actions'}">
+								<i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
+							</button>
+							<ul class="dropdown-menu dropdown-menu-end">
+								{foreach $rowActions as $ac}
+									<li n:if="$ac->danger && !$iterator->first"><hr class="dropdown-divider"></li>
+									{include 'action', name: $ac->name, label: $ac->label, id: $row[$primaryKey], class: $ac->class, icon: $ac->icon, danger: $ac->danger}
+								{/foreach}
+							</ul>
+						</div>
 					</td>
+				{elseif $hasFilters && $filterMode === 'inline'}
+					<td></td>
 				{/if}
 			</tr>
 		{/foreach}
 		</tbody>
 	</table>
+	</div>
+
+	{* the bar of the bulk actions, shown by the script while a row is chosen; every button sends the form
+	   to the bulk! signal with its name, the grid state comes from the persistent parameters *}
+	<div n:if="$bulk" class="selection-bar" data-selection-bar hidden>
+		<span class="selection-count"><strong data-selection-count>0</strong> {_'selected'}</span>
+		<div class="selection-actions">
+			{foreach $bulkActions as $ba}
+				<button type="submit" formaction="{link bulk!, name: $ba->name}" data-naja-history="off"
+					n:class="$ba->ajax ? ajax, 'btn btn-sm', $ba->danger ? 'btn-subtle theme-danger' : 'btn-secondary'"
+					n:attr="data-selection-single => $ba->single ? true : null">
+					<i n:if="$ba->icon !== null" class="{$ba->icon} me-1" aria-hidden="true"></i>{_$ba->label}
+				</button>
+			{/foreach}
+		</div>
+		<button type="button" class="btn-close" data-selection-clear aria-label="{_'Clear the selection'}"></button>
+	</div>
+
+	</form>
 	{include 'Footer.latte'}
 {/snippet}
