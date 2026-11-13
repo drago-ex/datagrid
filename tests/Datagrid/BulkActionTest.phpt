@@ -212,61 +212,82 @@ test('The delimiter of the export can be changed', function () {
 });
 
 
-test('A switch shows the state as a checkbox with its label and the link of the change', function () {
+test('A state is its badge with a menu of the states, the current one marked and without a link', function () {
 	$column = (new ColumnText('status', 'Status', true, null))
-		->setSwitch('publish', fn(int $id, bool $on) => null, on: 'published', labels: ['Published', 'Draft'])
-		->setSwitchLink(fn(array $row): array => ['/switch?id=' . $row['id'], 'grid-publish-' . $row['id']]);
+		->setState('publish', fn(int $id, int|string $state) => null, [
+			'published' => ['Published', 'success'],
+			'draft' => ['Draft', 'secondary'],
+		])
+		->setStateLink(fn(array $row): array => ['/state?id=' . $row['id'], 'grid-publish-' . $row['id']]);
 
 	Assert::same(
-		'<div class="form-check form-switch datagrid-switch">'
-		. '<input type="checkbox" role="switch" class="form-check-input" id="grid-publish-5" checked autocomplete="off" data-datagrid-switch="/switch?id=5">'
-		. '<label class="form-check-label" for="grid-publish-5">Published</label></div>',
+		'<div class="dropdown">'
+		. '<button type="button" class="badge badge-subtle theme-success datagrid-state" id="grid-publish-5" data-bs-toggle="dropdown"'
+		. ' data-bs-popper-config=\'{"strategy":"fixed"}\' aria-expanded="false" title="Change the state">'
+		. 'Published<i class="bi bi-chevron-down" aria-hidden="true"></i></button>'
+		. '<ul class="dropdown-menu">'
+		. '<li><button type="button" class="dropdown-item active" aria-current="true" value="published">Published</button></li>'
+		. '<li><button type="button" class="dropdown-item" data-datagrid-state="/state?id=5" value="draft">Draft</button></li>'
+		. '</ul></div>',
 		$column->renderCell(['id' => 5, 'status' => 'published']),
 	);
-	Assert::contains('>Draft</label>', $column->renderCell(['id' => 6, 'status' => 'draft']));
-	Assert::notContains(' checked', $column->renderCell(['id' => 6, 'status' => 'draft']));
+	Assert::contains('theme-secondary datagrid-state', $column->renderCell(['id' => 6, 'status' => 'draft']));
+
+	// the export writes the state only, not the items of its menu
 	Assert::same('Published', $column->exportCell(['id' => 5, 'status' => 'published']));
 });
 
 
-test('A switch of a true value is on for 1 and true, and a disabled one has no link', function () {
+test('A state of a bool column reads 1 and true, and a disabled one is a badge that is only read', function () {
+	$states = [1 => ['Active', 'success'], 0 => ['Inactive', 'secondary']];
 	$column = (new ColumnText('active', 'State', true, null))
-		->setSwitch('activate', fn(int $id, bool $on) => null, enabled: false)
-		->setSwitchLink(fn(array $row): array => ['/switch', 'x']);
+		->setState('activate', fn(int $id, int|string $state) => null, $states)
+		->setStateLink(fn(array $row): array => ['/state', 'x']);
 
-	Assert::contains(' checked', $column->renderCell(['active' => 1]));
-	Assert::contains(' checked', $column->renderCell(['active' => true]));
-	Assert::notContains(' checked', $column->renderCell(['active' => 0]));
-	Assert::contains(' disabled', $column->renderCell(['active' => 1]));
-	Assert::notContains('data-datagrid-switch', $column->renderCell(['active' => 1]));
-	Assert::false($column->isSwitchEnabled());
+	Assert::contains('theme-success datagrid-state', $column->renderCell(['active' => 1]));
+	Assert::contains('theme-success datagrid-state', $column->renderCell(['active' => true]));
+	Assert::contains('theme-secondary datagrid-state', $column->renderCell(['active' => false]));
+
+	$disabled = (new ColumnText('active', 'State', true, null))
+		->setState('activate', fn(int $id, int|string $state) => null, $states, enabled: false)
+		->setStateLink(fn(array $row): array => ['/state', 'x']);
+
+	Assert::same('<span class="badge badge-subtle theme-success">Active</span>', $disabled->renderCell(['active' => 1]));
+	Assert::false($disabled->isStateEnabled());
 });
 
 
-test('The switch signal calls the callback with the row ID and the posted state', function () {
+test('The state signal calls the callback with the row ID and the posted value of a state', function () {
 	$called = [];
-	$callback = function (int $id, bool $on) use (&$called): void {
-		$called[] = [$id, $on];
+	$callback = function (int $id, int|string $state) use (&$called): void {
+		$called[] = [$id, $state];
 	};
+	$states = ['published' => ['Published', 'success'], 'draft' => ['Draft', 'secondary']];
 
-	$on = bulkGrid(['on' => '1']);
-	$on->addColumnText('status', 'Status')->setSwitch('publish', $callback);
-	$on->handleSwitch('publish', 4);
+	$publish = bulkGrid(['value' => 'published']);
+	$publish->addColumnText('status', 'Status')->setState('publish', $callback, $states);
+	$publish->handleState('publish', 4);
+	$publish->handleState('other', 4);
+	$publish->handleState('publish', 0);
 
-	$off = bulkGrid(['on' => '0']);
-	$off->addColumnText('status', 'Status')->setSwitch('publish', $callback);
-	$off->handleSwitch('publish', 4);
-	$off->handleSwitch('other', 4);
-	$off->handleSwitch('publish', 0);
+	// the key of a number comes back as a number
+	$number = bulkGrid(['value' => '0']);
+	$number->addColumnText('active', 'State')->setState('activate', $callback, [1 => ['Active', 'success'], 0 => ['Inactive', 'secondary']]);
+	$number->handleState('activate', 7);
 
-	$disabled = bulkGrid(['on' => '1']);
-	$disabled->addColumnText('status', 'Status')->setSwitch('publish', $callback, enabled: false);
-	$disabled->handleSwitch('publish', 4);
+	// a value that is not a state changes nothing
+	$unknown = bulkGrid(['value' => 'deleted']);
+	$unknown->addColumnText('status', 'Status')->setState('publish', $callback, $states);
+	$unknown->handleState('publish', 4);
 
-	// without the posted state nothing is changed
+	$disabled = bulkGrid(['value' => 'published']);
+	$disabled->addColumnText('status', 'Status')->setState('publish', $callback, $states, enabled: false);
+	$disabled->handleState('publish', 4);
+
+	// without the posted value nothing is changed
 	$none = bulkGrid();
-	$none->addColumnText('status', 'Status')->setSwitch('publish', $callback);
-	$none->handleSwitch('publish', 4);
+	$none->addColumnText('status', 'Status')->setState('publish', $callback, $states);
+	$none->handleState('publish', 4);
 
-	Assert::same([[4, true], [4, false]], $called);
+	Assert::same([[4, 'published'], [7, 0]], $called);
 });

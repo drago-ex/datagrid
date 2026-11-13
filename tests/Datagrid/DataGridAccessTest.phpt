@@ -55,11 +55,11 @@ test('A row action needs the privilege named like the action', function () {
 });
 
 
-test('A bulk action and a switch need the privilege named like them, the export of all rows "export"', function () {
+test('A bulk action and a state menu need the privilege named like them, the export of all rows "export"', function () {
 	Assert::same('delete', Privilege::forSignal(grid('articles-grid', ['name' => 'delete']), 'bulk'));
 	Assert::same('export', Privilege::forSignal(grid('articles-grid', ['name' => 'export']), 'bulk'));
 	Assert::same('export', Privilege::forSignal(grid('articles-grid'), 'export'));
-	Assert::same('publish', Privilege::forSignal(grid('articles-grid', ['name' => 'publish']), 'switch'));
+	Assert::same('publish', Privilege::forSignal(grid('articles-grid', ['name' => 'publish']), 'state'));
 });
 
 

@@ -383,20 +383,20 @@ class DataGrid extends Control
 
 
 	/**
-	 * Changes the state of a row by the switch of a column (ColumnText::setSwitch()); the new state comes in the
-	 * POST field "on". drago-ex/permission checks it as the privilege named like the switch ("publish").
+	 * Changes the state of a row by the menu of its badge (ColumnText::setState()); the chosen value comes in
+	 * the POST field "value". drago-ex/permission checks it as the privilege named like the state ("publish").
 	 */
 	#[Access(parameter: 'name')]
-	public function handleSwitch(string $name, int $id): void
+	public function handleState(string $name, int $id): void
 	{
-		$post = $this->getPresenter()->getHttpRequest()->getPost('on');
+		$post = $this->getPresenter()->getHttpRequest()->getPost('value');
 		if ($id <= 0 || !is_scalar($post)) {
 			return;
 		}
 
 		foreach ($this->columns as $column) {
-			if ($column instanceof ColumnText && $column->getSwitchName() === $name && $column->isSwitchEnabled()) {
-				$column->toggle($id, (string) $post === '1');
+			if ($column instanceof ColumnText && $column->getStateName() === $name && $column->isStateEnabled()) {
+				$column->changeState($id, (string) $post);
 				return;
 			}
 		}
@@ -666,8 +666,8 @@ class DataGrid extends Control
 			throw new InvalidConfigurationException('Primary key must be set when using actions.');
 		}
 		foreach ($this->columns as $column) {
-			if ($column instanceof ColumnText && $column->getSwitchName() !== null && $this->primaryKey === null) {
-				throw new InvalidConfigurationException('Primary key must be set when using a switch.');
+			if ($column instanceof ColumnText && $column->getStateName() !== null && $this->primaryKey === null) {
+				throw new InvalidConfigurationException('Primary key must be set when using a state menu.');
 			}
 		}
 		if ($this->rowClickAction === Options::RowClickSelect) {
@@ -801,12 +801,12 @@ class DataGrid extends Control
 		foreach ($this->columns as $column) {
 			$column->setTranslator($this->translator);
 
-			// a switch sends its change to the switch! signal with its name and the row ID
-			if ($column instanceof ColumnText && $column->getSwitchName() !== null) {
-				$name = $column->getSwitchName();
+			// the menu of a state sends the choice to the state! signal with its name and the row ID
+			if ($column instanceof ColumnText && $column->getStateName() !== null) {
+				$name = $column->getStateName();
 				$key = (string) $this->primaryKey;
-				$column->setSwitchLink(fn(array $row): array => [
-					$this->link('switch!', ['name' => $name, 'id' => $row[$key]]),
+				$column->setStateLink(fn(array $row): array => [
+					$this->link('state!', ['name' => $name, 'id' => $row[$key]]),
 					$this->getUniqueId() . '-' . $name . '-' . $row[$key],
 				]);
 			}

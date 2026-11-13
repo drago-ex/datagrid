@@ -1,6 +1,6 @@
 # Drago DataGrid
 
-Drago DataGrid is a Nette component for rendering Bootstrap 5 tables with filtering, sorting, pagination, row actions, bulk actions for chosen rows, switches of a state right in the table and an export to CSV.
+Drago DataGrid is a Nette component for rendering Bootstrap 5 tables with filtering, sorting, pagination, row actions, bulk actions for chosen rows, a change of a state right in the table and an export to CSV.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/drago-ex/datagrid/blob/main/license)
 [![PHP version](https://badge.fury.io/ph/drago-ex%2Fdatagrid.svg)](https://badge.fury.io/ph/drago-ex%2Fdatagrid)
@@ -339,30 +339,33 @@ $grid->addColumnText('comments', 'Comments', formatter: $this->formatComments(..
 	->setExportable(false);
 ```
 
-## Switches
+## Changing a State
 
-A state with two values (published or draft, active or not) can be changed right in the table by a switch,
-without opening a form and without a bulk action:
+A state of a row (published or draft, active or not) can be changed right in the table, without opening a form
+and without a bulk action. The state is shown as its badge with a small arrow, which opens a menu of the states:
 
 ```php
 $grid->addColumnText('status', 'Status')
-	->setSwitch(
+	->setState(
 		name: 'publish',
-		callback: fn(int $id, bool $on) => $this->publish($id, $on),
-		on: 'published',
-		labels: ['Published', 'Draft'],
+		callback: fn(int $id, int|string $state) => $this->publish($id, $state === 'published'),
+		states: [
+			'published' => ['Published', 'success'],
+			'draft' => ['Draft', 'secondary'],
+		],
 		enabled: $this->isAllowed('publish'),
 	);
 ```
 
-- `name` identifies the switch in its link (letters, digits, `-` and `_`).
-- `callback` receives the row ID and the new state; it saves it and calls `$grid->redrawDataGrid()`.
-- `on` is the value of the column that means "on" (`true` by default, which also fits `1`).
-- `labels` are the texts next to the switch for on and off; they are translated.
-- `enabled: false` shows the state only: the switch cannot be changed and the grid refuses its signal.
+- `name` identifies the state in its link (letters, digits, `-` and `_`).
+- `callback` receives the row ID and the chosen value; it saves it and calls `$grid->redrawDataGrid()`.
+- `states` map the values of the column to a label and a color of the theme, as [badges](#badges) do; a column
+  with `true` and `false` uses the keys `1` and `0`. There can be more than two states.
+- `enabled: false` shows the badge only: it has no menu and the grid refuses its signal.
 
-A change is sent to the grid's `switch!` signal by POST and keeps the current filters, page and sorting. The
-column can still be sorted and filtered, and the export writes the label of the state.
+A choice is sent to the grid's `state!` signal by POST and keeps the current filters, page and sorting; a value
+that is not one of the states is refused. The column can still be sorted and filtered, and the export writes the
+label of the state.
 
 ## Badges
 
@@ -378,7 +381,7 @@ $grid->addColumnText('status', 'Status')
 	->setFilterSelect(['published' => 'Published', 'draft' => 'Draft']);
 ```
 
-The badge is only read, it is not a button: a state is changed by a switch (above) or by an action. A value without a badge is printed as
+The badge is only read, it is not a button: a state is changed by `setState()` (above) or by an action. A value without a badge is printed as
 a text (through the formatter, when the column has one). Labels are translated; pass `translate: false` for labels
 that are data. The export writes the label.
 
@@ -438,5 +441,5 @@ Text filters are submitted by pressing Enter. Select and date filters are submit
 - Page size is limited to the offered values (20, 50, 100 and All); other values from the URL use the default.
 - Sort direction is normalized to `ASC` or `DESC` before it is applied to SQL.
 - Empty filter values are removed from persistent parameters.
-- A bulk action takes only positive whole numbers as row IDs, each once; a hidden action is not run, and a switch that is not enabled is not changed.
-- Signals are checked by the presenter's authorization. With [drago-ex/permission](https://github.com/drago-ex/permission) a row action, a bulk action and a switch need the privilege named like them (`edit`, `delete`, `export`, `publish`), the button of the export `export`.
+- A bulk action takes only positive whole numbers as row IDs, each once; a hidden action is not run, and a state that is not enabled or a value that is not one of its states is not changed.
+- Signals are checked by the presenter's authorization. With [drago-ex/permission](https://github.com/drago-ex/permission) a row action, a bulk action and a change of a state need the privilege named like them (`edit`, `delete`, `export`, `publish`), the button of the export `export`.
