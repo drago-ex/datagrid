@@ -58,9 +58,18 @@ test('The shortcuts add the edit, delete and export bulk actions', function () {
 	$delete = $grid->addBulkActionDelete(fn(array $ids) => null, 'Remove');
 	$export = $grid->addBulkActionExport();
 
-	Assert::same(['edit', 'Edit', 'bi bi-pencil', true, false, true], [$edit->name, $edit->label, $edit->icon, $edit->single, $edit->danger, $edit->ajax]);
-	Assert::same(['delete', 'Remove', 'bi bi-trash', false, true, true], [$delete->name, $delete->label, $delete->icon, $delete->single, $delete->danger, $delete->ajax]);
-	Assert::same(['export', 'Export', 'bi bi-download', false, false, false], [$export->name, $export->label, $export->icon, $export->single, $export->danger, $export->ajax]);
+	Assert::same(
+		['edit', 'Edit', 'bi bi-pencil', true, false, true],
+		[$edit->name, $edit->label, $edit->icon, $edit->single, $edit->danger, $edit->ajax],
+	);
+	Assert::same(
+		['delete', 'Remove', 'bi bi-trash', false, true, true],
+		[$delete->name, $delete->label, $delete->icon, $delete->single, $delete->danger, $delete->ajax],
+	);
+	Assert::same(
+		['export', 'Export', 'bi bi-download', false, false, false],
+		[$export->name, $export->label, $export->icon, $export->single, $export->danger, $export->ajax],
+	);
 });
 
 
@@ -272,7 +281,8 @@ test('The state signal calls the callback with the row ID and the posted value o
 
 	// the key of a number comes back as a number
 	$number = bulkGrid(['value' => '0']);
-	$number->addColumnText('active', 'State')->setState('activate', $callback, [1 => ['Active', 'success'], 0 => ['Inactive', 'secondary']]);
+	$number->addColumnText('active', 'State')
+		->setState('activate', $callback, [1 => ['Active', 'success'], 0 => ['Inactive', 'secondary']]);
 	$number->handleState('activate', 7);
 
 	// a value that is not a state changes nothing

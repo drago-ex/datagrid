@@ -29,7 +29,7 @@ use Nette\Http\IRequest;
 use Nette\Http\IResponse;
 use Nette\Localization\Translator;
 use Nette\Utils\Paginator as UtilsPaginator;
-use function array_key_exists, count, is_array, sprintf;
+use function array_key_exists, count, is_array, is_scalar, sprintf;
 
 
 /**

@@ -12,6 +12,7 @@ use Dibi\Fluent;
 use Drago\Datagrid\Filter\Filter;
 use Nette\Localization\Translator;
 use function sprintf;
+use const ENT_HTML5, ENT_QUOTES;
 
 
 /** Base DataGrid column definition. */

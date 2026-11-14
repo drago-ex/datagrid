@@ -11,6 +11,7 @@ use Closure;
 use Drago\Datagrid\Filter\SelectFilter;
 use Drago\Datagrid\Filter\TextFilter;
 use Nette\Utils\Html;
+use function is_bool, is_scalar;
 
 
 /**
