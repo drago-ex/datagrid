@@ -1,10 +1,5 @@
 <?php declare(strict_types=1);
 
-/**
- * Drago Extension
- * Package built on the Nette Framework
- */
-
 namespace Drago\Datagrid\PageSize;
 
 use Closure;
