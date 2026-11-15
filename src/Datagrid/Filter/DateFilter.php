@@ -57,7 +57,9 @@ class DateFilter implements Filter
 			$fluent->where('%n >= %s', $column, $from->format('Y-m-d'));
 		}
 		if ($to !== null) {
-			$fluent->where('%n < %s', $column, $to->modify('+1 day')->format('Y-m-d'));
+			// setDate() moves to the next month or year by itself and, unlike modify(), throws nothing
+			$next = $to->setDate((int) $to->format('Y'), (int) $to->format('n'), (int) $to->format('j') + 1);
+			$fluent->where('%n < %s', $column, $next->format('Y-m-d'));
 		}
 	}
 

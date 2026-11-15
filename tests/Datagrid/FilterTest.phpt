@@ -43,6 +43,12 @@ test('A date range includes the whole last day', function () {
 	$sql = query(fn(Fluent $f) => (new DateFilter)->apply($f, 'created', '|2024-02-03'));
 	Assert::contains("[created] < '2024-02-04'", $sql);
 	Assert::notContains('>=', $sql);
+
+	// the day after the last one crosses a month, a leap day and a year
+	foreach (['2024-01-31' => '2024-02-01', '2024-02-29' => '2024-03-01', '2024-12-31' => '2025-01-01'] as $last => $next) {
+		$sql = query(fn(Fluent $f) => (new DateFilter)->apply($f, 'created', '|' . $last));
+		Assert::contains("[created] < '$next'", $sql);
+	}
 });
 
 
