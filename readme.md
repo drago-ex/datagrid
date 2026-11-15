@@ -56,7 +56,7 @@ new DataGrid().initialize(naja);
 RowSelection.init();
 ```
 
-Date filters open the calendar of compostrap, which needs the npm package `vanilla-calendar-pro`:
+Date filters open the calendar of compostrap; its library `vanilla-calendar-pro` comes with the npm dependencies of the package:
 
 ```js
 import { Datepicker } from 'compostrap/datepicker';

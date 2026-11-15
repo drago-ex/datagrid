@@ -8,6 +8,9 @@
 		"./page-items": "./src/assets/page-items.js",
 		"./switch": "./src/assets/switch.js"
 	},
+	"dependencies": {
+		"vanilla-calendar-pro": "^3.4.0"
+	},
 	"devDependencies": {
 		"naja": "^3.2.1"
 	},
