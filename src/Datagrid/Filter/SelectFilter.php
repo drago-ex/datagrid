@@ -14,18 +14,12 @@ use function array_key_exists, is_scalar;
 /** Select/dropdown DataGrid filter. */
 class SelectFilter implements Filter
 {
-	/** @var array<int|string, string> */
-	public array $items;
-
-	/** Whether the option labels are translated; data (e.g. names from the database) are not. */
-	public bool $translate;
-
-
-	/** @param array<int|string, string> $items Dropdown options */
-	public function __construct(array $items, bool $translate = true)
-	{
-		$this->items = $items;
-		$this->translate = $translate;
+	public function __construct(
+		/** @var array<int|string, string> Dropdown options */
+		public array $items,
+		/** Whether the option labels are translated; data (e.g. names from the database) are not. */
+		public bool $translate = true,
+	) {
 	}
 
 
