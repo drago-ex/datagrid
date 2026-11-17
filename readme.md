@@ -42,7 +42,8 @@ Install dependencies:
 npm install
 ```
 
-Import the assets:
+Import the assets (Drago Project already initializes Naja in `assets/core/base.js`; there leave out `naja.initialize()`,
+which would fail when called twice):
 
 ```js
 import naja from 'naja';
@@ -64,12 +65,18 @@ import { Datepicker } from 'compostrap/datepicker';
 Datepicker.init();
 ```
 
-The grid has no styles of its own, it prints the classes of compostrap:
+The grid has no styles of its own, it prints the classes of compostrap: its theme, tooltip and elements
+(Drago Project with Backend UI already imports them):
 
 ```scss
 @import 'compostrap/src/scss/theme';
 @import 'compostrap/src/scss/tooltip';
 @import 'compostrap/src/scss/elements';
+```
+
+and the modules of the grid, the selection and the date filter:
+
+```scss
 @import 'compostrap/src/scss/datagrid';
 @import 'compostrap/src/scss/selection';
 @import 'compostrap/src/scss/datepicker';
